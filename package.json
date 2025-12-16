@@ -1,0 +1,22 @@
+{
+  "name": "@mybricks/to-code-taro",
+  "version": "1.0.0",
+  "description": "To code for Taro",
+  "main": "index.min.js",
+  "scripts": {
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mybricks/to-code-taro"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "author": "MyBricks Team",
+  "license": "ISC",
+  "devDependencies": {
+
+  }
+}
