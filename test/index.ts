@@ -4,6 +4,7 @@ import { runCode } from './runCode';
 async function runTest() {
   // 生成模板json文件
   // generateTaroTempalteJson();
+  // return
 
   // 运行代码
   const result = await runCode();

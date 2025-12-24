@@ -8,9 +8,8 @@ export default function Index () {
   })
 
   return (
-    <View className='index'>
-      <Text>Hello world!123</Text>
-      <Button>跳转</Button>
+    <View>
+      <Text>Hello world</Text>
     </View>
   )
 }
