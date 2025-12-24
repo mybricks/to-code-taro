@@ -1,0 +1,65 @@
+{
+  "title": "评分",
+  "namespace": "mybricks.taro.formRate",
+  "author": "mybricks-team",
+  "author_name": "板砖团队",
+  "version": "1.0.0",
+  "runtime": "./runtime.tsx",
+  "data": "./data.json",
+  "editors": "./editors.tsx",
+  "icon": "./icon.svg",
+  "preview": "https://assets.mybricks.world/rypVkvNVm6mdQdNWmLTJtqlHrhzTrsqf-1743578564073.png",
+  "ai": "./ai.ts",
+  "inputs": [
+    {
+      "id": "setValue",
+      "title": "设置值",
+      "desc": "设置值，并触发值变化事件输出",
+      "schema": {
+        "type": "number"
+      }
+    },
+    {
+      "id": "getValue",
+      "title": "获取值",
+      "desc": "获取值并输出",
+      "schema": {
+        "type": "number"
+      },
+      "rels": ["returnValue"]
+    },
+    {
+      "id": "resetValue",
+      "title": "重置值",
+      "desc": "清空值",
+      "schema": {
+        "type": "any"
+      }
+    },
+    {
+      "id": "setDisabled",
+      "title": "设置是否禁用",
+      "desc": "设置表单项是否禁用，传入 true 时禁用表单项，传入 false 时启用表单项",
+      "schema": {
+        "type": "boolean"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "onChange",
+      "title": "当值变化",
+      "schema": {
+        "type": "number"
+      }
+    },
+    {
+      "id": "returnValue",
+      "title": "值输出",
+      "schema": {
+        "type": "number"
+      }
+    }
+  ],
+  "schema": ["mybricks.taro.formContainer/formItem", "*"]
+}

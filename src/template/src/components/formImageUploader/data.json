@@ -1,0 +1,14 @@
+{
+  "label": "图片上传",
+  "name": "图片上传",
+  "value": [],
+  "maxCount": 2,
+  "useValueString": false,
+  "placeholderText": "",
+  "placeholder": "",
+  "required": false,
+  "chooseAvatar": false,
+  "compressImage": false,
+  "compressQuality": 0.7,
+  "disabled": false
+}

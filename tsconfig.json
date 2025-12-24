@@ -1,11 +1,19 @@
 {
   "compilerOptions": {
-    "strict": true,
+    "target": "ES2017",
+    "lib": ["ES2017", "DOM"],
+    "module": "commonjs",
+    "strict": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "declaration": true,
     "skipLibCheck": true,
     "jsx": "react",
-    "baseUrl": "./packages",
-  }
+    "baseUrl": ".",
+    "paths": {
+      "@mybricks/render-web/packages/code-next/*": ["../render-web/packages/code-next/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

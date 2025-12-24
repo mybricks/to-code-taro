@@ -1,5 +1,31 @@
-node_modules
-package-lock.json
-**/dist
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Output
+src/_output/*
+src/_temp/*
+
+# Testing
+coverage/
+
+# Production
+dist/
+compiled/
+*.min.js
+
+# Misc
 .DS_Store
-lib
+*.log
+*.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test files (可选，如果不想提交测试数据)
+# test/*.json

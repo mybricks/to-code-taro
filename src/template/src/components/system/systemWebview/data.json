@@ -1,0 +1,10 @@
+{
+  "useNavigationStyle": "default",
+  "navigationStyle": "default",
+  "navigationBarBackgroundColor": "#464646",
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "网页标题",
+  "homeButton": false,
+
+  "url": ""
+}

@@ -1,0 +1,47 @@
+.com{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+
+  // :global(.taro-img__mode-aspectfill--width) {
+  //   height: auto;
+  // }
+
+  :global(.taro-img__mode-aspectfill) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.place {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  opacity: 0.4;
+  background-image: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+  // transition: all 0.1s ease-in-out;
+  z-index: 3;
+  &.none {
+    z-index: -1;
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}

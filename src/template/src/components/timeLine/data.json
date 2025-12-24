@@ -1,0 +1,10 @@
+{
+  "spacing":0,
+  "line_spacing":false,
+  "initialEmptyTip":"暂无内容",
+  "showEmptySlot":false,
+  "displaysEmptySpace":false,
+  "layout": {
+    "position": "smart"
+  }
+}

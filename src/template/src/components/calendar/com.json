@@ -1,0 +1,96 @@
+{
+  "title": "日历",
+  "namespace": "mybricks.taro.calendar",
+  "author": "mybricks-team",
+  "author_name": "板砖团队",
+  "icon": "./icon.svg",
+  "version": "1.0.15",
+  "description": "按钮",
+  "runtime": "./runtime.tsx",
+  "data": "./data.json",
+  "editors": "./editors.tsx",
+  "inputs": [
+    {
+      "id": "getSelectDate",
+      "title": "获取已选择日期",
+      "rels": [
+        "returnValues"
+      ],
+      "schema": {
+        "type": "any"
+      },
+      "desc": "获取用户选择的日期"
+    },
+    {
+      "id": "setCustomRange",
+      "title": "设置自定义日期范围",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "string",
+            "desc": "可选择的最小日期",
+            "title": "可选择的最小日期"
+          },
+          "max": {
+            "type": "string",
+            "desc": "可选择的最大日期",
+            "title": "可选择的最大日期"
+          }
+        }
+      },
+      "rels": [
+        "afterSetCustomRange"
+      ]
+    },
+    {
+      "id": "setValue",
+      "title": "设置值",
+      "rels": [
+        "setValueDone"
+      ],
+      "schema": {
+        "type": "any"
+      },
+      "desc": "设置日期值"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "setValueDone",
+      "title": "设置日期值完成",
+      "schema": {
+        "type": "any"
+      }
+    },
+    {
+      "id": "onSelect",
+      "title": "当选择日期时",
+      "schema": {
+        "type": "any"
+      }
+    },
+    {
+      "id": "onConfirm",
+      "title": "当选择完毕时",
+      "schema": {
+        "type": "any"
+      }
+    },
+    {
+      "id": "returnValues",
+      "title": "已选择日期",
+      "schema": {
+        "type": "any"
+      }
+    },
+    {
+      "id": "afterSetCustomRange",
+      "title": "设置自定义日期范围后",
+      "schema": {
+        "type": "any"
+      }
+    }
+  ],
+  "slots": []
+}

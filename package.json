@@ -2,9 +2,19 @@
   "name": "@mybricks/to-code-taro",
   "version": "1.0.0",
   "description": "To code for Taro",
-  "main": "index.min.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "scripts": {
-
+    "dev": "father dev",
+    "build": "father build",
+    "gen": "tsx src/generateFiles.ts",
+    "build:deps": "father prebundle",
+    "prepublishOnly": "father doctor && npm run build",
+    "test": "tsx test/index.ts",
+    "test:watch": "ts-node-dev --respawn test/index.ts",
+    "test:harmony": "tsx test/write-harmony-output.ts",
+    "test:taro": "tsx test/write-taro-output.ts"
   },
   "repository": {
     "type": "git",
@@ -16,7 +26,35 @@
   },
   "author": "MyBricks Team",
   "license": "ISC",
+  "keywords": [
+    "taro",
+    "code-generator",
+    "mybricks"
+  ],
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.26.0",
+    "@mybricks/to-code-react": "^0.0.5-next.160"
+  },
   "devDependencies": {
-
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "csstype": "^3.1.3",
+    "father": "^4.5.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@mybricks/code-next": "*"
+  },
+  "peerDependenciesMeta": {
+    "@mybricks/code-next": {
+      "optional": true
+    }
   }
 }
