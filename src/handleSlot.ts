@@ -22,6 +22,14 @@ interface HandleSlotConfig extends BaseConfig {
   ) => void;
   checkIsRoot: () => boolean;
   renderManager?: RenderManager;
+  addJSModule?: (module: {
+    id: string;
+    title: string;
+    transformCode: string;
+    inputs: string[];
+    outputs: string[];
+    data: any;
+  }) => void;
 }
 
 const handleSlot = (ui: UI, config: HandleSlotConfig) => {

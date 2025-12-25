@@ -68,8 +68,17 @@ async function runCode() {
     // // 输出生成的代码
     result.forEach((file) => {
       // console.log(`\n=== ${file.name} (${file.type}) ===`);
-      // console.log('====',file.importManager.toCode());
-      console.log('file.content====',file.content);
+      // console.log('==== Import Manager ====');
+      // console.log(file.importManager.toCode());
+      
+      // 如果是 jsModules 类型，打印其内容
+      // if (file.type === 'jsModules') {
+      //   console.log('\n==== JSModules Content ====');
+      //   console.log(file.content);
+      // } else {
+      //   console.log('file.content====',file.content);
+      // }
+      
       // if (file.cssContent) {
       //   console.log('\n--- CSS Content ---');
       //   console.log(file.cssContent);

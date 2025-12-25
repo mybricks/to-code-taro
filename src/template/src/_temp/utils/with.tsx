@@ -3,6 +3,8 @@ import { View } from '@tarojs/components';
 import { useModel, useBindInputs, useBindEvents } from './index';
 import { useAppCreateContext } from './useContext';
 import ComContext, { useAppContext } from './ComContext';
+import { SUBJECT_VALUE } from '../mybricks/constant';
+import { Subject } from '../mybricks/Subject';
 
 interface WithComProps {
   component: React.ComponentType<any>;
@@ -16,26 +18,10 @@ interface WithComProps {
 
 export const WithCom: React.FC<WithComProps> = (props) => {
   const { component: Component, id = '', data, className, style, ...rest } = props;
-  const { comRefs } = useAppContext();
-  const [show, setShow] = useState(true);
+  const { comRefs, appContext } = useAppContext();
+  const env = appContext; //TODO: 需要根据实际情况修改
 
-  // 创建一个模拟的 env 对象，包含组件所需的所有属性
-const env = {
-  canvas: {
-    id: "u_7VvVn", // 使用 data 中的 id
-  },
-  runtime: {
-    debug: false,
-  },
-  edit: false,
-  isH5: false,
-  isDesigner: false,
-  isPreview: false,
-  isRelease: false,
-  isDebug: false,
-  isLocal: false,
-  isTest: false,
-};
+  const [show, setShow] = useState(true);
   
   //默认事件注册
   useEffect(() => {
@@ -45,8 +31,9 @@ const env = {
     comRefs.current[id].show(()=>{
       setShow(true);
     });
-    comRefs.current[id].showOrHide(()=>{
-      setShow((prev: boolean)=>!prev);
+    comRefs.current[id].showOrHide((subject : Subject)=>{
+      const value = subject[SUBJECT_VALUE]  
+      setShow(value)
     });
   }, [comRefs]);
 

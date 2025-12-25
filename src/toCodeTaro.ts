@@ -10,6 +10,7 @@ import {
 import handleGlobal from "./handleGlobal";
 import handleExtension from "./handleExtension";
 import abstractEventTypeDef from "./abstractEventTypeDef";
+import { genJSModules } from "./utils/genJSModules";
 
 export interface ToTaroCodeConfig {
   getComponentMeta: (
@@ -78,9 +79,11 @@ export type Result = Array<{
     // TODO: 忽略，类型定义没写完整，到这一步的处理不会存在fx类型
     | "fx"
     // api归类，包含 event、api、config
-    | "api"
-    // 目前不会有，归类到api，不需要分文件
-    | "extension-event";
+        | "api"
+        // 目前不会有，归类到api，不需要分文件
+        | "extension-event"
+        | "jsModules"
+        | "commonIndex";
   meta?: ReturnType<typeof toCode>["scenes"][0]["scene"];
   name: string;
 }>;
@@ -100,6 +103,16 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
   const { tojson, toCodejson } = params;
   const { scenes, extensionEvents, globalFxs, globalVars, modules } =
     toCodejson;
+
+  // 收集所有 JS 计算组件
+  const jsModulesMap = new Map<string, {
+    id: string;
+    title: string;
+    transformCode: string;
+    inputs: string[];
+    outputs: string[];
+    data: any;
+  }>();
 
   const eventsMap = tojson.frames.reduce((pre, cur) => {
     if (cur.type === "extension-event") {
@@ -184,6 +197,29 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
   const abstractEventTypeDefMap: any = {};
 
   scenes.forEach(({ scene, ui, event }) => {
+    Object.entries(scene.coms || {}).forEach(([comId, comInfo]: [string, any]) => {
+      const { def, model } = comInfo;
+
+      // 收集js计算
+      const isJsCalculationComponent = 
+        def?.namespace === "mybricks.taro._muilt-inputJs" ||
+        def?.namespace === "mybricks.core-comlib.js-ai";
+      if (isJsCalculationComponent) {
+        // 优先使用原始代码（code），而不是转译后的代码（transformCode），避免包含 Babel 辅助函数
+        const transformCode = model?.data?.fns?.code || model?.data?.fns?.transformCode || model?.data?.fns;
+        if (transformCode && !jsModulesMap.has(comId)) {
+          jsModulesMap.set(comId, {
+            id: comId,
+            title: comInfo.title || "JS计算",
+            transformCode: typeof transformCode === 'string' ? transformCode : '',
+            inputs: model?.inputs || [],
+            outputs: model?.outputs || [],
+            data: model?.data || {},
+          });
+        }
+      }
+    });
+
     const providerMap: ReturnType<BaseConfig["getProviderMap"]> = {};
     const fileName = config.getFileName?.(ui.meta.slotId);
     const providerName = fileName ? `${fileName}Provider` : "slot_Index";
@@ -223,6 +259,11 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
           type: scene.type ? scene.type : "normal",
           meta: scene,
         });
+      },
+      addJSModule: (module) => {
+        if (!jsModulesMap.has(module.id)) {
+          jsModulesMap.set(module.id, module);
+        }
       },
       getEventByDiagramId: (diagramId) => {
         return event.find((event) => event.diagramId === diagramId)!;
@@ -309,6 +350,29 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
   });
 
   modules.forEach(({ scene, ui, event }) => {
+    // 遍历 scene.coms 收集所有 JS 计算组件（它们不在 slot.comAry 中）
+    Object.entries(scene.coms || {}).forEach(([comId, comInfo]: [string, any]) => {
+      const { def, model } = comInfo;
+      const isJsCalculationComponent = 
+        def?.namespace === "mybricks.taro._muilt-inputJs" ||
+        def?.namespace === "mybricks.core-comlib.js-ai";
+      
+      if (isJsCalculationComponent) {
+        // 优先使用原始代码（code），而不是转译后的代码（transformCode），避免包含 Babel 辅助函数
+        const transformCode = model?.data?.fns?.code || model?.data?.fns?.transformCode || model?.data?.fns;
+        if (transformCode && !jsModulesMap.has(comId)) {
+          jsModulesMap.set(comId, {
+            id: comId,
+            title: comInfo.title || "JS计算",
+            transformCode: typeof transformCode === 'string' ? transformCode : '',
+            inputs: model?.inputs || [],
+            outputs: model?.outputs || [],
+            data: model?.data || {},
+          });
+        }
+      }
+    });
+
     const providerMap: ReturnType<BaseConfig["getProviderMap"]> = {};
     const fileName = config.getFileName?.(ui.meta.slotId);
     const providerName = fileName ? `${fileName}Provider` : "slot_Index";
@@ -347,6 +411,11 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
           type: scene.type,
           meta: scene,
         });
+      },
+      addJSModule: (module) => {
+        if (!jsModulesMap.has(module.id)) {
+          jsModulesMap.set(module.id, module);
+        }
       },
       getEventByDiagramId: (diagramId) => {
         return event.find((event) => event.diagramId === diagramId)!;
@@ -441,6 +510,32 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
     importManager: new ImportManager(config),
     name: "abstractEventTypeDef",
   });
+
+  // 生成 JSModules.ts 文件
+  result.push({
+    type: "jsModules",
+    content: genJSModules(Array.from(jsModulesMap.values())),
+    importManager: new ImportManager(config),
+    name: "JSModules",
+  });
+
+  // 生成 common/index.ts 文件（初始化并导出 jsModules）
+  if (jsModulesMap.size > 0) {
+    const commonIndexContent = `import jsModulesGenerator from "./jsModules";
+import { createJSHandle } from "../_temp/mybricks/index";
+
+const jsModules: Record<string, (props: any, appContext: any) => any> = jsModulesGenerator({ createJSHandle });
+
+export { jsModules };
+`;
+
+    result.push({
+      type: "commonIndex",
+      content: commonIndexContent,
+      importManager: new ImportManager(config),
+      name: "commonIndex",
+    });
+  }
 
   return result;
 };

@@ -18,19 +18,80 @@ export const handleProcess = (
   const indent = indentation(config.codeStyle!.indent * config.depth);
   const indent2 = indentation(config.codeStyle!.indent * (config.depth + 1));
 
+  // 检查是否有 JS 计算组件
+  let hasJsCalculationComponent = false;
+  process.nodesDeclaration.forEach(({ meta }: any) => {
+    if (
+      meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
+      meta.def.namespace === "mybricks.core-comlib.js-ai"
+    ) {
+      hasJsCalculationComponent = true;
+    }
+  });
+
+  // 如果有 JS 计算组件，导入已初始化的 jsModules
+  if (hasJsCalculationComponent) {
+    config.addParentDependencyImport({
+      packageName: "../../common/index",
+      dependencyNames: ["jsModules"],
+      importType: "named",
+    });
+  }
+
   // 处理节点声明
   process.nodesDeclaration.forEach(({ meta, props }: any) => {
     if (meta.def.namespace.startsWith("mybricks.taro.module")) {
       return;
     }
 
-    // 检查是否是 JS 计算组件（以下划线开头，如 _muilt-inputJs）
+    // 检查是否是 JS 计算组件（_muilt-inputJs 或 js-ai）
+    const isJsCalculationComponent = 
+      meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
+      meta.def.namespace === "mybricks.core-comlib.js-ai";
+
     const { importInfo, name, callName } = config.getComponentMeta(meta);
-    if (name.startsWith('_')) {
-      // JS 计算组件：不引入组件，在调用时直接执行 transformCode
+    const componentName = name;
+
+    if (isJsCalculationComponent) {
+      // 生成合法的变量名（将连字符替换为下划线）
+      const sanitizedComponentName = componentName.replace(/-/g, '_');
+      const componentNameWithId =
+        config.getEventNodeName?.({
+          com: meta,
+          scene: config.getCurrentScene(),
+          type: "declaration",
+          event,
+        }) || `jsModules_${meta.id}`;
+
+      // JS 计算组件的 data 只包含必要配置（如 runImmediate），不包含 fns、transformCode 等
+      const jsData: any = {};
+      if (props.data) {
+        // 只保留必要的配置字段
+        if ('runImmediate' in props.data) {
+          jsData.runImmediate = props.data.runImmediate;
+        }
+        // 可以添加其他必要的配置字段
+      }
+
+      code +=
+        `${indent}/** ${meta.title} */` +
+        `\n${indent}const ${componentNameWithId} = jsModules.${meta.id}({` +
+        (config.verbose ? `\n${indent2}title: "${meta.title}",` : "") +
+        (Object.keys(jsData).length > 0
+          ? `\n${indent2}data: ${genObjectCode(jsData, {
+              initialIndent: config.codeStyle!.indent * (config.depth + 1),
+              indentSize: config.codeStyle!.indent,
+            })},`
+          : "") +
+        (props.inputs
+          ? `\n${indent2}inputs: [${props.inputs.map((input: string) => `"${input}"`).join(", ")}],`
+          : "") +
+        (props.outputs
+          ? `\n${indent2}outputs: [${props.outputs.map((output: string) => `"${output}"`).join(", ")}],`
+          : "") +
+        `\n${indent}}, appContext)\n`;
       return;
     }
-    const componentName = name;
 
     config.addParentDependencyImport({
       packageName: importInfo.from,
@@ -98,10 +159,30 @@ export const handleProcess = (
           `${indent}/** 打开 ${props.meta.title} */` +
           `\n${indent}${nextCode}page.${operateName}("${config.getPageId?.(_sceneId) || _sceneId}", ${nextValue})`;
       } else if (category === "normal") {
-        let componentNameWithId = getComponentNameWithId(props, config, event);
-        code +=
-          `${indent}/** 调用 ${props.meta.title} */` +
-          `\n${indent}${nextCode}${componentNameWithId}(${runType === "input" ? nextValue : ""})`;
+        // 检查是否是 JS 计算组件（_muilt-inputJs 或 js-ai）
+        const isJsCalculationComponent = 
+          props.meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
+          props.meta.def.namespace === "mybricks.core-comlib.js-ai";
+
+        if (isJsCalculationComponent) {
+          // JS 计算组件：使用声明时的变量名调用
+          const componentNameWithId =
+            config.getEventNodeName?.({
+              com: props.meta,
+              scene: config.getCurrentScene(),
+              type: "declaration",
+              event,
+            }) || `jsModules_${props.meta.id}`;
+          
+          code +=
+            `${indent}/** 调用 ${props.meta.title} */` +
+            `\n${indent}${nextCode}${componentNameWithId}(${runType === "input" ? nextValue : ""})`;
+        } else {
+          let componentNameWithId = getComponentNameWithId(props, config, event);
+          code +=
+            `${indent}/** 调用 ${props.meta.title} */` +
+            `\n${indent}${nextCode}${componentNameWithId}(${runType === "input" ? nextValue : ""})`;
+        }
       } else if (category === "var") {
         if (props.meta.global) {
           config.addParentDependencyImport({
@@ -207,6 +288,27 @@ const checkIsSameScope = (event: any, props: any) => {
 };
 
 const getComponentNameWithId = (props: any, config: HandleProcessConfig, event: any) => {
+  // 检查是否是 JS 计算组件
+  const isJsCalculationComponent = 
+    props.meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
+    props.meta.def.namespace === "mybricks.core-comlib.js-ai";
+
+  if (isJsCalculationComponent) {
+    // JS 计算组件：使用 jsModules_${meta.id} 作为变量名
+    if (config.getEventNodeName) {
+      const componentName = config.getEventNodeName({
+        com: props.meta,
+        scene: config.getCurrentScene(),
+        event,
+        type: "declaration",
+      });
+      if (componentName) {
+        return componentName;
+      }
+    }
+    return `jsModules_${props.meta.id}`;
+  }
+
   if (config.getEventNodeName) {
     const componentName = config.getEventNodeName({
       com: props.meta,
@@ -219,7 +321,9 @@ const getComponentNameWithId = (props: any, config: HandleProcessConfig, event: 
     }
   }
   const { name } = config.getComponentMeta(props.meta);
-  return `${name}_${props.meta.id}`;
+  // 确保变量名合法（将连字符替换为下划线）
+  const sanitizedName = name.replace(/-/g, '_');
+  return `${sanitizedName}_${props.meta.id}`;
 };
 
 const getNextCode = (props: any, config: HandleProcessConfig, isSameScope: boolean, event: any) => {

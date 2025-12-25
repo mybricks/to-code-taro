@@ -9,7 +9,7 @@ export function runJs(scriptText: string | any, model?: any[], props?: Props) {
   const { env, callback = () => {} } = props || {};
   const isRuntime = env?.runtime && !env?.runtime?.debug;
   if (typeof scriptText === 'object') {
-    scriptText = isRuntime ? scriptText?.transformCode || scriptText?.code : scriptText?.code;
+    scriptText = isRuntime ? scriptText?.transformCode || scriptText?.code : scriptText?.fns;
   }
 
   let fn = null;

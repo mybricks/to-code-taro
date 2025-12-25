@@ -34,6 +34,14 @@ export interface HandleComConfig extends BaseConfig {
   addConsumer: (provider: ReturnType<BaseConfig["getCurrentProvider"]>) => void;
   addComId: (comId: string) => void;
   renderManager?: RenderManager;
+  addJSModule?: (module: {
+    id: string;
+    title: string;
+    transformCode: string;
+    inputs: string[];
+    outputs: string[];
+    data: any;
+  }) => void;
 }
 
 const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
@@ -41,6 +49,36 @@ const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
 
   const isModule = meta.def.namespace.startsWith("mybricks.taro.module");
   const { importInfo, callName } = config.getComponentMeta(meta);
+  
+  // 检查是否是 JS 计算组件（_muilt-inputJs 或 js-ai）
+  const isJsCalculationComponent = 
+    meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
+    meta.def.namespace === "mybricks.core-comlib.js-ai";
+
+  if (isJsCalculationComponent) {
+    // 收集 JS 计算组件信息
+    // 优先使用原始代码（code），而不是转译后的代码（transformCode），避免包含 Babel 辅助函数
+    const transformCode = props.data?.fns?.code || props.data?.fns?.transformCode || props.data?.fns;
+    if (transformCode && config.addJSModule) {
+      config.addJSModule({
+        id: meta.id,
+        title: meta.title || "JS计算",
+        transformCode: typeof transformCode === 'string' ? transformCode : '',
+        inputs: (meta.model as any)?.inputs || [],
+        outputs: (meta.model as any)?.outputs || [],
+        data: props.data || {},
+      });
+    }
+    // JS 计算组件：不引入组件，在调用时使用 jsModules
+    return {
+      slots: [],
+      scopeSlots: [],
+      ui: '',
+      js: '',
+      cssContent: '',
+      outputsConfig: undefined,
+    };
+  }
   
   // 确保组件名是大驼峰
   const componentName = firstCharToUpperCase(callName || importInfo.name);
@@ -146,9 +184,6 @@ const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
 
       // 事件处理函数的参数名
       const paramName = "value";
-      const indent = indentation(
-        config.codeStyle!.indent * (config.depth + 2),
-      );
 
       let process = handleProcess(event, {
         ...config,
@@ -177,8 +212,9 @@ const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
           process;
       }
 
-      // 临时改为空实现，避免执行时出错
-      const handlerCode = `(${paramName}: any) => {\n\n      }`;
+      // 生成事件处理函数代码（参照鸿蒙的实现方式）
+      // handlerCode 应该是函数体代码，不包含事件名
+      const handlerCode = `(${paramName}: any) => {\n${process}\n${indentation(config.codeStyle!.indent * (config.depth + 2))}}`;
       if (!outputsConfig[meta.id]) {
         outputsConfig[meta.id] = {};
       }

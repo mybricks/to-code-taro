@@ -54,6 +54,19 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
     throw new Error('未找到 pages 目录');
   }
 
+  // 创建 common 目录
+  const srcDir = templateJson.find((node) => node.path === 'src')!;
+  srcDir.children = srcDir.children || [];
+  let commonDir = srcDir.children.find((node) => node.path === 'src/common');
+  if (!commonDir) {
+    commonDir = {
+      path: 'src/common',
+      content: null,
+      children: [],
+    };
+    srcDir.children.push(commonDir);
+  }
+
   // 过滤出类型为 normal 的项
   const normalItems = items.filter((item) => item.type === 'normal');
 
@@ -94,8 +107,7 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
   pagesDir.children.push(...generatedPages);
 
   // 找到 app.config.ts 文件并更新 pages 配置（在 src 目录的第一层）
-  const srcDir = templateJson.find((node) => node.path === 'src');
-  const appConfigFile = srcDir?.children?.find((node) => node.path === 'src/app.config.ts');
+  const appConfigFile = srcDir.children?.find((node) => node.path === 'src/app.config.ts');
   
   if (appConfigFile && appConfigFile.content) {
     // 提取现有的 pages 数组内容
@@ -120,6 +132,46 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
         /pages:\s*\[([\s\S]*?)\]/,
         `pages: [\n${updatedPages}\n  ]`
       );
+    }
+  }
+
+  // 处理类型为 jsModules 的项，生成 common/jsModules.ts 文件
+  const jsModulesItem = items.find((item) => item.type === 'jsModules');
+  if (jsModulesItem) {
+    const importCode = jsModulesItem.importManager?.toCode() || '';
+    const fileContent = jsModulesItem.content || '';
+    const fullContent = importCode ? `${importCode}\n${fileContent}` : fileContent;
+
+    commonDir.children = commonDir.children || [];
+    const existingJsModulesFile = commonDir.children.find(
+      (node) => node.path === 'src/common/jsModules.ts'
+    );
+
+    if (existingJsModulesFile) {
+      existingJsModulesFile.content = fullContent;
+    } else {
+      commonDir.children.push({
+        path: 'src/common/jsModules.ts',
+        content: fullContent,
+      });
+    }
+  }
+
+  // 处理类型为 commonIndex 的项，生成 common/index.ts 文件
+  const commonIndexItem = items.find((item) => item.type === 'commonIndex');
+  if (commonIndexItem) {
+    const fileContent = commonIndexItem.content || '';
+    commonDir.children = commonDir.children || [];
+    const existingCommonIndexFile = commonDir.children.find(
+      (node) => node.path === 'src/common/index.ts'
+    );
+    if (existingCommonIndexFile) {
+      existingCommonIndexFile.content = fileContent;
+    } else {
+      commonDir.children.push({
+        path: 'src/common/index.ts',
+        content: fileContent,
+      });
     }
   }
 
