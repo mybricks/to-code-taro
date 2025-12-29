@@ -9,6 +9,7 @@
  */
 
 import toCodeTaro from '../src/index';
+import { convertNamespaceToImportName } from '../src/utils/convertNamespace';
 
 import testData from './test-data.json';
 
@@ -20,7 +21,27 @@ async function runCode() {
       getComponentMeta: (com: any, configMeta?: any) => {
         // 根据组件的 namespace 返回对应的元数据
         const namespace = com.def?.namespace || '';
-        // 从 namespace 中提取组件名（取最后一部分）
+        const rtType = com.def?.rtType || '';
+        
+        // JS 类型组件（_showToast、_scan-qrcode、_setStorage 等）
+        const isJsComponent = rtType?.match(/^js/gi);
+        const isJsApiComponent = namespace.startsWith('mybricks.taro._');
+        
+        if (isJsApiComponent) {
+          // 转换为导入名：mybricks.taro._showToast -> mybricks_taro__showToast
+          const importName = convertNamespaceToImportName(namespace);
+          return {
+            importInfo: {
+              name: importName,
+              from: '../../_temp/comlib',
+              type: 'named' as const,
+            },
+            name: importName,
+            callName: importName,
+          };
+        }
+        
+        // 普通组件：从 namespace 中提取组件名（取最后一部分）
         const componentName = namespace.split('.').pop() || 'Component';
         
         // 创建组件元数据对象

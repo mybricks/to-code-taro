@@ -8,6 +8,26 @@ export interface HandleProcessConfig extends BaseConfig {
   addConsumer: (provider: ReturnType<BaseConfig["getCurrentProvider"]>) => void;
 }
 
+/**
+ * 判断是否是 JS 计算组件
+ */
+const isJsCalculationComponent = (namespace: string): boolean => {
+  return (
+    namespace === "mybricks.taro._muilt-inputJs" ||
+    namespace === "mybricks.core-comlib.js-ai"
+  );
+};
+
+/**
+ * 判断是否是 JS API 组件
+ */
+const isJsApiComponent = (namespace: string, rtType?: string): boolean => {
+  return (
+    namespace.startsWith("mybricks.taro._") &&
+    rtType?.match(/^js/gi) !== null
+  );
+};
+
 export const handleProcess = (
   event: Exclude<ReturnType<BaseConfig["getEventByDiagramId"]>, undefined>,
   config: HandleProcessConfig,
@@ -19,15 +39,9 @@ export const handleProcess = (
   const indent2 = indentation(config.codeStyle!.indent * (config.depth + 1));
 
   // 检查是否有 JS 计算组件
-  let hasJsCalculationComponent = false;
-  process.nodesDeclaration.forEach(({ meta }: any) => {
-    if (
-      meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
-      meta.def.namespace === "mybricks.core-comlib.js-ai"
-    ) {
-      hasJsCalculationComponent = true;
-    }
-  });
+  const hasJsCalculationComponent = process.nodesDeclaration.some(
+    ({ meta }: any) => isJsCalculationComponent(meta.def.namespace)
+  );
 
   // 如果有 JS 计算组件，导入已初始化的 jsModules
   if (hasJsCalculationComponent) {
@@ -44,52 +58,38 @@ export const handleProcess = (
       return;
     }
 
-    // 检查是否是 JS 计算组件（_muilt-inputJs 或 js-ai）
-    const isJsCalculationComponent = 
-      meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
-      meta.def.namespace === "mybricks.core-comlib.js-ai";
+    // 检查组件类型
+    const isJsCalc = isJsCalculationComponent(meta.def.namespace);
+    const isJsApi = isJsApiComponent(meta.def.namespace, meta.def.rtType);
 
     const { importInfo, name, callName } = config.getComponentMeta(meta);
     const componentName = name;
 
-    if (isJsCalculationComponent) {
-      // 生成合法的变量名（将连字符替换为下划线）
-      const sanitizedComponentName = componentName.replace(/-/g, '_');
-      const componentNameWithId =
-        config.getEventNodeName?.({
-          com: meta,
-          scene: config.getCurrentScene(),
-          type: "declaration",
-          event,
-        }) || `jsModules_${meta.id}`;
+    if (isJsCalc) {
+      code += generateJsCalculationComponentCode({
+        meta,
+        props,
+        componentName,
+        config,
+        event,
+        indent,
+        indent2,
+      });
+      return;
+    }
 
-      // JS 计算组件的 data 只包含必要配置（如 runImmediate），不包含 fns、transformCode 等
-      const jsData: any = {};
-      if (props.data) {
-        // 只保留必要的配置字段
-        if ('runImmediate' in props.data) {
-          jsData.runImmediate = props.data.runImmediate;
-        }
-        // 可以添加其他必要的配置字段
-      }
-
-      code +=
-        `${indent}/** ${meta.title} */` +
-        `\n${indent}const ${componentNameWithId} = jsModules.${meta.id}({` +
-        (config.verbose ? `\n${indent2}title: "${meta.title}",` : "") +
-        (Object.keys(jsData).length > 0
-          ? `\n${indent2}data: ${genObjectCode(jsData, {
-              initialIndent: config.codeStyle!.indent * (config.depth + 1),
-              indentSize: config.codeStyle!.indent,
-            })},`
-          : "") +
-        (props.inputs
-          ? `\n${indent2}inputs: [${props.inputs.map((input: string) => `"${input}"`).join(", ")}],`
-          : "") +
-        (props.outputs
-          ? `\n${indent2}outputs: [${props.outputs.map((output: string) => `"${output}"`).join(", ")}],`
-          : "") +
-        `\n${indent}}, appContext)\n`;
+    if (isJsApi) {
+      code += generateJsApiComponentCode({
+        meta,
+        props,
+        componentName,
+        callName,
+        importInfo,
+        config,
+        event,
+        indent,
+        indent2,
+      });
       return;
     }
 
@@ -159,30 +159,10 @@ export const handleProcess = (
           `${indent}/** 打开 ${props.meta.title} */` +
           `\n${indent}${nextCode}page.${operateName}("${config.getPageId?.(_sceneId) || _sceneId}", ${nextValue})`;
       } else if (category === "normal") {
-        // 检查是否是 JS 计算组件（_muilt-inputJs 或 js-ai）
-        const isJsCalculationComponent = 
-          props.meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
-          props.meta.def.namespace === "mybricks.core-comlib.js-ai";
-
-        if (isJsCalculationComponent) {
-          // JS 计算组件：使用声明时的变量名调用
-          const componentNameWithId =
-            config.getEventNodeName?.({
-              com: props.meta,
-              scene: config.getCurrentScene(),
-              type: "declaration",
-              event,
-            }) || `jsModules_${props.meta.id}`;
-          
-          code +=
-            `${indent}/** 调用 ${props.meta.title} */` +
-            `\n${indent}${nextCode}${componentNameWithId}(${runType === "input" ? nextValue : ""})`;
-        } else {
-          let componentNameWithId = getComponentNameWithId(props, config, event);
-          code +=
-            `${indent}/** 调用 ${props.meta.title} */` +
-            `\n${indent}${nextCode}${componentNameWithId}(${runType === "input" ? nextValue : ""})`;
-        }
+        let componentNameWithId = getComponentNameWithId(props, config, event);
+        code +=
+          `${indent}/** 调用 ${props.meta.title} */` +
+          `\n${indent}${nextCode}${componentNameWithId}(${runType === "input" ? nextValue : ""})`;
       } else if (category === "var") {
         if (props.meta.global) {
           config.addParentDependencyImport({
@@ -289,11 +269,7 @@ const checkIsSameScope = (event: any, props: any) => {
 
 const getComponentNameWithId = (props: any, config: HandleProcessConfig, event: any) => {
   // 检查是否是 JS 计算组件
-  const isJsCalculationComponent = 
-    props.meta.def.namespace === "mybricks.taro._muilt-inputJs" ||
-    props.meta.def.namespace === "mybricks.core-comlib.js-ai";
-
-  if (isJsCalculationComponent) {
+  if (isJsCalculationComponent(props.meta.def.namespace)) {
     // JS 计算组件：使用 jsModules_${meta.id} 作为变量名
     if (config.getEventNodeName) {
       const componentName = config.getEventNodeName({
@@ -389,5 +365,130 @@ const getCurrentProvider = (
   }
 
   return provider;
+};
+
+/**
+ * 生成 JS 计算组件的代码
+ */
+const generateJsCalculationComponentCode = (params: {
+  meta: any;
+  props: any;
+  componentName: string;
+  config: HandleProcessConfig;
+  event: any;
+  indent: string;
+  indent2: string;
+}): string => {
+  const { meta, props, componentName, config, event, indent, indent2 } = params;
+
+  const componentNameWithId =
+    config.getEventNodeName?.({
+      com: meta,
+      scene: config.getCurrentScene(),
+      type: "declaration",
+      event,
+    }) || `jsModules_${meta.id}`;
+
+  // JS 计算组件的 data 只包含必要配置（如 runImmediate），不包含 fns、transformCode 等
+  const jsData: any = {};
+  if (props.data && 'runImmediate' in props.data) {
+    jsData.runImmediate = props.data.runImmediate;
+  }
+
+  return (
+    `${indent}/** ${meta.title} */` +
+    `\n${indent}const ${componentNameWithId} = jsModules.${meta.id}({` +
+    (config.verbose ? `\n${indent2}title: "${meta.title}",` : "") +
+    (Object.keys(jsData).length > 0
+      ? `\n${indent2}data: ${genObjectCode(jsData, {
+          initialIndent: config.codeStyle!.indent * (config.depth + 1),
+          indentSize: config.codeStyle!.indent,
+        })},`
+      : "") +
+    (props.inputs
+      ? `\n${indent2}inputs: [${props.inputs.map((input: string) => `"${input}"`).join(", ")}],`
+      : "") +
+    (props.outputs
+      ? `\n${indent2}outputs: [${props.outputs.map((output: string) => `"${output}"`).join(", ")}],`
+      : "") +
+    `\n${indent}}, appContext)\n`
+  );
+};
+
+/**
+ * 生成 JS API 组件的代码
+ */
+const generateJsApiComponentCode = (params: {
+  meta: any;
+  props: any;
+  componentName: string;
+  callName?: string;
+  importInfo: any;
+  config: HandleProcessConfig;
+  event: any;
+  indent: string;
+  indent2: string;
+}): string => {
+  const {
+    meta,
+    props,
+    componentName,
+    callName,
+    importInfo,
+    config,
+    event,
+    indent,
+    indent2,
+  } = params;
+
+  // 导入 createJSHandle
+  config.addParentDependencyImport({
+    packageName: "../../_temp/mybricks/index",
+    dependencyNames: ["createJSHandle"],
+    importType: "named",
+  });
+
+  // 导入 JS API 组件
+  config.addParentDependencyImport({
+    packageName: importInfo.from,
+    dependencyNames: [importInfo.name],
+    importType: importInfo.type,
+  });
+
+  const componentNameWithId =
+    config.getEventNodeName?.({
+      com: meta,
+      scene: config.getCurrentScene(),
+      type: "declaration",
+      event,
+    }) || `${componentName}_${meta.id}`;
+
+  config.addParentDependencyImport({
+    packageName: config.getComponentPackageName(),
+    dependencyNames: ["useAppContext"],
+    importType: "named",
+  });
+
+  return (
+    `${indent}/** ${meta.title} */` +
+    `\n${indent}const ${componentNameWithId} = createJSHandle(${callName || componentName}, {` +
+    `\n${indent2}props: {` +
+    (config.verbose ? `\n${indent2}  title: "${meta.title}",` : "") +
+    (props.data
+      ? `\n${indent2}  data: ${genObjectCode(props.data, {
+          initialIndent: config.codeStyle!.indent * (config.depth + 2),
+          indentSize: config.codeStyle!.indent,
+        })},`
+      : "") +
+    (props.inputs
+      ? `\n${indent2}  inputs: [${props.inputs.map((input: string) => `"${input}"`).join(", ")}],`
+      : "") +
+    (props.outputs
+      ? `\n${indent2}  outputs: [${props.outputs.map((output: string) => `"${output}"`).join(", ")}],`
+      : "") +
+    `\n${indent2}},` +
+    `\n${indent2}appContext` +
+    `\n${indent}})\n`
+  );
 };
 

@@ -93,6 +93,21 @@
                     "namespace": "mybricks.taro._muilt-inputJs",
                     "version": "1.0.0",
                     "rtType": "js-autorun"
+                },
+                {
+                    "namespace": "mybricks.taro._showToast",
+                    "version": "1.0.1",
+                    "rtType": "js"
+                },
+                {
+                    "namespace": "mybricks.taro._scan-qrcode",
+                    "version": "1.0.0",
+                    "rtType": "js"
+                },
+                {
+                    "namespace": "mybricks.taro._setStorage",
+                    "version": "1.0.0",
+                    "rtType": "js"
                 }
             ],
             "coms": {
@@ -903,6 +918,94 @@
                     "outputs": [
                         "output0"
                     ]
+                },
+                "u_0BeDz": {
+                    "id": "u_0BeDz",
+                    "def": {
+                        "namespace": "mybricks.taro._showToast",
+                        "version": "1.0.1",
+                        "rtType": "js"
+                    },
+                    "title": "显示 Toast",
+                    "model": {
+                        "data": {
+                            "title": "提示的内容",
+                            "duration": 1000,
+                            "icon": "none",
+                            "mask": false,
+                            "dynamic": false,
+                            "id": "u_1xbdi7"
+                        },
+                        "outputEvents": {},
+                        "style": {
+                            "display": "block"
+                        }
+                    },
+                    "style": {},
+                    "configs": [],
+                    "_inputs": [],
+                    "inputs": [
+                        "showToast"
+                    ],
+                    "outputs": [
+                        "afterShowToast"
+                    ]
+                },
+                "u_mGau2": {
+                    "id": "u_mGau2",
+                    "def": {
+                        "namespace": "mybricks.taro._scan-qrcode",
+                        "version": "1.0.0",
+                        "rtType": "js"
+                    },
+                    "title": "扫码",
+                    "model": {
+                        "data": {
+                            "onlyFromCamera": false
+                        },
+                        "outputEvents": {},
+                        "style": {
+                            "display": "block"
+                        }
+                    },
+                    "style": {},
+                    "configs": [],
+                    "_inputs": [],
+                    "inputs": [
+                        "scan"
+                    ],
+                    "outputs": [
+                        "onSuccess",
+                        "onFail"
+                    ]
+                },
+                "u__R27h": {
+                    "id": "u__R27h",
+                    "def": {
+                        "namespace": "mybricks.taro._setStorage",
+                        "version": "1.0.0",
+                        "rtType": "js"
+                    },
+                    "title": "写入本地缓存",
+                    "model": {
+                        "data": {
+                            "mock": {}
+                        },
+                        "outputEvents": {},
+                        "style": {
+                            "display": "block"
+                        }
+                    },
+                    "style": {},
+                    "configs": [],
+                    "_inputs": [],
+                    "inputs": [
+                        "setStorage"
+                    ],
+                    "outputs": [
+                        "onSuccess",
+                        "onFail"
+                    ]
                 }
             },
             "id": "u_QKDb5",
@@ -995,6 +1098,36 @@
                         "pinId": "input.inputValue0",
                         "pinType": "param",
                         "direction": "input"
+                    },
+                    {
+                        "id": "u_13fO2",
+                        "type": "com",
+                        "frameKey": "_rootFrame_",
+                        "targetFrameKey": "_rootFrame_",
+                        "comId": "u_0BeDz",
+                        "def": {
+                            "namespace": "mybricks.taro._showToast",
+                            "version": "1.0.1",
+                            "rtType": "js"
+                        },
+                        "pinId": "showToast",
+                        "pinType": "normal",
+                        "direction": "input"
+                    },
+                    {
+                        "id": "u_12qvI",
+                        "type": "com",
+                        "frameKey": "_rootFrame_",
+                        "targetFrameKey": "_rootFrame_",
+                        "comId": "u__R27h",
+                        "def": {
+                            "namespace": "mybricks.taro._setStorage",
+                            "version": "1.0.0",
+                            "rtType": "js"
+                        },
+                        "pinId": "setStorage",
+                        "pinType": "normal",
+                        "direction": "input"
                     }
                 ],
                 "u_bC0LU-output0": [
@@ -1062,6 +1195,23 @@
                         },
                         "pinId": "showOrHide",
                         "pinType": "ext",
+                        "direction": "input"
+                    }
+                ],
+                "u_0BeDz-afterShowToast": [
+                    {
+                        "id": "u_Rx5W7",
+                        "type": "com",
+                        "frameKey": "_rootFrame_",
+                        "targetFrameKey": "_rootFrame_",
+                        "comId": "u_mGau2",
+                        "def": {
+                            "namespace": "mybricks.taro._scan-qrcode",
+                            "version": "1.0.0",
+                            "rtType": "js"
+                        },
+                        "pinId": "scan",
+                        "pinType": "normal",
                         "direction": "input"
                     }
                 ]
@@ -1783,7 +1933,7 @@
                             "id": "u_eO9Ui",
                             "title": "小程序页面1",
                             "createTime": 1766383698201,
-                            "updateTime": 1766648821845,
+                            "updateTime": 1766976230186,
                             "updated": true,
                             "starter": {
                                 "type": "frame",
@@ -1869,7 +2019,7 @@
                             "id": "u_GtgkJ",
                             "title": "按钮 > 单击",
                             "createTime": 1766389962718,
-                            "updateTime": 1766648821845,
+                            "updateTime": 1766976230187,
                             "updated": true,
                             "starter": {
                                 "type": "com",
@@ -1942,6 +2092,71 @@
                                         "parent": {
                                             "type": "com",
                                             "id": "u_9Nwzm"
+                                        }
+                                    }
+                                },
+                                {
+                                    "id": "u_13fO2",
+                                    "title": "从 单击 到 显示 的连接",
+                                    "startPinParentKey": "u_g5l8I",
+                                    "from": {
+                                        "id": "onClick",
+                                        "title": "单击",
+                                        "parent": {
+                                            "type": "com",
+                                            "id": "u_nwhbp"
+                                        }
+                                    },
+                                    "to": {
+                                        "id": "showToast",
+                                        "title": "显示",
+                                        "type": "normal",
+                                        "parent": {
+                                            "type": "com",
+                                            "id": "u_0BeDz"
+                                        }
+                                    }
+                                },
+                                {
+                                    "id": "u_Rx5W7",
+                                    "title": "从 显示后 到 触发 的连接",
+                                    "from": {
+                                        "id": "afterShowToast",
+                                        "title": "显示后",
+                                        "parent": {
+                                            "type": "com",
+                                            "id": "u_0BeDz"
+                                        }
+                                    },
+                                    "to": {
+                                        "id": "scan",
+                                        "title": "触发",
+                                        "type": "normal",
+                                        "parent": {
+                                            "type": "com",
+                                            "id": "u_mGau2"
+                                        }
+                                    }
+                                },
+                                {
+                                    "id": "u_12qvI",
+                                    "title": "从 单击 到 写入 的连接",
+                                    "startPinParentKey": "u_g5l8I",
+                                    "from": {
+                                        "id": "onClick",
+                                        "title": "单击",
+                                        "parent": {
+                                            "type": "com",
+                                            "id": "u_nwhbp"
+                                        }
+                                    },
+                                    "to": {
+                                        "id": "setStorage",
+                                        "title": "写入",
+                                        "type": "normal",
+                                        "parent": {
+                                            "type": "com",
+                                            "id": "u__R27h"
                                         }
                                     }
                                 }

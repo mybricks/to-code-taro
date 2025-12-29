@@ -14,7 +14,7 @@ interface FileNode {
  */
 const generateTaroProject = (
   projectJson: FileNode[],
-  outputDir: string = path.join(__dirname, '_output/project')
+  outputDir: string = path.join(__dirname, '../_output/project')
 ) => {
   /**
    * 递归处理文件节点

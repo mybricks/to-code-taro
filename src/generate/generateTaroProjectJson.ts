@@ -26,7 +26,7 @@ interface GenerateItem {
 const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
 
   // 读取模板 JSON 文件
-  const templateJsonPath = path.join(__dirname, '_output/taro-template.json');
+  const templateJsonPath = path.join(__dirname, '../_output/taro-template.json');
   if (!fs.existsSync(templateJsonPath)) {
     throw new Error(`模板文件不存在: ${templateJsonPath}`);
   }
@@ -50,8 +50,12 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
   };
 
   const pagesDir = findPagesDir(templateJson);
-  if (!pagesDir || !pagesDir.children) {
+  if (!pagesDir) {
     throw new Error('未找到 pages 目录');
+  }
+  // 如果 pages 目录没有 children，初始化一个空数组
+  if (!pagesDir.children) {
+    pagesDir.children = [];
   }
 
   // 创建 common 目录
@@ -79,11 +83,17 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
     const fileContent = item.content || '';
     const fullContent = importCode ? `${importCode}\n${fileContent}` : fileContent;
 
+    // 生成 index.config.ts 内容，使用 scene 的 title
+    const sceneTitle = item.meta?.title || item.meta?.scene?.title || '页面';
+    const configContent = `export default definePageConfig({
+  navigationBarTitleText: '${sceneTitle}'
+})`;
+
     // 固定生成三个文件节点
     const pageChildren: FileNode[] = [
       {
         path: `src/pages/${pageName}/index.config.ts`,
-        content: '',
+        content: configContent,
       },
       {
         path: `src/pages/${pageName}/index.less`,
@@ -182,7 +192,7 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
   // }
 
   // 用于测试：判断文件是否存在，存在则删除，然后写入
-  const outputFilePath = path.join(__dirname, '_output/taro-project.json');
+  const outputFilePath = path.join(__dirname, '../_output/taro-project.json');
   if (fs.existsSync(outputFilePath)) {
     fs.unlinkSync(outputFilePath);
   }
