@@ -45,7 +45,24 @@ const generateTaroProject = (
         fs.mkdirSync(fileDir, { recursive: true });
       }
 
-      // 写入文件内容
+      // 判断是否为 base64 编码的二进制文件（图片等）
+      // 如果 content 是 base64 字符串且路径是图片文件，则按二进制写入
+      const isImageFile = /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(nodePath);
+      if (isImageFile && node.content && typeof node.content === 'string') {
+        try {
+          // 尝试将 content 作为 base64 解码
+          const buffer = Buffer.from(node.content, 'base64');
+          // 如果解码成功且长度合理，按二进制写入
+          if (buffer.length > 0) {
+            fs.writeFileSync(nodePath, buffer);
+            return;
+          }
+        } catch (error) {
+          // 如果解码失败，按文本写入
+        }
+      }
+
+      // 写入文件内容（文本文件）
       fs.writeFileSync(nodePath, node.content, 'utf-8');
     }
   };

@@ -1,5 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import type { ToJSON } from '@mybricks/to-code-react/dist/esm/toCode/types';
+import {
+  generateTabBarConfig,
+  formatTabBarConfigForAppConfig,
+} from './utils/generateTabBarConfig';
+import { generatePageConfig } from './utils/generatePageConfig';
 
 interface FileNode {
   path: string;
@@ -21,9 +27,13 @@ interface GenerateItem {
 /**
  * 根据数组生成文件结构 JSON 对象
  * @param items 包含 content、cssContent 等信息的数组
+ * @param toJson MyBricks toJson 数据（可选，用于生成 TabBar 配置）
  * @returns 返回文件结构的 JSON 对象数组
  */
-const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
+const generateTaroProjectJson = (
+  items: GenerateItem[] = [],
+  toJson?: ToJSON,
+): FileNode[] => {
 
   // 读取模板 JSON 文件
   const templateJsonPath = path.join(__dirname, '../_output/taro-template.json');
@@ -71,11 +81,29 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
     srcDir.children.push(commonDir);
   }
 
+  // 创建 assets/tabbar 目录（用于存放 TabBar 图标）
+  let assetsDir = srcDir.children.find((node) => node.path === 'src/assets');
+  if (!assetsDir) {
+    assetsDir = { path: 'src/assets', content: null, children: [] };
+    srcDir.children.push(assetsDir);
+  }
+  assetsDir.children = assetsDir.children || [];
+  let tabbarDir = assetsDir.children.find((node) => node.path === 'src/assets/tabbar');
+  if (!tabbarDir) {
+    tabbarDir = { path: 'src/assets/tabbar', content: null, children: [] };
+    assetsDir.children.push(tabbarDir);
+  }
+  tabbarDir.children = tabbarDir.children || [];
+
+  // 收集需要保存的图片文件
+  const imageFiles: Array<{ filePath: string; fileContent: Buffer }> = [];
+
   // 过滤出类型为 normal 的项
   const normalItems = items.filter((item) => item.type === 'normal');
 
   // 处理所有 normal 类型的项，生成页面节点数组
   const generatedPages: FileNode[] = normalItems.map((item, index) => {
+    // 使用序号作为页面目录名
     const pageName = `page${index + 1}`;
 
     // 生成完整的文件内容：import 语句 + content
@@ -83,11 +111,8 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
     const fileContent = item.content || '';
     const fullContent = importCode ? `${importCode}\n${fileContent}` : fileContent;
 
-    // 生成 index.config.ts 内容，使用 scene 的 title
-    const sceneTitle = item.meta?.title || item.meta?.scene?.title || '页面';
-    const configContent = `export default definePageConfig({
-  navigationBarTitleText: '${sceneTitle}'
-})`;
+    // 生成 index.config.ts 内容
+    const configContent = generatePageConfig(item, toJson);
 
     // 固定生成三个文件节点
     const pageChildren: FileNode[] = [
@@ -116,73 +141,65 @@ const generateTaroProjectJson = (items: GenerateItem[] = []): FileNode[] => {
   // 一次性将所有生成的页面添加到 pages 目录的子项后面
   pagesDir.children.push(...generatedPages);
 
-  // 找到 app.config.ts 文件并更新 pages 配置（在 src 目录的第一层）
+  // 更新 app.config.ts
   const appConfigFile = srcDir.children?.find((node) => node.path === 'src/app.config.ts');
-  
-  if (appConfigFile && appConfigFile.content) {
-    // 提取现有的 pages 数组内容
-    const content = appConfigFile.content;
-    // 匹配 pages: [ ... ] 中的内容
-    const pagesMatch = content.match(/pages:\s*\[([\s\S]*?)\]/);
+  if (appConfigFile?.content) {
+    let content = appConfigFile.content;
     
-    if (pagesMatch) {
-      // 生成新的页面路径数组（格式：pages/page1/index, pages/page2/index 等）
-      const newPagePaths = normalItems.map((_, index) => {
-        const pageName = `page${index + 1}`;
-        return `    'pages/${pageName}/index'`;
-      }).join(',\n');
+    // 更新 pages 配置（使用序号）
+    const newPagePaths = normalItems.map((_, index) => {
+      return `    'pages/page${index + 1}/index'`;
+    }).join(',\n');
+    content = content.replace(/pages:\s*\[([\s\S]*?)\]/, `pages: [\n${newPagePaths}\n  ]`);
 
-      // 更新 content，在原有 pages 后面添加新页面
-      const existingPages = pagesMatch[1].trim();
-      const updatedPages = existingPages 
-        ? `${existingPages},\n${newPagePaths}`
-        : newPagePaths;
-      
-      appConfigFile.content = content.replace(
-        /pages:\s*\[([\s\S]*?)\]/,
-        `pages: [\n${updatedPages}\n  ]`
-      );
+    // 生成并添加 TabBar 配置
+    if (toJson) {
+      // tabBar 的 pagePath 都指向第一个页面
+      const pageIdToPath = (pageId: string): string => {
+        return 'pages/page1/index';
+      };
+
+      const tabBarConfig = generateTabBarConfig(toJson, pageIdToPath, true, imageFiles);
+      if (tabBarConfig) {
+        const tabBarConfigStr = formatTabBarConfigForAppConfig(tabBarConfig);
+        content = content.replace(/window:\s*\{([\s\S]*?)\n\s*\}/, (match) => `${match},\n${tabBarConfigStr}`);
+      }
     }
+
+    appConfigFile.content = content;
   }
 
-  // 处理类型为 jsModules 的项，生成 common/jsModules.ts 文件
+  // 将收集到的图片文件添加到项目结构中
+  imageFiles.forEach((imageFile) => {
+    // 使用完整路径（与 generateTaroProject.ts 的处理逻辑一致）
+    tabbarDir.children!.push({
+      path: imageFile.filePath,
+      content: imageFile.fileContent.toString('base64'),
+    });
+  });
+
+  // 处理 common 目录下的文件
+  commonDir.children = commonDir.children || [];
+  
+  // 处理 jsModules
   const jsModulesItem = items.find((item) => item.type === 'jsModules');
   if (jsModulesItem) {
     const importCode = jsModulesItem.importManager?.toCode() || '';
     const fileContent = jsModulesItem.content || '';
     const fullContent = importCode ? `${importCode}\n${fileContent}` : fileContent;
-
-    commonDir.children = commonDir.children || [];
-    const existingJsModulesFile = commonDir.children.find(
-      (node) => node.path === 'src/common/jsModules.ts'
-    );
-
-    if (existingJsModulesFile) {
-      existingJsModulesFile.content = fullContent;
-    } else {
-      commonDir.children.push({
-        path: 'src/common/jsModules.ts',
-        content: fullContent,
-      });
-    }
+    commonDir.children.push({
+      path: 'src/common/jsModules.ts',
+      content: fullContent,
+    });
   }
 
-  // 处理类型为 commonIndex 的项，生成 common/index.ts 文件
+  // 处理 commonIndex
   const commonIndexItem = items.find((item) => item.type === 'commonIndex');
   if (commonIndexItem) {
-    const fileContent = commonIndexItem.content || '';
-    commonDir.children = commonDir.children || [];
-    const existingCommonIndexFile = commonDir.children.find(
-      (node) => node.path === 'src/common/index.ts'
-    );
-    if (existingCommonIndexFile) {
-      existingCommonIndexFile.content = fileContent;
-    } else {
-      commonDir.children.push({
-        path: 'src/common/index.ts',
-        content: fileContent,
-      });
-    }
+    commonDir.children.push({
+      path: 'src/common/index.ts',
+      content: commonIndexItem.content || '',
+    });
   }
 
   // TODO: 处理类型为 api 的项，留扩展口子
