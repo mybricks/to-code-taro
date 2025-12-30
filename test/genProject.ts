@@ -12,7 +12,7 @@ async function genProjectDir() {
   } as any;
   
   const result = await runCode();
-  const projectJson = generateTaroProjectJson(result, testDataWithModules);
+  const projectJson = generateTaroProjectJson(result);
   genFile(projectJson);
 }
 // 如果直接运行此文件，执行测试

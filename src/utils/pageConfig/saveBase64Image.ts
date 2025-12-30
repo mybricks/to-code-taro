@@ -1,24 +1,43 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
 /**
  * Base64 图片处理工具
  * 负责将 base64 图片保存为本地文件
  */
 
 /**
+ * MIME 类型到文件扩展名的映射
+ */
+const MIME_TO_EXT: Record<string, string> = {
+  png: 'png',
+  jpg: 'jpg',
+  jpeg: 'jpg',
+  gif: 'gif',
+  webp: 'webp',
+  svg: 'svg',
+};
+
+/**
+ * Base64 图片解析结果
+ */
+interface ParsedBase64Image {
+  mimeType: string;
+  base64Data: string;
+}
+
+/**
  * 从 base64 字符串中提取图片格式和 base64 数据
  * @param base64Str base64 字符串
- * @returns { mimeType: string, base64Data: string } 或 null
+ * @returns 解析结果或 null
  */
-function parseBase64Image(base64Str: string): { mimeType: string; base64Data: string } | null {
+function parseBase64Image(base64Str: string): ParsedBase64Image | null {
   if (typeof base64Str !== 'string' || !base64Str.startsWith('data:image/')) {
     return null;
   }
+
   const match = base64Str.match(/^data:image\/([^;]+);base64,(.+)$/);
   if (!match) {
     return null;
   }
+
   return {
     mimeType: match[1],
     base64Data: match[2],
@@ -27,30 +46,34 @@ function parseBase64Image(base64Str: string): { mimeType: string; base64Data: st
 
 /**
  * 根据 MIME 类型获取文件扩展名
- * @param mimeType MIME 类型（如 'png', 'jpg', 'jpeg'）
- * @returns 文件扩展名
+ * @param mimeType MIME 类型
+ * @returns 文件扩展名，默认为 'png'
  */
 function getFileExtension(mimeType: string): string {
-  const mimeToExt: Record<string, string> = {
-    png: 'png',
-    jpg: 'jpg',
-    jpeg: 'jpg',
-    gif: 'gif',
-    webp: 'webp',
-    svg: 'svg',
-  };
-  return mimeToExt[mimeType.toLowerCase()] || 'png';
+  return MIME_TO_EXT[mimeType.toLowerCase()] || 'png';
 }
 
 /**
  * 生成唯一的文件名
- * @param index 索引（用于区分不同的图标）
- * @param type 类型（'normal' 或 'selected'）
+ * @param index TabBar 项的索引
+ * @param type 图标类型
  * @param extension 文件扩展名
  * @returns 文件名
  */
-function generateFileName(index: number, type: 'normal' | 'selected', extension: string): string {
+function generateFileName(
+  index: number,
+  type: 'normal' | 'selected',
+  extension: string,
+): string {
   return `tabbar_${index}_${type}.${extension}`;
+}
+
+/**
+ * 图片文件信息
+ */
+export interface ImageFileInfo {
+  filePath: string;
+  fileContent: Buffer;
 }
 
 /**
@@ -58,20 +81,20 @@ function generateFileName(index: number, type: 'normal' | 'selected', extension:
  * @param iconPath 图标路径（可能是 base64 或普通路径）
  * @param tabBarIndex TabBar 项的索引
  * @param type 图标类型（'normal' 或 'selected'）
- * @param imageFiles 用于收集需要保存的图片文件的数组
- * @returns 处理后的图标路径（用于 app.config.ts，相对于项目根目录）
+ * @param imageFiles 用于收集需要保存的图片文件的数组（可选）
+ * @returns 处理后的图标路径（用于 app.config.ts），如果不是 base64 则返回原路径
  */
 export function processTabBarIcon(
   iconPath: string | undefined,
   tabBarIndex: number,
   type: 'normal' | 'selected',
-  imageFiles?: Array<{ filePath: string; fileContent: Buffer }>,
+  imageFiles?: ImageFileInfo[],
 ): string | undefined {
   if (!iconPath) {
     return undefined;
   }
 
-  // 解析 base64 图片（如果不是 base64 格式，会返回 null）
+  // 解析 base64 图片
   const parsed = parseBase64Image(iconPath);
   if (!parsed) {
     // 不是 base64 格式，直接返回原路径
@@ -81,12 +104,10 @@ export function processTabBarIcon(
   // 生成文件名和路径
   const extension = getFileExtension(parsed.mimeType);
   const fileName = generateFileName(tabBarIndex, type, extension);
-  // 文件系统中的完整路径
   const fileSystemPath = `src/assets/tabbar/${fileName}`;
-  // 配置中的路径（相对于项目根目录，用于 app.config.ts）
   const configPath = `assets/tabbar/${fileName}`;
 
-  // 如果提供了 imageFiles 数组，将文件信息添加到数组中
+  // 如果需要收集图片文件
   if (imageFiles) {
     try {
       // 将 base64 数据转换为 Buffer
@@ -97,6 +118,7 @@ export function processTabBarIcon(
       });
     } catch (error) {
       console.error(`处理 TabBar 图标失败: ${error}`);
+      // 转换失败时返回原路径
       return iconPath;
     }
   }
@@ -104,4 +126,3 @@ export function processTabBarIcon(
   // 返回配置路径（用于 app.config.ts）
   return configPath;
 }
-

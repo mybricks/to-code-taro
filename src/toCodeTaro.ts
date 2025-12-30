@@ -11,6 +11,7 @@ import handleGlobal from "./handleGlobal";
 import handleExtension from "./handleExtension";
 import abstractEventTypeDef from "./abstractEventTypeDef";
 import { genJSModules } from "./utils/genJSModules";
+import { HandlePageConfig } from "./utils/handlePageConfig";
 
 export interface ToTaroCodeConfig {
   getComponentMeta: (
@@ -65,6 +66,7 @@ export interface ToTaroCodeConfig {
 export type Result = Array<{
   content: string;
   cssContent?: string;
+  pageConfigContent?: string; // 页面配置内容（definePageConfig）
   importManager: ImportManager;
   type:
     | "normal"
@@ -83,12 +85,15 @@ export type Result = Array<{
         // 目前不会有，归类到api，不需要分文件
         | "extension-event"
         | "jsModules"
-        | "commonIndex";
+        | "commonIndex"
+        | "tabBarConfig"; // TabBar 配置
   meta?: ReturnType<typeof toCode>["scenes"][0]["scene"];
   name: string;
+  tabBarConfig?: string; // TabBar 配置内容（用于 app.config.ts）
 }>;
 
 const toCodeTaro = (tojson: ToJSON, config: ToTaroCodeConfig): Result => {
+  console.log('tojson', tojson);
   return getCode({ tojson, toCodejson: toCode(tojson) }, config);
 };
 
@@ -196,6 +201,9 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
 
   const abstractEventTypeDefMap: any = {};
 
+  // 创建页面配置处理器
+  const pageConfigHandler = new HandlePageConfig();
+
   scenes.forEach(({ scene, ui, event }) => {
     Object.entries(scene.coms || {}).forEach(([comId, comInfo]: [string, any]) => {
       const { def, model } = comInfo;
@@ -248,6 +256,9 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
 
     const fxsMap = Object.assign({}, defaultFxsMap);
 
+    // 处理页面配置
+    const pageConfigContent = pageConfigHandler.handle(scene);
+
     handleSlot(ui, {
       ...config,
       getCurrentScene: () => {
@@ -258,6 +269,7 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
           ...value,
           type: scene.type ? scene.type : "normal",
           meta: scene,
+          pageConfigContent, // 添加页面配置内容
         });
       },
       addJSModule: (module) => {
@@ -536,6 +548,22 @@ export { jsModules };
       name: "commonIndex",
     });
   }
+
+  // 添加 TabBar 配置项（如果存在）
+  const globalTabBarConfig = pageConfigHandler.getTabBarConfig();
+  if (globalTabBarConfig) {
+    result.push({
+      type: "tabBarConfig",
+      content: globalTabBarConfig,
+      importManager: new ImportManager(config),
+      name: "tabBarConfig",
+      tabBarConfig: globalTabBarConfig,
+    });
+  }
+
+  // 将 TabBar 图片文件信息附加到结果中（通过扩展字段）
+  // 由于 TypeScript 类型限制，我们使用 any 来扩展
+  (result as any).__tabBarImageFiles = pageConfigHandler.getTabBarImageFiles();
 
   return result;
 };

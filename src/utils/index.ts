@@ -358,4 +358,5 @@ export const genObjectCode = (
 
 // 导出 code 目录下的函数
 export { getUiComponentCode } from "./code";
+export { getRootComponentClassName } from "./getComponentClassName";
 

@@ -1,4 +1,4 @@
-import { ImportManager, indentation, convertStyleAryToCss, convertRootStyle } from "./utils";
+import { ImportManager, indentation, convertStyleAryToCss, convertRootStyle, getRootComponentClassName } from "./utils";
 import handleCom from "./handleCom";
 import { handleProcess } from "./utils/handleProcess";
 import {
@@ -192,7 +192,12 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
     ...mergedStyle,
     layout: (ui as any).layout || mergedStyle.layout
   }));
-  const uiResult = `${indent}<View style={${styleCode}}>\n${uiCode}\n${indent}</View>`;
+  
+  // 获取根组件的 className（只在根组件时获取）
+  const scene = config.getCurrentScene();
+  const rootClassName = getRootComponentClassName(scene, config.checkIsRoot());
+  const classNameAttr = rootClassName ? ` className='${rootClassName}'` : '';
+  const uiResult = `${indent}<View${classNameAttr} style={${styleCode}}>\n${uiCode}\n${indent}</View>`;
 
   // 如果是根场景，需要将生成的代码添加到结果中
   if (config.checkIsRoot()) {

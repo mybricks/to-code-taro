@@ -3,7 +3,7 @@
  */
 
 /**
- * TabBar 项的数据结构（来自 toJson.tabbar）
+ * TabBar 项源数据（来自 toJson.tabbar）
  */
 export interface TabBarItemSource {
   scene: {
@@ -12,28 +12,28 @@ export interface TabBarItemSource {
   };
   text?: string;
   type?: string;
-  selectedIconPath?: string;
-  selectedIconStyle?: Record<string, any>;
-  selectedTextStyle?: Record<string, any>;
-  selectedBackgroundStyle?: Record<string, any>;
   normalIconPath?: string;
-  normalIconStyle?: Record<string, any>;
+  selectedIconPath?: string;
   normalTextStyle?: Record<string, any>;
+  selectedTextStyle?: Record<string, any>;
+  normalIconStyle?: Record<string, any>;
+  selectedIconStyle?: Record<string, any>;
   normalBackgroundStyle?: Record<string, any>;
+  selectedBackgroundStyle?: Record<string, any>;
   subMenu?: Array<{
     scene: {
       id: string;
       title?: string;
     };
     normalIconPath?: string;
-    normalIconStyle?: Record<string, any>;
     normalTextStyle?: Record<string, any>;
+    normalIconStyle?: Record<string, any>;
     normalBackgroundStyle?: Record<string, any>;
   }>;
 }
 
 /**
- * Taro TabBar 配置项
+ * Taro TabBar 项配置
  */
 export interface TaroTabBarItem {
   pagePath: string;
@@ -43,13 +43,13 @@ export interface TaroTabBarItem {
 }
 
 /**
- * Taro TabBar 完整配置
+ * Taro TabBar 配置
  */
 export interface TaroTabBarConfig {
   color?: string;
   selectedColor?: string;
   backgroundColor?: string;
-  borderStyle?: 'black' | 'white';
+  borderStyle?: string;
   list: TaroTabBarItem[];
 }
 
@@ -57,11 +57,8 @@ export interface TaroTabBarConfig {
  * TabBar 验证结果
  */
 export interface TabBarValidationResult {
-  /** 是否启用 TabBar */
   useTabBar: boolean;
-  /** 验证后的 TabBar 项列表 */
   validItems: TabBarItemSource[];
-  /** 错误信息（如果有） */
   error?: string;
 }
 

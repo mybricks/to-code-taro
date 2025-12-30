@@ -3,16 +3,8 @@ import { runCode } from './runCode';
 import testData from './test-data.json';
 
 async function runTest() {
-  // 运行代码
-  const testDataWithModules = {
-    ...testData,
-    modules: (testData as any).modules || {},
-    frames: (testData as any).frames || [],
-  } as any;
-  
   const result = await runCode();
-  const projectJson = generateTaroProjectJson(result, testDataWithModules);
-  console.log('projectJson', projectJson);
+  const projectJson = generateTaroProjectJson(result);
 }
 // 如果直接运行此文件，执行测试
 if (require.main === module) {

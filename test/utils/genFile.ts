@@ -45,10 +45,26 @@ const genFile = (
         fs.mkdirSync(fileDir, { recursive: true });
       }
 
-      // 判断是否为 base64 编码的二进制文件（图片等）
-      // 如果 content 是 base64 字符串且路径是图片文件，则按二进制写入
-      // 写入文件内容（文本文件）
-      fs.writeFileSync(nodePath, node.content, 'utf-8');
+      // 判断是否为图片文件（通过扩展名）
+      const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'];
+      const ext = path.extname(nodePath).toLowerCase();
+      const isImageFile = imageExtensions.includes(ext);
+
+      // 如果是图片文件，将 base64 字符串转换为 Buffer 后以二进制方式写入
+      if (isImageFile && typeof node.content === 'string') {
+        try {
+          // 将 base64 字符串转换为 Buffer
+          const buffer = Buffer.from(node.content, 'base64');
+          fs.writeFileSync(nodePath, buffer);
+        } catch (error) {
+          console.error(`写入图片文件失败 ${nodePath}: ${error}`);
+          // 如果转换失败，尝试直接写入（可能是普通路径）
+          fs.writeFileSync(nodePath, node.content, 'utf-8');
+        }
+      } else {
+        // 文本文件，使用 utf-8 编码写入
+        fs.writeFileSync(nodePath, node.content, 'utf-8');
+      }
     }
   };
 
