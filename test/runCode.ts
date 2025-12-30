@@ -33,7 +33,7 @@ async function runCode() {
           return {
             importInfo: {
               name: importName,
-              from: '../../_temp/comlib',
+              from: '../../core/comlib',
               type: 'named' as const,
             },
             name: importName,
@@ -58,8 +58,8 @@ async function runCode() {
         // 以下划线开头的组件（如 _muilt-inputJs）在 handleProcess 中会有特殊处理
         return createMeta(componentName);
       },
-      getComponentPackageName: () => '../../_temp/utils/ComContext',
-      getUtilsPackageName: () => '../../_temp/utils/index',
+      getComponentPackageName: () => '../../core/utils/ComContext',
+      getUtilsPackageName: () => '../../core/utils/index',
       getPageId: (id: string) => id,
       getModuleApi: () => ({
         dependencyImport: {

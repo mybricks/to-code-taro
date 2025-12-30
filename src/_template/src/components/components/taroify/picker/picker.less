@@ -1,0 +1,97 @@
+.taroify_picker {
+  // position: relative;
+  overflow: hidden;
+  user-select: none;
+  // background-color: #fff;
+  text-size-adjust: 100%; /* avoid iOS text size adjust */
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+  }
+
+  &__cancel,
+  &__confirm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 15px;
+    font-size: 15px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none 0;
+
+    &:active {
+      opacity: 0.7;
+    }
+  }
+
+  &__confirm {
+    color: #1989fa;
+  }
+
+  &__cancel {
+    color: #969799;
+  }
+
+  &__title {
+    max-width: 50%;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  &__loading {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // color: var(--picker-loading-icon-color, $picker-loading-icon-color);
+    // background-color: var(--picker-loading-mask-color, $picker-loading-mask-color);
+  }
+
+  &__columns {
+    position: relative;
+    display: flex;
+    cursor: grab;
+  }
+
+  &__mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background-image: linear-gradient(
+                    180deg,
+                    hsla(0, 0%, 100%, 0.9),
+                    hsla(0, 0%, 100%, 0.4)
+    ),
+    linear-gradient(0deg, hsla(0, 0%, 100%, 0.9), hsla(0, 0%, 100%, 0.4));
+    background-repeat: no-repeat;
+    background-position: top, bottom;
+    // fix rendering failure during animation on safari
+    transform: translateZ(0);
+  }
+
+  &__frame {
+    position: absolute;
+    top: 50%;
+    // right: var(--padding-md, $padding-md);
+    // left: var(--padding-md, $padding-md);
+    z-index: 2;
+    width: 100%;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+}

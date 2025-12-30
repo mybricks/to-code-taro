@@ -522,7 +522,7 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
   // 生成 common/index.ts 文件（初始化并导出 jsModules）
   if (jsModulesMap.size > 0) {
     const commonIndexContent = `import jsModulesGenerator from "./jsModules";
-import { createJSHandle } from "../_temp/mybricks/index";
+import { createJSHandle } from "../core/mybricks/index";
 
 const jsModules: Record<string, (props: any, appContext: any) => any> = jsModulesGenerator({ createJSHandle });
 

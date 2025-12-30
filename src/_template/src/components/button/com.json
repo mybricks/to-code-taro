@@ -1,0 +1,60 @@
+{
+  "title": "按钮",
+  "namespace": "mybricks.taro.button",
+  "author": "mybricks-team",
+  "author_name": "板砖团队",
+  "icon": "./icon.svg",
+  "version": "1.0.0",
+  "description": "按钮",
+  "runtime": "./runtime.tsx",
+  "runtime.edit": "./runtime.edit.tsx",
+  "data": "./data.json",
+  "ai": "./ai.ts",
+  "editors": "./editors.tsx",
+  "inputs": [
+    {
+      "id": "setDisabled",
+      "title": "设置按钮禁用",
+      "schema": {
+        "type": "any"
+      },
+      "rels": [
+        "setDisabledSuccess"
+      ]
+    },
+    {
+      "id": "setEnabled",
+      "title": "设置按钮启用",
+      "schema": {
+        "type": "any"
+      },
+      "rels": [
+        "setEnabledSuccess"
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "id": "onClick",
+      "title": "单击",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "setDisabledSuccess",
+      "title": "设置按钮禁用完成",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "setEnabledSuccess",
+      "title": "设置按钮禁用完成",
+      "schema": {
+        "type": "string"
+      }
+    }
+  ],
+  "slots": []
+}

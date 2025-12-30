@@ -1,0 +1,115 @@
+{
+  "title": "选择器",
+  "namespace": "mybricks.taro.picker",
+  "author": "mybricks-team",
+  "author_name": "板砖团队",
+  "version": "1.0.0",
+  "description": "选择器",
+  "icon": "./icon.svg",
+  "data": "./data.json",
+  "runtime": "./runtime.tsx",
+  "editors": "./editors.tsx",
+  "inputs": [
+    {
+      "id": "setValue",
+      "title": "设置值",
+      "desc": "设置值",
+      "schema": {
+        "type": "string"
+      },
+      "rels": ["setValueComplete"]
+    },
+    {
+      "id": "getValue",
+      "title": "获取值",
+      "desc": "获取值",
+      "schema": {
+        "type": "string"
+      },
+      "rels": ["returnValue"]
+    },
+    {
+      "id": "setOptions",
+      "title": "设置选项",
+      "schema": {
+        "title": "列表数据",
+        "type": "array",
+        "items": {
+          "title": "列项数据",
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "description": "选项名"
+            },
+            "value": {
+              "type": "string",
+              "description": "选项值"
+            },
+            "selected": {
+              "type": "boolean",
+              "description": "是否选中"
+            }
+          }
+        }
+      },
+      "rels": ["setOptionsComplete"]
+    },
+    {
+      "id": "setTitle",
+      "title": "设置标题",
+      "schema": {
+        "type": "string"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "onChange",
+      "title": "当值变化",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "setOptionsComplete",
+      "title": "设置选项完成",
+      "schema": {
+        "title": "列表数据",
+        "type": "array",
+        "items": {
+          "title": "列项数据",
+          "type": "any"
+        }
+      }
+    },
+    {
+      "id": "setValueComplete",
+      "title": "设置值完成",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "returnValue",
+      "title": "值输出",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "onCancel",
+      "title": "取消",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "onConfirm",
+      "title": "确认",
+      "schema": {
+        "type": "string"
+      }
+    }
+  ]
+}

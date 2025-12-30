@@ -443,7 +443,7 @@ const generateJsApiComponentCode = (params: {
 
   // 导入 createJSHandle
   config.addParentDependencyImport({
-    packageName: "../../_temp/mybricks/index",
+    packageName: "../../core/mybricks/index",
     dependencyNames: ["createJSHandle"],
     importType: "named",
   });

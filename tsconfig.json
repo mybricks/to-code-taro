@@ -14,6 +14,6 @@
       "@mybricks/render-web/packages/code-next/*": ["../render-web/packages/code-next/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "test/utils/genFile.ts"],
   "exclude": ["node_modules"]
 }

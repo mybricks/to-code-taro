@@ -1,0 +1,132 @@
+{
+  "title": "单选",
+  "namespace": "mybricks.taro.formRadio",
+  "author": "mybricks-team",
+  "author_name": "板砖团队",
+  "version": "1.0.0",
+  "runtime": "./runtime.tsx",
+  "data": "./data.json",
+  "editors": "./editors.tsx",
+  "icon": "./icon.svg",
+  "preview": "https://assets.mybricks.world/ooOA2aEntBU0FZ0XyzdV7Lwu37DZEgAh-1743576973821.png",
+  "ai": "./ai.ts",
+  "inputs": [
+    {
+      "id": "setValue",
+      "title": "设置值",
+      "desc": "设置表单项值 示例:\"公开\"",
+      "schema": {
+        "type": "string"
+      },
+      "rels": ["setValueComplete"]
+    },
+    {
+      "id": "getValue",
+      "title": "获取值",
+      "desc": "获取表单项值并输出 示例:\"公开\"",
+      "schema": {
+        "type": "string"
+      },
+      "rels": ["returnValue"]
+    },
+    {
+      "id": "resetValue",
+      "title": "重置值",
+      "desc": "清空表单项值",
+      "schema": {
+        "type": "any"
+      },
+      "rels": ["resetValueComplete"]
+    },
+    {
+      "id": "setOptions",
+      "title": "设置单选项",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "icon": {
+              "title": "图标",
+              "type": "string"
+            },
+            "label": {
+              "title": "标签",
+              "type": "string"
+            },
+            "brief": {
+              "title": "描述",
+              "type": "string"
+            },
+            "value": {
+              "title": "值",
+              "type": "any"
+            },
+            "disabled": {
+              "title": "禁用",
+              "type": "boolean"
+            },
+            "checked": {
+              "title": "默认选中",
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "rels": ["setOptionsComplete"]
+    },
+    {
+      "id": "setDisabled",
+      "title": "设置是否禁用",
+      "desc": "设置表单项是否禁用，传入 true 时禁用表单项，传入 false 时启用表单项",
+      "schema": {
+        "type": "boolean"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "onChange",
+      "title": "当值变化",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "setValueComplete",
+      "title": "设置值完成",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "returnValue",
+      "title": "值输出",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "resetValueComplete",
+      "title": "重置值完成",
+      "schema": {
+        "type": "string"
+      }
+    },
+    {
+      "id": "setOptionsComplete",
+      "title": "选项设置完成",
+      "schema": {
+        "type": "array"
+      }
+    },
+    {
+      "id": "setDisabledComplete",
+      "title": "是否禁用设置完成",
+      "schema": {
+        "type": "boolean"
+      }
+    }
+  ],
+  "schema": ["mybricks.taro.formContainer/formItem", "*"]
+}

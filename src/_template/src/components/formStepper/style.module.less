@@ -1,0 +1,52 @@
+.hidden {
+  display: none !important;
+}
+
+.h5Reset {
+  :global {
+    input {
+      box-sizing: inherit;
+      display: inherit;
+      width: inherit;
+      min-width: inherit;
+      height: inherit;
+      line-height: inherit;
+      color: inherit;
+      resize: inherit;
+      background: inherit;
+      border: inherit;
+    }
+
+    .weui-input {
+      //这样处理先，不然在调试的时候数字会看不见
+      opacity: 1;
+      text-align: center;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+  }
+}
+
+.stepper {
+  width: 100%;
+  text-align: right;
+
+  :global {
+    .taroify-stepper__decrease {
+      color: rgb(250, 100, 0);
+      border-color: rgb(250, 100, 0);
+    }
+
+    .taroify-stepper__increase {
+      color: #fff;
+      background: rgb(250, 100, 0);
+    }
+  }
+}

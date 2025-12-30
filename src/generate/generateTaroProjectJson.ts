@@ -208,15 +208,6 @@ const generateTaroProjectJson = (
   //   // 扩展点：后续可以在这里处理 api 类型的项
   // }
 
-  // 用于测试：判断文件是否存在，存在则删除，然后写入
-  // const outputFilePath = path.join(__dirname, '../_output/taro-project.json');
-  // if (fs.existsSync(outputFilePath)) {
-  //   fs.unlinkSync(outputFilePath);
-  // }
-  // fs.writeFileSync(outputFilePath, JSON.stringify(templateJson, null, 2));
-
-  // 返回完整的模板 JSON（包含新添加的页面）
-  // console.log(JSON.stringify(templateJson, null, 2));
   return templateJson;
 };
 
