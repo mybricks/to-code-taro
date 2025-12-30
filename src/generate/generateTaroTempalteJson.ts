@@ -13,7 +13,7 @@ interface TemplateJson {
 }
 
 
-const _templateDir = path.join(__dirname, '../template');
+const _templateDir = path.join(__dirname, '../_template');
 
 /**
  * 递归遍历目录并生成文件树结构
@@ -94,7 +94,7 @@ const generateTaroTemplateJson = (templateDir: string = _templateDir): TemplateJ
   // console.log(files);
 
   // 写入 JSON 文件，如果已存在则先删除
-  const jsonFilePath = path.join(__dirname, '../_output/taro-template.json');
+  const jsonFilePath = path.join(__dirname, '../taro-template.json');
   if (fs.existsSync(jsonFilePath)) {
     fs.unlinkSync(jsonFilePath);
   }

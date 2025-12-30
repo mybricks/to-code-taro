@@ -16,7 +16,7 @@ async function runTest() {
   
   const result = await runCode();
   const projectJson = generateTaroProjectJson(result, testDataWithModules);
-  generateTaroProject(projectJson);
+  console.log('projectJson', projectJson);
 }
 // 如果直接运行此文件，执行测试
 if (require.main === module) {

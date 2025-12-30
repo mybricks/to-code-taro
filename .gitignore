@@ -6,6 +6,8 @@ node_modules/
 # Output
 src/_output/*
 src/_temp/*
+src/_template/*
+
 
 # Testing
 coverage/
