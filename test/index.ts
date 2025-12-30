@@ -1,6 +1,5 @@
 import { generateTaroProjectJson } from '../src/index';
 import { runCode } from './runCode';
-import testData from './test-data.json';
 
 async function runTest() {
   const result = await runCode();
