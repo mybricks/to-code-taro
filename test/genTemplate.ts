@@ -1,6 +1,4 @@
-import toCodeTaro, { generateTaroProjectJson, generateTaroTempalteJson, generateTaroProject } from '../src/index';
-import { runCode } from './runCode';
-import testData from './test-data.json';
+import { generateTaroTempalteJson } from '../src/index';
 
 async function genTemplate() {
   generateTaroTempalteJson();

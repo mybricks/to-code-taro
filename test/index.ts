@@ -1,12 +1,8 @@
-import toCodeTaro, { generateTaroProjectJson, generateTaroTempalteJson, generateTaroProject } from '../src/index';
+import { generateTaroProjectJson } from '../src/index';
 import { runCode } from './runCode';
 import testData from './test-data.json';
 
 async function runTest() {
-  // 生成模板json文件
-  // generateTaroTempalteJson();
-  // return
-
   // 运行代码
   const testDataWithModules = {
     ...testData,
