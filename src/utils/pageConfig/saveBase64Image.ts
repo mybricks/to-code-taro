@@ -3,6 +3,8 @@
  * 负责将 base64 图片保存为本地文件
  */
 
+import type { ImageFileInfo } from './types';
+
 /**
  * MIME 类型到文件扩展名的映射
  */
@@ -66,14 +68,6 @@ function generateFileName(
   extension: string,
 ): string {
   return `tabbar_${index}_${type}.${extension}`;
-}
-
-/**
- * 图片文件信息
- */
-export interface ImageFileInfo {
-  filePath: string;
-  fileContent: Buffer;
 }
 
 /**

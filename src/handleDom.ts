@@ -20,9 +20,10 @@ type HandleDomResult = {
 
 const handleDom = (dom: Dom, config: HandleDomConfig): HandleDomResult => {
   const { props, children } = dom;
+  const domProps = props as any; // 扩展类型以支持 id 属性
   let uiCode = "";
   let jsCode = "";
-  let cssContent = convertStyleAryToCss(props.style?.styleAry, props.id);
+  let cssContent = convertStyleAryToCss(domProps.style?.styleAry, domProps.id);
   const level0Slots: string[] = [];
   const level1Slots: string[] = [];
   const nextConfig = {
@@ -56,9 +57,9 @@ const handleDom = (dom: Dom, config: HandleDomConfig): HandleDomResult => {
   });
 
   const indent = indentation(config.codeStyle!.indent * config.depth);
-  const styleCode = JSON.stringify(convertRootStyle(props.style));
+  const styleCode = JSON.stringify(convertRootStyle(domProps.style));
 
-  const ui = `${indent}<View${props.id ? ` id="${props.id}" className="${props.id}"` : ""} style={${styleCode}}>\n${uiCode}\n${indent}</View>`;
+  const ui = `${indent}<View${domProps.id ? ` id="${domProps.id}" className="${domProps.id}"` : ""} style={${styleCode}}>\n${uiCode}\n${indent}</View>`;
 
   return {
     ui,

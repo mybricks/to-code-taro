@@ -6,6 +6,7 @@ export interface HandleProcessConfig extends BaseConfig {
   addParentDependencyImport: (typeof ImportManager)["prototype"]["addImport"];
   getParams: () => Record<string, string>;
   addConsumer: (provider: ReturnType<BaseConfig["getCurrentProvider"]>) => void;
+  target?: string;
 }
 
 /**

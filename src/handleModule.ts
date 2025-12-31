@@ -73,7 +73,7 @@ const handleModule = (module: Module, config: HandleModuleConfig) => {
   currentProvider.coms.add(module.meta.id);
   currentProvider.controllers.add(module.meta.id);
   const resultStyle = convertComponentStyle(module.props.style);
-  const cssContent = convertStyleAryToCss(props.style?.styleAry, module.meta.id);
+  const cssContent = convertStyleAryToCss((props.style as any)?.styleAry, module.meta.id);
   const componentController =
     config.getComponentController?.({
       com: module.meta,

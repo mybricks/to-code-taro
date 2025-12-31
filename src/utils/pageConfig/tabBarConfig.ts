@@ -3,17 +3,9 @@
  * 负责从 tabBar 数据生成 app.config.ts 中的 tabBar 配置字符串
  */
 
-import type { TaroTabBarConfig } from './types';
+import type { TaroTabBarConfig, ImageFileInfo } from './types';
 import { convertToTaroTabBarConfig } from './converter';
 import { processTabBarIcon } from './saveBase64Image';
-
-/**
- * 图片文件信息
- */
-export interface ImageFileInfo {
-  filePath: string;
-  fileContent: Buffer;
-}
 
 /**
  * 从 tabBar 数据生成 TabBar 配置字符串（用于 app.config.ts）

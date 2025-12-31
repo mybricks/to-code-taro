@@ -15,5 +15,5 @@
     }
   },
   "include": ["src/**/*", "test/utils/genFile.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "src/core/**/*", "src/_template/**/*"]
 }

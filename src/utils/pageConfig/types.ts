@@ -62,3 +62,11 @@ export interface TabBarValidationResult {
   error?: string;
 }
 
+/**
+ * 图片文件信息
+ */
+export interface ImageFileInfo {
+  filePath: string;
+  fileContent: Buffer;
+}
+

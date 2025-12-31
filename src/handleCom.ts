@@ -121,7 +121,7 @@ const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
   const eventConfig: Record<string, any> = {};
 
   const resultStyle = convertComponentStyle(props.style);
-  const cssContent = convertStyleAryToCss(props.style?.styleAry, meta.id);
+  const cssContent = convertStyleAryToCss((props.style as any)?.styleAry, meta.id);
 
   const outputEvents = events || {};
 
@@ -252,7 +252,7 @@ const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
     
     slotEntries.forEach(([slotId, slot]: [string, any], index) => {
       // 尝试从 props.style.slots 中获取原始 layout 信息
-      const rawSlotInfo = props.style?.slots?.[slotId];
+      const rawSlotInfo = (props.style as any)?.slots?.[slotId];
       if (rawSlotInfo?.layout) {
         slot.layout = rawSlotInfo.layout;
       }
