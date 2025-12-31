@@ -509,7 +509,6 @@ export default function (props) {
           showScrollbar={false}
           onScroll={handleScroll}
           enableBackToTop={true}
-          using-sticky={true}
           {...scrollToProps}
           scrollTop={scrollRef.current}
           {...pulldownProps}

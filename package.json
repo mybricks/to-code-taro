@@ -52,10 +52,22 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "@mybricks/code-next": "*"
+    "@mybricks/code-next": "*",
+    "@tarojs/components": "*",
+    "@tarojs/taro": "*",
+    "react": "*"
   },
   "peerDependenciesMeta": {
     "@mybricks/code-next": {
+      "optional": true
+    },
+    "@tarojs/components": {
+      "optional": true
+    },
+    "@tarojs/taro": {
+      "optional": true
+    },
+    "react": {
       "optional": true
     }
   }
