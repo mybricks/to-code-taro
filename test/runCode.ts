@@ -8,7 +8,7 @@
  * 4. 运行 npm run test 执行测试
  */
 
-import toCodeTaro from '../src/index';
+import {toCodeTaro} from '../src/index';
 import { convertNamespaceToImportName } from '../src/utils/convertNamespace';
 
 import testData from './test-data.json';
