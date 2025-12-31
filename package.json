@@ -12,7 +12,7 @@
     "build:deps": "father prebundle",
     "prepublishOnly": "father doctor && npm run build",
     "test": "tsx test/index.ts",
-    "test:project": "tsx test/genProject.ts", 
+    "test:project": "tsx test/genProject.ts",
     "test:template": "tsx test/genTemplate.ts",
     "test:watch": "ts-node-dev --respawn test/index.ts",
     "test:harmony": "tsx test/write-harmony-output.ts",

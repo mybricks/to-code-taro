@@ -1,6 +1,5 @@
-
-import toCode from "@mybricks/to-code-react/dist/esm/toCode";
-import type { ToJSON } from "@mybricks/to-code-react/dist/esm/toCode/types";
+import toCode from "@mybricks/to-code-react/dist/cjs/toCode";
+import type { ToJSON } from "@mybricks/to-code-react/dist/cjs/toCode/types";
 import handleSlot from "./handleSlot";
 import {
   ImportManager,

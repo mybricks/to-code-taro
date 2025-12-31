@@ -1,4 +1,4 @@
-import toCode from "@mybricks/to-code-react/dist/esm/toCode";
+import toCode from "@mybricks/to-code-react/dist/cjs/toCode";
 import { generatePageConfigContent, generateTabBarConfigContent, type ImageFileInfo } from "./pageConfig";
 
 /**
