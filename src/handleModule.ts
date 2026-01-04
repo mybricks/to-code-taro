@@ -47,12 +47,12 @@ const handleModule = (module: Module, config: HandleModuleConfig) => {
     if (process.includes("pageParams")) {
       config.addParentDependencyImport({
         packageName: config.getComponentPackageName(),
-        dependencyNames: ["page"],
+        dependencyNames: ["page", "SUBJECT_VALUE"],
         importType: "named",
       });
       process =
         indentation(config.codeStyle!.indent * (config.depth + 2)) +
-        `const pageParams: any = page.getParams("${config.getCurrentScene().id}");\n` +
+        `const pageParams: any = page.getParams("${config.getCurrentScene().id}")[SUBJECT_VALUE];\n` +
         process;
     }
 

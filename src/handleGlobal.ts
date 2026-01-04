@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ImportManager, indentation } from "./utils";
 import { handleProcess } from "./utils/handleProcess";
-import type { ToTaroCodeConfig, Result } from "./toCodeTaro";
+import type { ToTaroCodeConfig, GeneratedFile } from "./toCodeTaro";
 
 interface HandleGlobalParams {
   tojson: any;
@@ -16,7 +16,7 @@ interface HandleGlobalParams {
 const handleGlobal = (
   params: HandleGlobalParams,
   config: ToTaroCodeConfig,
-) => {
+): GeneratedFile[] => {
   const { tojson, globalFxs, globalVars } = params;
   const globalImportManager = new ImportManager(config);
   const globalAddDependencyImport =
@@ -151,6 +151,22 @@ const handleGlobal = (
     `}` +
     `\n\nexport const globalFxs = new GlobalFxs()`;
 
+  if (varCode.includes("createVariable(")) {
+    globalAddDependencyImport({
+      packageName: config.getUtilsPackageName(),
+      dependencyNames: ["createVariable"],
+      importType: "named",
+    });
+  }
+
+  if (fxCode.includes("createFx(")) {
+    globalAddDependencyImport({
+      packageName: config.getUtilsPackageName(),
+      dependencyNames: ["createFx"],
+      importType: "named",
+    });
+  }
+
   if (fxCode.includes("merge(")) {
     globalAddDependencyImport({
       packageName: config.getUtilsPackageName(),
@@ -159,12 +175,14 @@ const handleGlobal = (
     });
   }
 
-  return {
-    type: "global",
-    content: varCode + "\n\n" + fxCode,
-    importManager: globalImportManager,
-    name: "global",
-  } as Result[0];
+  return [
+    {
+      type: "global",
+      content: varCode + "\n\n" + fxCode,
+      importManager: globalImportManager,
+      name: "global",
+    },
+  ];
 };
 
 export default handleGlobal;

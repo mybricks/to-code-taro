@@ -1,16 +1,31 @@
+/**
+ * Taro 代码生成入口文件
+ * 参考鸿蒙实现，采用低耦合、高内聚的设计
+ */
+
 import toCode from "@mybricks/to-code-react/dist/cjs/toCode";
 import type { ToJSON } from "@mybricks/to-code-react/dist/cjs/toCode/types";
-import handleSlot from "./handleSlot";
-import {
-  ImportManager,
-  firstCharToLowerCase,
-  firstCharToUpperCase,
-} from "./utils";
+import { ImportManager } from "./utils";
 import handleGlobal from "./handleGlobal";
 import handleExtension from "./handleExtension";
-import abstractEventTypeDef from "./abstractEventTypeDef";
-import { genJSModules } from "./utils/genJSModules";
 import { HandlePageConfig } from "./utils/handlePageConfig";
+
+// 工具函数
+import { buildFrameMap } from "./utils/buildFrameMap";
+import {
+  buildSceneMap,
+  buildEventsMap,
+  createGetSceneById,
+  createGetExtensionEventById,
+  createGetFrameById,
+} from "./utils/buildContext";
+import { createJSModulesCollector } from "./utils/collectJSModules";
+import { buildGlobalVarTypeDef, buildDefaultFxsMap } from "./utils/buildGlobalData";
+import { buildFinalResults } from "./utils/buildResult";
+
+// 处理器
+import { processScenes } from "./processors/processScene";
+import { processModules } from "./processors/processModule";
 
 export interface ToTaroCodeConfig {
   getComponentMeta: (
@@ -61,8 +76,8 @@ export interface ToTaroCodeConfig {
   };
 }
 
-/** 返回结果 */
-export type Result = Array<{
+/** 单个生成文件的信息 */
+export interface GeneratedFile {
   content: string;
   cssContent?: string;
   pageConfigContent?: string; // 页面配置内容（definePageConfig）
@@ -75,24 +90,33 @@ export type Result = Array<{
     | "extension-config"
     | "extension-api"
     | "extension-bus"
-    // 组件抽象事件类型定义
     | "abstractEventTypeDef"
-    // TODO: 忽略，类型定义没写完整，到这一步的处理不会存在fx类型
     | "fx"
-    // api归类，包含 event、api、config
-        | "api"
-        // 目前不会有，归类到api，不需要分文件
-        | "extension-event"
-        | "jsModules"
-        | "commonIndex"
-        | "tabBarConfig"; // TabBar 配置
+    | "api"
+    | "extension-event"
+    | "jsModules"
+    | "commonIndex"
+    | "tabBarConfig";
   meta?: ReturnType<typeof toCode>["scenes"][0]["scene"];
   name: string;
   tabBarConfig?: string; // TabBar 配置内容（用于 app.config.ts）
-}>;
+}
 
-const toCodeTaro = (tojson: ToJSON, config: ToTaroCodeConfig): Result => {
-  console.log('tojson', tojson);
+/** 统一的生成结果结构 */
+export interface GenerationResult {
+  files: GeneratedFile[];
+  assets?: {
+    tabBarImages?: any[];
+  };
+}
+
+/**
+ * Taro 代码生成主函数
+ */
+const toCodeTaro = (
+  tojson: ToJSON,
+  config: ToTaroCodeConfig,
+): GenerationResult => {
   return getCode({ tojson, toCodejson: toCode(tojson) }, config);
 };
 
@@ -100,44 +124,36 @@ interface GetCodeParams {
   tojson: ToJSON;
   toCodejson: ReturnType<typeof toCode>;
 }
-const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
+
+/**
+ * 核心代码生成逻辑
+ * 参考鸿蒙实现，采用模块化设计
+ */
+const getCode = (
+  params: GetCodeParams,
+  config: ToTaroCodeConfig,
+): GenerationResult => {
+  // 初始化配置
   transformConfig(config);
 
-  const result: Result = [];
+  const files: GeneratedFile[] = [];
   const { tojson, toCodejson } = params;
   const { scenes, extensionEvents, globalFxs, globalVars, modules } =
     toCodejson;
 
-  // 收集所有 JS 计算组件
-  const jsModulesMap = new Map<string, {
-    id: string;
-    title: string;
-    transformCode: string;
-    inputs: string[];
-    outputs: string[];
-    data: any;
-  }>();
+  // ========== 第一步：构建上下文数据 ==========
+  // 构建 frameMap（参考鸿蒙实现）
+  const frameMap = buildFrameMap(tojson);
+  const getFrameById = createGetFrameById(frameMap);
 
-  const eventsMap = tojson.frames.reduce((pre, cur) => {
-    if (cur.type === "extension-event") {
-      pre[cur.id] = cur;
-    }
-    return pre;
-  }, {} as any);
-  const sceneMap = tojson.scenes.reduce((pre, cur) => {
-    pre[cur.id] = cur;
-    return pre;
-  }, {} as any);
+  // 构建场景和事件映射
+  const sceneMap = buildSceneMap(tojson.scenes);
+  const eventsMap = buildEventsMap(tojson.frames);
+  const getSceneById = createGetSceneById(sceneMap);
+  const getExtensionEventById = createGetExtensionEventById(eventsMap);
 
-  const getSceneById = (id: string) => {
-    return sceneMap[id];
-  };
-
-  const getExtensionEventById = (id: string) => {
-    return eventsMap[id];
-  };
-
-  result.push(
+  // ========== 第二步：处理扩展事件 ==========
+  files.push(
     ...handleExtension(
       {
         extensionEvents,
@@ -152,38 +168,13 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
     ),
   );
 
-  const globalVarTypeDef: any = {};
+  // ========== 第三步：构建全局数据 ==========
+  const globalVarTypeDef = buildGlobalVarTypeDef(tojson.global.comsReg);
+  const defaultFxsMap = buildDefaultFxsMap(tojson.global.fxFrames || []);
 
-  Object.entries(tojson.global.comsReg).forEach(([, com]: [string, any]) => {
-    if (com.def.namespace !== "mybricks.core-comlib.var") {
-      // 非变量，不需要初始化
-      return;
-    }
-
-    globalVarTypeDef[com.title] = com;
-  });
-
-  /** 向下记录组件可调用的fx，id唯一，所以直接key-value即可 */
-  const defaultFxsMap: Record<string, Provider> = {};
-  (tojson.global.fxFrames || [])
-    .filter((fxFrame: any) => {
-      return fxFrame.type === "fx";
-    })
-    .forEach((fxFrame: any) => {
-      defaultFxsMap[fxFrame.id] = {
-        name: "global",
-        class: "global",
-        controllers: new Set(),
-        useParams: false,
-        useEvents: false,
-        coms: new Set(),
-        useController: false,
-        useData: false,
-      };
-    });
-
-  result.push(
-    handleGlobal(
+  // ========== 第四步：处理全局变量和 FX ==========
+  files.push(
+    ...handleGlobal(
       {
         tojson,
         globalFxs,
@@ -198,376 +189,64 @@ const getCode = (params: GetCodeParams, config: ToTaroCodeConfig): Result => {
     ),
   );
 
-  const abstractEventTypeDefMap: any = {};
-
-  // 创建页面配置处理器
+  // ========== 第五步：初始化共享资源 ==========
+  const abstractEventTypeDefMap: Record<string, any> = {};
+  const jsModulesCollector = createJSModulesCollector();
   const pageConfigHandler = new HandlePageConfig();
 
-  scenes.forEach(({ scene, ui, event }) => {
-    Object.entries(scene.coms || {}).forEach(([comId, comInfo]: [string, any]) => {
-      const { def, model } = comInfo;
-
-      // 收集js计算
-      const isJsCalculationComponent = 
-        def?.namespace === "mybricks.taro._muilt-inputJs" ||
-        def?.namespace === "mybricks.core-comlib.js-ai";
-      if (isJsCalculationComponent) {
-        // 优先使用原始代码（code），而不是转译后的代码（transformCode），避免包含 Babel 辅助函数
-        const transformCode = model?.data?.fns?.code || model?.data?.fns?.transformCode || model?.data?.fns;
-        if (transformCode && !jsModulesMap.has(comId)) {
-          jsModulesMap.set(comId, {
-            id: comId,
-            title: comInfo.title || "JS计算",
-            transformCode: typeof transformCode === 'string' ? transformCode : '',
-            inputs: model?.inputs || [],
-            outputs: model?.outputs || [],
-            data: model?.data || {},
-          });
-        }
-      }
-    });
-
-    const providerMap: ReturnType<BaseConfig["getProviderMap"]> = {};
-    const fileName = config.getFileName?.(ui.meta.slotId);
-    const providerName = fileName ? `${fileName}Provider` : "slot_Index";
-    const currentProvider: ReturnType<BaseConfig["getCurrentProvider"]> = {
-      name: firstCharToLowerCase(providerName),
-      class: firstCharToUpperCase(providerName),
-      controllers: new Set(),
-      useParams: false,
-      useEvents: false,
-      coms: new Set(),
-      useController: false,
-      useData: false,
-    };
-
-    providerMap[currentProvider.name] = currentProvider;
-
-    /** 类型定义 */
-    const typeDef = {
-      // 变量
-      vars: Object.assign({}, globalVarTypeDef),
-      // 输入
-      inputs: {},
-      // 输出
-      outputs: {},
-    };
-
-    const fxsMap = Object.assign({}, defaultFxsMap);
-
-    // 处理页面配置
-    const pageConfigContent = pageConfigHandler.handle(scene);
-
-    handleSlot(ui, {
-      ...config,
-      getCurrentScene: () => {
-        return scene;
-      },
-      add: (value) => {
-        result.push({
-          ...value,
-          type: scene.type ? scene.type : "normal",
-          meta: scene,
-          pageConfigContent, // 添加页面配置内容
-        });
-      },
-      addJSModule: (module) => {
-        if (!jsModulesMap.has(module.id)) {
-          jsModulesMap.set(module.id, module);
-        }
-      },
-      getEventByDiagramId: (diagramId) => {
-        return event.find((event) => event.diagramId === diagramId)!;
-      },
-      getVarEvents: (params) => {
-        if (!params) {
-          return event.filter((event) => {
-            return (
-              (event.type === "var" && !event.meta.parentComId) ||
-              (event.type === "listener" && !event.meta.proxy.parentComId)
-            );
-          });
-        }
-        return event.filter((event) => {
-          return (
-            (event.type === "var" &&
-              params.comId === event.meta.parentComId &&
-              params.slotId === event.meta.frameId) ||
-            (event.type === "listener" &&
-              params.comId === event.meta.proxy.parentComId &&
-              params.slotId === event.meta.proxy.frameId)
-          );
-        });
-      },
-      getFxEvents: (params) => {
-        if (!params) {
-          return event.filter((event) => {
-            return event.type === "fx" && !event.parentComId;
-          });
-        }
-        return event.filter((event) => {
-          return (
-            event.type === "fx" &&
-            params.comId === event.parentComId &&
-            params.slotId === event.parentSlotId
-          );
-        });
-      },
-      checkIsRoot: () => true,
-      getEffectEvent: (params) => {
-        // 默认只有一个生命周期事件
-        if (!params) {
-          // 主场景
-          return event.find((event) => {
-            return !event.slotId; // 没有slotId，认为是主场景
-          })!;
-        } else {
-          // 作用域插槽
-          const { comId, slotId } = params;
-          return event.find((event) => {
-            return event.slotId === slotId && event.comId === comId;
-          })!;
-        }
-      },
-      getCurrentProvider: () => {
-        return currentProvider;
-      },
-      getRootProvider: () => {
-        return currentProvider;
-      },
-      getProviderMap: () => {
-        return providerMap;
-      },
-      getExtensionEventById,
-      getSceneById,
-      depth: 0,
-      getTypeDef: () => {
-        return typeDef;
-      },
-      getFxsMap: () => {
-        return fxsMap;
-      },
-      setAbstractEventTypeDefMap: (params) => {
-        const { comId, eventId, typeDef, schema } = params;
-        if (!abstractEventTypeDefMap[comId]) {
-          abstractEventTypeDefMap[comId] = {
-            typeDef,
-            eventIdMap: {},
-          };
-        }
-        abstractEventTypeDefMap[comId].eventIdMap[eventId] = schema;
-      },
-    });
+  // ========== 第六步：处理场景 ==========
+  processScenes(scenes, {
+    config,
+    globalVarTypeDef,
+    defaultFxsMap,
+    abstractEventTypeDefMap,
+    jsModulesMap: jsModulesCollector.getMap(),
+    getExtensionEventById,
+    getSceneById,
+    getFrameById,
+    pageConfigHandler,
+    addResult: (item) => {
+      files.push(item);
+    },
   });
 
-  modules.forEach(({ scene, ui, event }) => {
-    // 遍历 scene.coms 收集所有 JS 计算组件（它们不在 slot.comAry 中）
-    Object.entries(scene.coms || {}).forEach(([comId, comInfo]: [string, any]) => {
-      const { def, model } = comInfo;
-      const isJsCalculationComponent = 
-        def?.namespace === "mybricks.taro._muilt-inputJs" ||
-        def?.namespace === "mybricks.core-comlib.js-ai";
-      
-      if (isJsCalculationComponent) {
-        // 优先使用原始代码（code），而不是转译后的代码（transformCode），避免包含 Babel 辅助函数
-        const transformCode = model?.data?.fns?.code || model?.data?.fns?.transformCode || model?.data?.fns;
-        if (transformCode && !jsModulesMap.has(comId)) {
-          jsModulesMap.set(comId, {
-            id: comId,
-            title: comInfo.title || "JS计算",
-            transformCode: typeof transformCode === 'string' ? transformCode : '',
-            inputs: model?.inputs || [],
-            outputs: model?.outputs || [],
-            data: model?.data || {},
-          });
-        }
-      }
-    });
-
-    const providerMap: ReturnType<BaseConfig["getProviderMap"]> = {};
-    const fileName = config.getFileName?.(ui.meta.slotId);
-    const providerName = fileName ? `${fileName}Provider` : "slot_Index";
-    const currentProvider: ReturnType<BaseConfig["getCurrentProvider"]> = {
-      name: firstCharToLowerCase(providerName),
-      class: firstCharToUpperCase(providerName),
-      controllers: new Set(),
-      useParams: false,
-      useEvents: false,
-      coms: new Set(),
-      useController: false,
-      useData: false,
-    };
-    providerMap[currentProvider.name] = currentProvider;
-
-    /** 类型定义 */
-    const typeDef = {
-      // 变量
-      vars: Object.assign({}, globalVarTypeDef),
-      // 输入
-      inputs: {},
-      // 输出
-      outputs: {},
-    };
-
-    const fxsMap = Object.assign({}, defaultFxsMap);
-
-    handleSlot(ui, {
-      ...config,
-      getCurrentScene: () => {
-        return scene;
-      },
-      add: (value) => {
-        result.push({
-          ...value,
-          type: scene.type,
-          meta: scene,
-        });
-      },
-      addJSModule: (module) => {
-        if (!jsModulesMap.has(module.id)) {
-          jsModulesMap.set(module.id, module);
-        }
-      },
-      getEventByDiagramId: (diagramId) => {
-        return event.find((event) => event.diagramId === diagramId)!;
-      },
-      getVarEvents: (params) => {
-        if (!params) {
-          return event.filter((event) => {
-            return (
-              (event.type === "var" && !event.meta.parentComId) ||
-              (event.type === "listener" && !event.meta.proxy.parentComId)
-            );
-          });
-        }
-        return event.filter((event) => {
-          return (
-            (event.type === "var" &&
-              params.comId === event.meta.parentComId &&
-              params.slotId === event.meta.frameId) ||
-            (event.type === "listener" &&
-              params.comId === event.meta.proxy.parentComId &&
-              params.slotId === event.meta.proxy.frameId)
-          );
-        });
-      },
-      getFxEvents: (params) => {
-        if (!params) {
-          return event.filter((event) => {
-            return event.type === "fx" && !event.parentComId;
-          });
-        }
-        return event.filter((event) => {
-          return (
-            event.type === "fx" &&
-            params.comId === event.parentComId &&
-            params.slotId === event.parentSlotId
-          );
-        });
-      },
-      checkIsRoot: () => true,
-      getEffectEvent: (params) => {
-        // 默认只有一个生命周期事件
-        if (!params) {
-          // 主场景
-          return event.find((event) => {
-            return !event.slotId; // 没有slotId，认为是主场景
-          })!;
-        } else {
-          // 作用域插槽
-          const { comId, slotId } = params;
-          return event.find((event) => {
-            return event.slotId === slotId && event.comId === comId;
-          })!;
-        }
-      },
-      getCurrentProvider: () => {
-        return currentProvider;
-      },
-      getRootProvider() {
-        return currentProvider;
-      },
-      getProviderMap: () => {
-        return providerMap;
-      },
-      getExtensionEventById,
-      getSceneById,
-      depth: 0,
-      getTypeDef() {
-        return typeDef;
-      },
-      getFxsMap: () => {
-        return fxsMap;
-      },
-      setAbstractEventTypeDefMap: (params) => {
-        const { comId, eventId, typeDef, schema } = params;
-        if (!abstractEventTypeDefMap[comId]) {
-          abstractEventTypeDefMap[comId] = {
-            typeDef,
-            eventIdMap: {},
-          };
-        }
-        abstractEventTypeDefMap[comId].eventIdMap[eventId] = schema;
-      },
-      getComponentController: ({ com }) => {
-        return com.id;
-      },
-    });
+  // ========== 第七步：处理模块 ==========
+  processModules(modules, {
+    config,
+    globalVarTypeDef,
+    defaultFxsMap,
+    abstractEventTypeDefMap,
+    jsModulesMap: jsModulesCollector.getMap(),
+    getExtensionEventById,
+    getSceneById,
+    getFrameById,
+    addResult: (item) => {
+      files.push(item);
+    },
   });
 
-  result.push({
-    type: "abstractEventTypeDef",
-    content: abstractEventTypeDef(abstractEventTypeDefMap, config),
-    importManager: new ImportManager(config),
-    name: "abstractEventTypeDef",
+  // ========== 第八步：构建最终结果 ==========
+  const finalResultData = buildFinalResults({
+    abstractEventTypeDefMap,
+    jsModulesMap: jsModulesCollector.getMap(),
+    globalTabBarConfig: pageConfigHandler.getTabBarConfig(),
+    tabBarImageFiles: pageConfigHandler.getTabBarImageFiles(),
+    config,
   });
 
-  // 生成 JSModules.ts 文件
-  result.push({
-    type: "jsModules",
-    content: genJSModules(Array.from(jsModulesMap.values())),
-    importManager: new ImportManager(config),
-    name: "JSModules",
-  });
+  files.push(...finalResultData.files);
 
-  // 生成 common/index.ts 文件（初始化并导出 jsModules）
-  if (jsModulesMap.size > 0) {
-    const commonIndexContent = `import jsModulesGenerator from "./jsModules";
-import { createJSHandle } from "../core/mybricks/index";
-
-const jsModules: Record<string, (props: any, appContext: any) => any> = jsModulesGenerator({ createJSHandle });
-
-export { jsModules };
-`;
-
-    result.push({
-      type: "commonIndex",
-      content: commonIndexContent,
-      importManager: new ImportManager(config),
-      name: "commonIndex",
-    });
-  }
-
-  // 添加 TabBar 配置项（如果存在）
-  const globalTabBarConfig = pageConfigHandler.getTabBarConfig();
-  if (globalTabBarConfig) {
-    result.push({
-      type: "tabBarConfig",
-      content: globalTabBarConfig,
-      importManager: new ImportManager(config),
-      name: "tabBarConfig",
-      tabBarConfig: globalTabBarConfig,
-    });
-  }
-
-  // 将 TabBar 图片文件信息附加到结果中（通过扩展字段）
-  // 由于 TypeScript 类型限制，我们使用 any 来扩展
-  (result as any).__tabBarImageFiles = pageConfigHandler.getTabBarImageFiles();
-
-  return result;
+  return {
+    files,
+    assets: {
+      tabBarImages: finalResultData.tabBarImageFiles,
+    },
+  };
 };
 
-/** 初始化配置 */
+/**
+ * 初始化配置
+ */
 const transformConfig = (config: ToTaroCodeConfig) => {
   if (!config.codeStyle) {
     config.codeStyle = {
@@ -633,6 +312,13 @@ export interface BaseConfig extends ToTaroCodeConfig {
     id: string,
   ) => ReturnType<typeof toCode>["scenes"][0]["event"][0];
   getSceneById: (id: string) => ReturnType<typeof toCode>["scenes"][0]["scene"];
+  /** 根据 pinId 获取场景/区块的输入项事件 */
+  getFrameInputEvent: (pinId: string, frameId?: string) => ReturnType<typeof toCode>["scenes"][0]["event"][0];
+  /** 根据 frameId 获取 frame 信息（参考鸿蒙实现） */
+  getFrameById?: (id: string) => {
+    frame: any;
+    meta: any;
+  } | undefined;
   /** 层级，用于格式化代码 */
   depth: number;
   getTypeDef: () => {

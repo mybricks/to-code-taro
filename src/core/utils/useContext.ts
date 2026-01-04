@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react'
+import { useRef, createContext, useContext } from 'react'
+import { deepProxy } from './hooks'
 
 export interface ComContextStore {
   comRefs: any;
@@ -6,7 +7,7 @@ export interface ComContextStore {
 }
 
 export function useAppCreateContext(): ComContextStore {
-  const comRefs = useRef<any>({});
+  const comRefs = useRef<any>(deepProxy({}));
 
   const appContext: any = {
     canvas: {

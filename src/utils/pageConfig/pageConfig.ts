@@ -40,47 +40,33 @@ export function generatePageConfigContent(systemPageData?: any): string {
   const pageConfig: Record<string, any> = {};
 
   if (systemPageData) {
-    const useNavigationStyle = systemPageData.useNavigationStyle;
-    
-    // 确定要使用的属性列表
-    let propertiesToUse: string[] = [];
-    
-    if (useNavigationStyle === 'default') {
-      // 如果 useNavigationStyle 为 default，使用 TARO_NAVIGATION_BAR_PROPERTIES
-      propertiesToUse = TARO_NAVIGATION_BAR_PROPERTIES;
-    } else {
-      // 否则使用 TARO_PAGE_CONFIG_TEMPLATE_PROPERTIES
-      propertiesToUse = TARO_PAGE_CONFIG_TEMPLATE_PROPERTIES;
-    }
-    
+    const propertiesToUse =
+      systemPageData.useNavigationStyle === "default"
+        ? TARO_NAVIGATION_BAR_PROPERTIES
+        : TARO_PAGE_CONFIG_TEMPLATE_PROPERTIES;
+
     // 从 systemPageData 中提取配置属性
     propertiesToUse.forEach((prop) => {
-      if (systemPageData[prop] !== undefined && systemPageData[prop] !== null) {
-        const value = systemPageData[prop];
-        // 处理不同类型的值
-        if (typeof value === 'string') {
-          pageConfig[prop] = `'${value}'`;
-        } else if (typeof value === 'boolean' || typeof value === 'number') {
-          pageConfig[prop] = value;
-        } else if (typeof value === 'object') {
-          pageConfig[prop] = JSON.stringify(value);
-        }
+      const value = systemPageData[prop];
+      if (value !== undefined && value !== null) {
+        pageConfig[prop] = value;
       }
     });
   }
 
   // 如果没有找到任何配置，设置默认的 navigationBarTitleText
   if (Object.keys(pageConfig).length === 0) {
-    pageConfig.navigationBarTitleText = `'页面'`;
+    pageConfig.navigationBarTitleText = "页面";
   }
 
   // 生成配置字符串
-  const configLines = Object.entries(pageConfig).map(([key, value]) => {
-    return `  ${key}: ${value}`;
-  });
+  const configContent = JSON.stringify(pageConfig, null, 2)
+    .replace(/^\{/, "")
+    .replace(/\}$/, "")
+    .trim();
 
   return `export default definePageConfig({
-${configLines.join(',\n')}
+  ${configContent}
 })`;
 }
 

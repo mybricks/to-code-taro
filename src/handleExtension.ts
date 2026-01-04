@@ -5,7 +5,7 @@
 
 import { ImportManager, indentation } from "./utils";
 import { handleProcess } from "./utils/handleProcess";
-import type { ToTaroCodeConfig, Result } from "./toCodeTaro";
+import type { ToTaroCodeConfig, GeneratedFile } from "./toCodeTaro";
 
 interface HandleExtensionParams {
   tojson: any;
@@ -15,9 +15,9 @@ interface HandleExtensionParams {
 const handleExtension = (
   params: HandleExtensionParams,
   config: ToTaroCodeConfig,
-) => {
+): GeneratedFile[] => {
   const { tojson, extensionEvents } = params;
-  const result: Result = [];
+  const files: GeneratedFile[] = [];
   const importManager = new ImportManager(config);
   const addDependencyImport = importManager.addImport.bind(importManager);
 
@@ -51,7 +51,7 @@ const handleExtension = (
     { ...config, addParentDependencyImport: addDependencyImport },
   );
 
-  result.push({
+  files.push({
     type: "api",
     content:
       (apiCode ? `${apiCode}\n\n` : "") +
@@ -76,7 +76,7 @@ const handleExtension = (
   );
 
   if (busCode) {
-    result.push({
+    files.push({
       content: busCode,
       importManager: extensionBusImportManager,
       type: "extension-bus",
@@ -84,7 +84,7 @@ const handleExtension = (
     });
   }
 
-  return result;
+  return files;
 };
 
 export default handleExtension;

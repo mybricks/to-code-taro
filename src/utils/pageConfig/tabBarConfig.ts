@@ -48,43 +48,23 @@ export function generateTabBarConfigContent(
  */
 function formatTabBarConfigForAppConfig(
   config: TaroTabBarConfig,
-  indent: string = '  ',
+  indent: string = "  ",
 ): string {
-  const lines: string[] = [];
-  lines.push(`${indent}tabBar: {`);
+  // 使用 JSON.stringify 生成结构化的字符串，然后进行微调以符合 TypeScript 习惯（如去掉引号）
+  const tabBarJson = JSON.stringify(config, null, 2);
 
-  // 添加颜色配置（如果存在）
-  if (config.color) {
-    lines.push(`${indent}  color: '${config.color}',`);
-  }
-  if (config.selectedColor) {
-    lines.push(`${indent}  selectedColor: '${config.selectedColor}',`);
-  }
-  if (config.backgroundColor) {
-    lines.push(`${indent}  backgroundColor: '${config.backgroundColor}',`);
-  }
-  if (config.borderStyle) {
-    lines.push(`${indent}  borderStyle: '${config.borderStyle}',`);
-  }
+  // 格式化：将双引号改为单引号，并将 key 的引号去掉（如果符合变量命名规范）
+  const formattedJson = tabBarJson
+    .replace(/"([^"]+)":/g, "$1:") // 去掉 key 的引号
+    .replace(/"/g, "'"); // 将双引号改为单引号
 
-  // 添加 list 配置
-  lines.push(`${indent}  list: [`);
-  config.list.forEach((item, index) => {
-    const isLast = index === config.list.length - 1;
-    lines.push(`${indent}    {`);
-    lines.push(`${indent}      pagePath: '${item.pagePath}',`);
-    lines.push(`${indent}      text: '${item.text}',`);
-    if (item.iconPath) {
-      lines.push(`${indent}      iconPath: '${item.iconPath}',`);
-    }
-    if (item.selectedIconPath) {
-      lines.push(`${indent}      selectedIconPath: '${item.selectedIconPath}',`);
-    }
-    lines.push(`${indent}    }${isLast ? '' : ','}`);
-  });
-  lines.push(`${indent}  ]`);
-  lines.push(`${indent}}`);
-
-  return lines.join('\n');
+  // 添加缩进，并前置 "tabBar: "
+  const lines = formattedJson.split("\n");
+  return lines
+    .map((line, index) => {
+      if (index === 0) return `${indent}tabBar: ${line}`;
+      return `${indent}${line}`;
+    })
+    .join("\n");
 }
 

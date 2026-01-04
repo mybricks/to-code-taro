@@ -323,8 +323,9 @@ const getNextValue = (props: any, config: HandleProcessConfig, event: any) => {
       return JSON.stringify(param.value);
     }
     const componentNameWithId = getComponentNameWithId(param, config, event);
-    if (param.connectId) {
-      return `${componentNameWithId}_${param.connectId}.${param.id}`;
+    // 变量组件直接返回 Subject，不加 .id 后缀
+    if (param.meta?.def?.namespace?.includes(".var")) {
+      return `${componentNameWithId}_result`;
     }
     return `${componentNameWithId}_result.${param.id}`;
   });
@@ -332,14 +333,19 @@ const getNextValue = (props: any, config: HandleProcessConfig, event: any) => {
   return nextValue.join(", ");
 };
 
-const getNextValueWithParam = (param: any, config: HandleProcessConfig, event: any) => {
+const getNextValueWithParam = (
+  param: any,
+  config: HandleProcessConfig,
+  event: any,
+) => {
   if (param.type === "params") {
     const params = config.getParams();
     return params[param.id];
   }
   const componentNameWithId = getComponentNameWithId(param, config, event);
-  if (param.connectId) {
-    return `${componentNameWithId}_${param.connectId}.${param.id}`;
+  // 变量组件直接返回 Subject
+  if (param.meta?.def?.namespace?.includes(".var")) {
+    return `${componentNameWithId}_result`;
   }
   return `${componentNameWithId}_result.${param.id}`;
 };

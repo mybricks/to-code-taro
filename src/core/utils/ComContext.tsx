@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react'
 import type { ComContextStore } from './useContext'
+export { page } from './page'
 
 const ComContext = createContext<ComContextStore | undefined>(undefined)
 

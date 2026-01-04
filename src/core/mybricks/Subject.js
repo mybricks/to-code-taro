@@ -113,4 +113,3 @@ class SubjectNext extends Subject {
     this._observers.add(observer)
   }
 }
-

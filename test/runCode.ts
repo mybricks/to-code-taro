@@ -58,7 +58,7 @@ async function runCode() {
         // 以下划线开头的组件（如 _muilt-inputJs）在 handleProcess 中会有特殊处理
         return createMeta(componentName);
       },
-      getComponentPackageName: () => '../../core/utils/ComContext',
+      getComponentPackageName: () => '../../core/utils/index',
       getUtilsPackageName: () => '../../core/utils/index',
       getPageId: (id: string) => id,
       getModuleApi: () => ({
@@ -87,7 +87,7 @@ async function runCode() {
     // console.log(JSON.stringify(result, null, 2));
 
     // // 输出生成的代码
-    result.forEach((file) => {
+    result.files.forEach((file) => {
       // console.log(`\n=== ${file.name} (${file.type}) ===`);
       // console.log('==== Import Manager ====');
       // console.log(file.importManager.toCode());
