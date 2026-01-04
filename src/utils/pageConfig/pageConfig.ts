@@ -3,6 +3,8 @@
  * 负责从 systemPage 组件数据生成 definePageConfig 配置字符串
  */
 
+import { colorToHex } from "../index";
+
 const TARO_NAVIGATION_BAR_PROPERTIES = [
   'navigationBarBackgroundColor',
   'navigationBarTextStyle',
@@ -40,23 +42,27 @@ export function generatePageConfigContent(systemPageData?: any): string {
   const pageConfig: Record<string, any> = {};
 
   if (systemPageData) {
+    // 1. 处理导航栏隐藏逻辑：如果是 none，强制设置 navigationStyle 为 custom 以隐藏默认导航栏
+    if (systemPageData.useNavigationStyle === "none") {
+      pageConfig.navigationStyle = "custom";
+    }
+
     const propertiesToUse =
       systemPageData.useNavigationStyle === "default"
         ? TARO_NAVIGATION_BAR_PROPERTIES
         : TARO_PAGE_CONFIG_TEMPLATE_PROPERTIES;
 
-    // 从 systemPageData 中提取配置属性
+    // 2. 从 systemPageData 中提取配置属性
     propertiesToUse.forEach((prop) => {
-      const value = systemPageData[prop];
+      let value = systemPageData[prop];
       if (value !== undefined && value !== null) {
+        // 特殊处理：将 RGBA 颜色转换为 WeChat 要求的 Hex 格式
+        if (prop.includes("BackgroundColor") || prop === "backgroundColor" || prop === "backgroundColorTop" || prop === "backgroundColorBottom") {
+          value = colorToHex(value);
+        }
         pageConfig[prop] = value;
       }
     });
-  }
-
-  // 如果没有找到任何配置，设置默认的 navigationBarTitleText
-  if (Object.keys(pageConfig).length === 0) {
-    pageConfig.navigationBarTitleText = "页面";
   }
 
   // 生成配置字符串
