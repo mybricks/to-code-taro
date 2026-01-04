@@ -4,7 +4,7 @@
  */
 
 import { ImportManager, indentation } from "./utils";
-import { handleProcess } from "./utils/handleProcess";
+import { handleProcess } from "./utils/logic/handleProcess";
 import type { ToTaroCodeConfig, GeneratedFile } from "./toCodeTaro";
 
 interface HandleExtensionParams {

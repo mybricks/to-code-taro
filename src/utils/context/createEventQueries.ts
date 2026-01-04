@@ -3,7 +3,7 @@
  * 用于从事件列表中查询特定类型的事件
  */
 
-import type { BaseConfig } from "../toCodeTaro";
+import type { BaseConfig } from "../../toCodeTaro";
 
 type Event = ReturnType<BaseConfig["getEventByDiagramId"]>;
 

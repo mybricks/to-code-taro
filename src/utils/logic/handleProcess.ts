@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ImportManager, indentation, genObjectCode } from "./index";
-import type { BaseConfig } from "../toCodeTaro";
+import { ImportManager } from "../common/ImportManager";
+import { indentation } from "../common/helper";
+import { genObjectCode } from "../common/object";
+import type { BaseConfig } from "../../toCodeTaro";
 
 export interface HandleProcessConfig extends BaseConfig {
   addParentDependencyImport: (typeof ImportManager)["prototype"]["addImport"];

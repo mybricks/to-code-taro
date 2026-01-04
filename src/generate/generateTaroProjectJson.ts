@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import type { ImageFileInfo } from "../utils/pageConfig";
+import type { ImageFileInfo } from "../utils/config/content";
 import { findDir, ensureDir } from "./utils/fileNode";
 import { handleCommonDir } from "./utils/commonDir";
 import { handleTabBarImages } from "./utils/tabBarImages";

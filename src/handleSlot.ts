@@ -4,9 +4,9 @@ import {
   genSlotDefineCode,
   genComponentTemplate,
   wrapInEffect
-} from "./utils/code/scene";
-import { RenderManager } from "./utils/code/renderManager";
-import { processChildren } from "./utils/processChildren";
+} from "./utils/templates/scene";
+import { RenderManager } from "./utils/templates/renderManager";
+import { processChildren } from "./utils/logic/processChildren";
 import { processSceneLogic } from "./processors/processSceneLogic";
 
 import type { UI, BaseConfig } from "./toCodeTaro";

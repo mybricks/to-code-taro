@@ -6,11 +6,11 @@ import {
   convertStyleAryToCss,
   indentation,
 } from "./utils";
-import { getUiComponentCode } from "./utils/code";
+import { getUiComponentCode } from "./utils/templates";
 import handleSlot from "./handleSlot";
-import { RenderManager } from "./utils/code/renderManager";
+import { RenderManager } from "./utils/templates/renderManager";
 import { processComEvents } from "./processors/processComEvents";
-import { genSlotRenderRef, formatSlotContent } from "./utils/code/component";
+import { genSlotRenderRef, formatSlotContent } from "./utils/templates/component";
 
 import type { UI, BaseConfig } from "./toCodeTaro";
 

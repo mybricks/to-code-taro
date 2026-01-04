@@ -1,6 +1,6 @@
 import type { UI, BaseConfig } from "./toCodeTaro";
 import { ImportManager, indentation, convertStyleAryToCss, convertRootStyle } from "./utils";
-import { processChildren } from "./utils/processChildren";
+import { processChildren } from "./utils/logic/processChildren";
 
 type Dom = Extract<UI["children"][0], { type: "dom" }>;
 

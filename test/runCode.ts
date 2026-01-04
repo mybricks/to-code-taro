@@ -9,7 +9,7 @@
  */
 
 import {toCodeTaro} from '../src/index';
-import { convertNamespaceToImportName } from '../src/utils/convertNamespace';
+import { convertNamespaceToImportName } from '../src/utils/logic/convertNamespace';
 
 import testData from './test-data.json';
 
@@ -18,96 +18,59 @@ async function runCode() {
   try {
     // 配置 toCodeTaro 的参数
     const config = {
-      getComponentMeta: (com: any, configMeta?: any) => {
-        // 根据组件的 namespace 返回对应的元数据
-        const namespace = com.def?.namespace || '';
-        const rtType = com.def?.rtType || '';
-        
-        // JS 类型组件（_showToast、_scan-qrcode、_setStorage 等）
-        const isJsComponent = rtType?.match(/^js/gi);
-        const isJsApiComponent = namespace.startsWith('mybricks.taro._');
-        
-        if (isJsApiComponent) {
-          // 转换为导入名：mybricks.taro._showToast -> mybricks_taro__showToast
+      getComponentMeta: (com: any) => {
+        const { namespace = "" } = com.def || {};
+
+        // JS API 组件（以 _ 开头，如 _showToast）
+        if (namespace.startsWith("mybricks.taro._")) {
           const importName = convertNamespaceToImportName(namespace);
           return {
             importInfo: {
               name: importName,
-              from: '../../core/comlib',
-              type: 'named' as const,
+              from: "../../core/comlib",
+              type: "named" as const,
             },
             name: importName,
             callName: importName,
           };
         }
-        
-        // 普通组件：从 namespace 中提取组件名（取最后一部分）
-        const componentName = namespace.split('.').pop() || 'Component';
-        
-        // 创建组件元数据对象
-        const createMeta = (name: string) => ({
+
+        // 普通组件：从 namespace 中提取组件名
+        const componentName = namespace.split(".").pop() || "Component";
+        return {
           importInfo: {
-            name,
-            from: '../../components',
-            type: 'named' as const,
+            name: componentName,
+            from: "../../components",
+            type: "named" as const,
           },
-          name,
-          callName: name,
-        });
-        
-        // 以下划线开头的组件（如 _muilt-inputJs）在 handleProcess 中会有特殊处理
-        return createMeta(componentName);
+          name: componentName,
+          callName: componentName,
+        };
       },
-      getComponentPackageName: () => '../../core/utils/index',
-      getUtilsPackageName: () => '../../core/utils/index',
+      getComponentPackageName: () => "../../core/utils/index",
+      getUtilsPackageName: () => "../../core/utils/index",
       getPageId: (id: string) => id,
       getModuleApi: () => ({
         dependencyImport: {
-          packageName: '@mybricks/taro-api-todo',
-          dependencyNames: ['api'],
-          importType: 'named' as const,
+          packageName: "@mybricks/taro-api-todo",
+          dependencyNames: ["api"],
+          importType: "named" as const,
         },
-        componentName: 'api',
+        componentName: "api",
       }),
-      codeStyle: {
-        indent: 2,
-      },
+      codeStyle: { indent: 2 },
     };
 
-    // 确保测试数据符合 ToJSON 类型要求
+    // 确保测试数据结构完整
     const testDataWithModules = {
       ...testData,
       modules: (testData as any).modules || {},
       frames: (testData as any).frames || [],
     } as any;
 
-    const result = toCodeTaro(testDataWithModules, config);
-
-    // console.log(result);
-    // console.log(JSON.stringify(result, null, 2));
-
-    // // 输出生成的代码
-    result.files.forEach((file) => {
-      // console.log(`\n=== ${file.name} (${file.type}) ===`);
-      // console.log('==== Import Manager ====');
-      // console.log(file.importManager.toCode());
-      
-      // 如果是 jsModules 类型，打印其内容
-      // if (file.type === 'jsModules') {
-      //   console.log('\n==== JSModules Content ====');
-      //   console.log(file.content);
-      // } else {
-      //   console.log('file.content====',file.content);
-      // }
-      
-      // if (file.cssContent) {
-      //   console.log('\n--- CSS Content ---');
-      //   console.log(file.cssContent);
-      // }
-    });
-    return result;
+    return toCodeTaro(testDataWithModules, config);
   } catch (error) {
-    console.error('测试失败:', error);
+    console.error("测试失败:", error);
     process.exit(1);
   }
 }

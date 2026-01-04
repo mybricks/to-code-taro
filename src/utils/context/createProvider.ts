@@ -2,8 +2,8 @@
  * 创建 Provider 相关工具
  */
 
-import { firstCharToLowerCase, firstCharToUpperCase } from "./index";
-import type { BaseConfig } from "../toCodeTaro";
+import { firstCharToLowerCase, firstCharToUpperCase } from "../common/string";
+import type { BaseConfig } from "../../toCodeTaro";
 
 export interface Provider {
   name: string;

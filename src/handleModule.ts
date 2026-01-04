@@ -1,6 +1,6 @@
 import type { UI, BaseConfig } from "./toCodeTaro";
 import { ImportManager, indentation, genObjectCode, convertComponentStyle, convertStyleAryToCss, firstCharToUpperCase } from "./utils";
-import { handleProcess } from "./utils/handleProcess";
+import { handleProcess } from "./utils/logic/handleProcess";
 
 type Module = Extract<UI["children"][0], { type: "module" }>;
 

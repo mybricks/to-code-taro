@@ -1,5 +1,5 @@
 import toCode from "@mybricks/to-code-react/dist/cjs/toCode";
-import { generatePageConfigContent, generateTabBarConfigContent, type ImageFileInfo } from "./pageConfig";
+import { generatePageConfigContent, generateTabBarConfigContent, type ImageFileInfo } from "./content";
 
 /**
  * 处理页面配置的类

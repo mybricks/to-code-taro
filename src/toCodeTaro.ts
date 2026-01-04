@@ -5,23 +5,23 @@
 
 import toCode from "@mybricks/to-code-react/dist/cjs/toCode";
 import type { ToJSON } from "@mybricks/to-code-react/dist/cjs/toCode/types";
-import { ImportManager } from "./utils";
+import { ImportManager } from "./utils/common/ImportManager";
 import handleGlobal from "./handleGlobal";
 import handleExtension from "./handleExtension";
-import { HandlePageConfig } from "./utils/handlePageConfig";
+import { HandlePageConfig } from "./utils/config/handlePageConfig";
 
 // 工具函数
-import { buildFrameMap } from "./utils/buildFrameMap";
+import { buildFrameMap } from "./utils/context/buildFrameMap";
 import {
   buildSceneMap,
   buildEventsMap,
   createGetSceneById,
   createGetExtensionEventById,
   createGetFrameById,
-} from "./utils/buildContext";
-import { createJSModulesCollector } from "./utils/collectJSModules";
-import { buildGlobalVarTypeDef, buildDefaultFxsMap } from "./utils/buildGlobalData";
-import { buildFinalResults } from "./utils/buildResult";
+} from "./utils/context/buildContext";
+import { createJSModulesCollector } from "./utils/context/collectJSModules";
+import { buildGlobalVarTypeDef, buildDefaultFxsMap } from "./utils/context/buildGlobalData";
+import { buildFinalResults } from "./utils/builder/buildResult";
 
 // 处理器
 import { processScenes } from "./processors/processScene";

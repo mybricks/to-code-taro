@@ -4,7 +4,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ImportManager, indentation } from "./utils";
-import { handleProcess } from "./utils/handleProcess";
+import { handleProcess } from "./utils/logic/handleProcess";
 import type { ToTaroCodeConfig, GeneratedFile } from "./toCodeTaro";
 
 interface HandleGlobalParams {

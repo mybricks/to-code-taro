@@ -3,7 +3,7 @@
  * 负责从 systemPage 组件数据生成 definePageConfig 配置字符串
  */
 
-import { colorToHex } from "../index";
+import { colorToHex } from "../../index";
 
 const TARO_NAVIGATION_BAR_PROPERTIES = [
   'navigationBarBackgroundColor',

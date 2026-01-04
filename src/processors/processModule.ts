@@ -10,10 +10,10 @@ import {
   createProvider,
   createProviderMap,
   type Provider,
-} from "../utils/createProvider";
-import { createEventQueries } from "../utils/createEventQueries";
-import { collectJSModulesFromScene } from "../utils/collectJSModules";
-import type { JSModulesMap } from "../utils/collectJSModules";
+} from "../utils/context/createProvider";
+import { createEventQueries } from "../utils/context/createEventQueries";
+import { collectJSModulesFromScene } from "../utils/context/collectJSModules";
+import type { JSModulesMap } from "../utils/context/collectJSModules";
 
 type ToCodeResult = ReturnType<typeof toCode>;
 type Module = ToCodeResult["modules"][0];

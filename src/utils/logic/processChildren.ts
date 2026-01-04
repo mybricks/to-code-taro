@@ -1,7 +1,7 @@
-import type { UI, BaseConfig } from "../toCodeTaro";
-import handleCom from "../handleCom";
-import handleDom from "../handleDom";
-import handleModule from "../handleModule";
+import type { UI } from "../../toCodeTaro";
+import handleCom from "../../handleCom";
+import handleDom from "../../handleDom";
+import handleModule from "../../handleModule";
 
 export type ChildResult = {
   ui: string;

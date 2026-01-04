@@ -3,11 +3,11 @@
  * 包括抽象事件类型定义、JS 模块、TabBar 配置等
  */
 
-import { ImportManager } from "./index";
-import abstractEventTypeDef from "../abstractEventTypeDef";
-import { genJSModules } from "./genJSModules";
-import type { ToTaroCodeConfig, GeneratedFile } from "../toCodeTaro";
-import type { JSModulesMap } from "./collectJSModules";
+import { ImportManager } from "../common/ImportManager";
+import abstractEventTypeDef from "../../abstractEventTypeDef";
+import { genJSModules } from "../logic/genJSModules";
+import type { ToTaroCodeConfig, GeneratedFile } from "../../toCodeTaro";
+import type { JSModulesMap } from "../context/collectJSModules";
 
 interface BuildResultParams {
   abstractEventTypeDefMap: Record<string, any>;

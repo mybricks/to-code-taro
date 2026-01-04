@@ -2,7 +2,7 @@
  * TabBar 图片文件处理工具
  */
 
-import type { ImageFileInfo } from '../../utils/pageConfig';
+import type { ImageFileInfo } from '../../utils/config/content';
 
 interface FileNode {
   path: string;
