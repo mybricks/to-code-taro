@@ -2,12 +2,11 @@ import Taro from '@tarojs/taro';
 
 export type DataType = {
   key?: string;
-  value?: any;
   sync?: boolean;
 };
 
 export interface Inputs {
-  setStorage?: (fn: (config: DataType, relOutputs?: any) => void) => void;
+  getStorage?: (fn: (config: DataType, relOutputs?: any) => void) => void;
 }
 
 export interface Outputs {
@@ -26,10 +25,9 @@ export default (context: IOContext) => {
   const inputs: Inputs = context.inputs;
   const outputs: Outputs = context.outputs;
 
-  inputs.setStorage?.((val: DataType) => {
+  inputs.getStorage?.((val: DataType) => {
     try {
       const key = val?.key || data.key;
-      const value = val?.value !== undefined ? val.value : data.value;
       const useSync = val?.sync !== undefined ? val.sync : data.sync || false;
 
       if (!key) {
@@ -37,23 +35,23 @@ export default (context: IOContext) => {
         return;
       }
 
-      const result = { key, value };
-
       if (useSync) {
-        Taro.setStorageSync(key, value);
-        outputs.onSuccess(result);
+        try {
+          const value = Taro.getStorageSync(key);
+          outputs.onSuccess({ key, value });
+        } catch (error: any) {
+          outputs.onFail(error?.message || '读取本地缓存失败');
+        }
       } else {
-        Taro.setStorage({
+        Taro.getStorage({
           key,
-          data: value,
-          success: () => outputs.onSuccess(result),
-          fail: (err) => outputs.onFail(err.errMsg || '写入本地缓存失败'),
+          success: (res) => outputs.onSuccess({ key, value: res.data }),
+          fail: (err) => outputs.onFail(err.errMsg || '读取本地缓存失败'),
         });
       }
     } catch (error: any) {
-      console.error('写入本地缓存失败:', error);
-      outputs.onFail(error?.message || '写入本地缓存失败');
+      console.error('读取本地缓存失败:', error);
+      outputs.onFail(error?.message || '读取本地缓存失败');
     }
   });
 };
-

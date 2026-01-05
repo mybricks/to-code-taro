@@ -39,7 +39,9 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.26.0",
-    "@mybricks/to-code-react": "^0.0.5-next.160"
+    "@mybricks/to-code-react": "^0.0.5-next.160",
+    "@types/crypto-js": "^4.2.2",
+    "crypto-js": "^4.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
