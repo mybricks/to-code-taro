@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, Image } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 
 const mockData = {

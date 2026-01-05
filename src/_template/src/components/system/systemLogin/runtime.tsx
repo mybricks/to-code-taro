@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { View, Image } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 import { isDesigner } from "../../utils/env";
 
 export default function ({ env, data, inputs, outputs, slots }) {

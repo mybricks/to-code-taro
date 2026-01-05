@@ -5,9 +5,9 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import css from "./../style.module.less";
+import css from "./../style.less";
 import cx from "classnames";
-import { View, SkeletonImage } from '../../components-h5'
+import { View, SkeletonImage } from './../../components-h5'
 
 export default function ({ env, data, inputs, outputs, title, style }) {
   const ele = useRef(null)

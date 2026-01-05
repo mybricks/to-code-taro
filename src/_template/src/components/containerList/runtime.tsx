@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import { uuid, debounce, throttle } from "../utils";
 import { List, Loading } from "brickd-mobile";
 import { Direction } from "./constant";

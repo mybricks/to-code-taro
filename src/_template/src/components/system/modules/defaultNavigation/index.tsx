@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { View, Image } from "@tarojs/components";
 import cx from "classnames";
-import css from "./style.module.less";
+import css from "./style.less";
 import backIconWhite from "../icons/backIconWhite";
 import backIconBlack from "../icons/backIconBlack";
 import homeButtonWhite from "../icons/homeButtonWhite";

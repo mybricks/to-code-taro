@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { View, Image } from "@tarojs/components";
 import { Arrow } from "@taroify/icons";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 
 export default function ({ env, data, slots, inputs, outputs }) {

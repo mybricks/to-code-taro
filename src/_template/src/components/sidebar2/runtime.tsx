@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { View, ScrollView } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 import { TreeSelect } from "brickd-mobile";
 import { isDesigner } from "../utils/env";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 
 const rowKey = "_itemKey";
 

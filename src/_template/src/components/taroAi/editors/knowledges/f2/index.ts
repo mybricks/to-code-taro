@@ -1,11 +1,11 @@
-import Area from "./area.js";
-import Funnel from "./funnel.js";
-import Column from "./column.js";
-import Bar from "./bar.js";
-import Line from "./line.js";
-import Pie from "./pie.js";
-import Heatmap from "./heatmap.js";
-import Radar from "./radar.js";
+import Area from "./area.ts";
+import Funnel from "./funnel.ts";
+import Column from "./column.ts";
+import Bar from "./bar.ts";
+import Line from "./line.ts";
+import Pie from "./pie.ts";
+import Heatmap from "./heatmap.ts";
+import Radar from "./radar.ts";
 
 const mdMap = {
   AREA: Area,

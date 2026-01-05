@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
-} from "../index";
-import Carousel from '../carousel'
+} from "./../index";
+import Carousel from './../carousel'
 import { SwiperProps } from '@tarojs/components'
 import css from "./index.less";
 

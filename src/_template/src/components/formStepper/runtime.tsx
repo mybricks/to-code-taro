@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect } from "react";
 import Taro from "@tarojs/taro";
-import { isObject, isString, isNumber, isEmpty } from "../utils/type";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import { isObject, isString, isNumber, isEmpty } from "./../utils/type";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import { Field, Stepper } from "brickd-mobile";
 import cx from "classnames";
-import css from "./style.module.less";
+import css from "./style.less";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;
@@ -100,7 +100,6 @@ export default function (props) {
       max={data.max ?? Infinity}
       disabled={data.disabled}
       shape="circular"
-      size={24}
       value={value ?? 0}
       onChange={onChange}
     ></Stepper>

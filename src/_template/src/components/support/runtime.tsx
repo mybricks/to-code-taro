@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import css from "./style.module.less";
+import css from "./style.less";
 import { View, Image } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 
 export default function ({ env, data, inputs, outputs, title }) {
   const onClick = useCallback(() => {

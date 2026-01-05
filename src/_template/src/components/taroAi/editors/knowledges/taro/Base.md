@@ -85,7 +85,7 @@ type ComponentType<T> = ComponentType<T>
 ```
 
 ```jsx file="runtime.jsx"
-import css from 'style.module.less';
+import css from 'style.less';
 import { comDef } from 'mybricks';
 import { View, Text } from '@tarojs/components';
 import { useState } from 'react';
@@ -188,7 +188,7 @@ export default comDef(({
 ```
 
 ```jsx file="runtime.jsx"
-import css from 'style.module.less';
+import css from 'style.less';
 import { comDef } from 'mybricks';
 import { View, Text } from '@tarojs/components';
 import { useEffect, useCallback, useMemo } from 'react';
@@ -344,7 +344,7 @@ export default comDef(({
 ```
 
 ```jsx file="runtime.jsx"
-import css from 'style.module.less';
+import css from 'style.less';
 import { comDef } from 'mybricks';
 import { View, Text } from '@tarojs/components';
 import { useEffect, useCallback, useMemo } from 'react';
@@ -448,7 +448,7 @@ import { comDef } from 'mybricks';
 import { View, Text } from '@tarojs/components';
 import * as Taro from '@tarojs/taro';
 import { useRef, useState } from 'react';
-import css from 'style.module.less';
+import css from 'style.less';
 export default comDef(({
   data,
   env
@@ -630,7 +630,7 @@ export default comDef(({
 import { comDef } from 'mybricks';
 import { View, Text } from '@tarojs/components';
 import { useState } from 'react';
-import css from 'style.module.less';
+import css from 'style.less';
 export default comDef(({
   data
 }) => {

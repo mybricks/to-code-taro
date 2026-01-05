@@ -5,12 +5,12 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 import { View, Image } from "@tarojs/components";
-import SkeletonImage from "../components/skeleton-image";
-import { useRedirectedImageUrl } from "../utils/hooks";
-import Taro from "@tarojs/taro";
+import SkeletonImage from "./../components/skeleton-image";
+import { useRedirectedImageUrl } from "./../utils/hooks";
+import * as Taro from "@tarojs/taro";
 
 export default function ({ env, data, inputs, outputs, title, style, extra }) {
   const ele = useRef(null);
@@ -110,7 +110,7 @@ export default function ({ env, data, inputs, outputs, title, style, extra }) {
         onLoad={onLoad}
         onError={onError}
         showMenuByLongpress={data.showMenuByLongpress ?? false}
-        cdnCut='auto'
+        cdnCut="auto"
         cdnCutOption={{ width: style.width, height: style.height }}
         {...svgProps}
       />

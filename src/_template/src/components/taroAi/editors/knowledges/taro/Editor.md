@@ -29,9 +29,9 @@ ComponentType<EditorProps>
 ```jsx file="runtime.jsx"
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Editor, View, Image } from '@tarojs/components';
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 
 //下面是图标，不能省略
 const boldIcon = `https://assets.mybricks.world/hUOViBP3ohSJJDJNST8AGu6DwO4jrsL0-1732074614093.png`;

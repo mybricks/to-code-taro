@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { View } from "@tarojs/components";
+import css from "./style.less";
 import cx from "classnames";
-import css from "./style.module.less";
 import Taro from "@tarojs/taro";
 
 export default function ({ env, data, slots, inputs, outputs }) {
@@ -22,7 +22,7 @@ export default function ({ env, data, slots, inputs, outputs }) {
     <View className={cx(css.container, "mybricks-container")} onClick={onClick}>
       {slots["content"].render({
         style: {
-          ...data.layout,
+          ...data.layout || { position: "smart"},
         },
       })}
     </View>

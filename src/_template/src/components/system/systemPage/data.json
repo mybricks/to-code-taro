@@ -1,8 +1,8 @@
 {
   "useNavigationStyle": "default",
   "navigationStyle": "default",
-  "navigationBarBackgroundColor": "#464646",
-  "navigationBarTextStyle": "white",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
   "navigationBarTitleText": "页面标题",
   "backgroundColorTop": "#ffffff",
   "backgroundColorBottom": "#ffffff",
@@ -14,12 +14,9 @@
     "mainSlotStyle": {},
     "useFixed": true
   },
-
   "useTabBar": true,
   "tabBar": [],
-
   "background": "#ffffff",
-
   "enablePullDownRefresh": false,
   "backgroundTextStyle": "dark",
   "backgroundColor": "#464646",
@@ -29,7 +26,6 @@
   "disableScroll": false,
   "disableSwipeBack": false,
   "useFooter": false,
-
   "useSkeleton": false,
   "skeleton": [
     {

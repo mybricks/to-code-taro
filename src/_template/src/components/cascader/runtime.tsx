@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Cascader } from "brickd-mobile";
 import mockData from "./mockData";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 
 export default function ({ env, data, inputs, outputs, slots, mockProps }) {

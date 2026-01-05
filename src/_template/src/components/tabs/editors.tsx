@@ -1,5 +1,5 @@
 import { uuid } from "../utils";
-import { DynamicArrayData } from "../utils/dynamic-array";
+import { DynamicArrayData } from "./../utils/dynamic-array";
 import comJson from "./com.json";
 
 const ScopeSlotInputs = comJson.slots[0].inputs;

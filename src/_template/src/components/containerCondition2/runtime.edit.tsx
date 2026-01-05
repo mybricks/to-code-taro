@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 
 export default function ({ env, data, slots, inputs, outputs }) {
   const [innputId, setInputId] = useState(data.defaultActiveId);

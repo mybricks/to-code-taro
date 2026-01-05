@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import cls from "classnames";
-import css from "./../style.module.less";
+import css from "./../style.less";
 
 
 export default function ({ env, data, inputs, style, outputs }) {

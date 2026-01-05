@@ -1,5 +1,5 @@
 import { getFormItem } from "./utils";
-import { DynamicArrayData } from '../utils/dynamic-array'
+import { DynamicArrayData } from './../utils/dynamic-array'
 import { FormItems, Data, RuleKeys } from "./types";
 import comJson from './com.json'
 

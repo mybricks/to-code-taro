@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
-import Taro from "@tarojs/taro";
-import RichText from "../components/rich-text";
+import css from "./style.less";
+import * as Taro from "@tarojs/taro";
+import RichText from "./../components/rich-text";
 
 export default function ({ env, data, inputs, outputs, slots }) {
   const [ready, setReady] = useState(false);

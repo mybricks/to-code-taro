@@ -9,7 +9,7 @@ import React, {
 import css from "./index.less";
 import Taro from "@tarojs/taro";
 import { View, Text, Image, RichText, ImageProps } from "@tarojs/components";
-import SkeletonImage from "../skeleton-image";
+import SkeletonImage from "./../skeleton-image";
 import { isH5 } from "../../utils/env";
 
 function styleStringToCSSProperties(styleString) {

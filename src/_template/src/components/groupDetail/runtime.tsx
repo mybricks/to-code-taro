@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Button, Text, Image, RichText } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
-import SkeletonImage from "../components/skeleton-image";
-import Taro from "@tarojs/taro";
+import SkeletonImage from "./../components/skeleton-image";
+import * as Taro from "@tarojs/taro";
 
 const mockData = {
   organization: {

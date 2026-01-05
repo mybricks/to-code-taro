@@ -6,9 +6,9 @@ import React, {
   useRef,
 } from "react";
 import { View } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 import { Tabs } from "brickd-mobile";
-import css from "./style.module.less";
+import css from "./style.less";
 import classNames from "classnames";
 
 function getDefaultCurrTabId(tabs) {

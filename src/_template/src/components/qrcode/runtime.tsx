@@ -3,8 +3,8 @@ import { View, Image } from "@tarojs/components";
 // https://github.com/miaonster/taro-code
 // import { Barcode, QRCode } from "taro-code";
 import { QRCode } from "taro-code";
-import { isString } from "../utils/core";
-import css from "./style.module.less";
+import { isString } from "./../utils/core";
+import css from "./style.less";
 
 export default function ({ env, data, inputs, outputs, title, style }) {
   useMemo(() => {

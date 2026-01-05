@@ -8,9 +8,9 @@ import React, {
 } from "react";
 import { View, Button, Image } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
-import { isEmpty, isObject } from "../utils/core";
+import { isEmpty, isObject } from "./../utils/core";
 import { Cell, Form, Field } from "brickd-mobile";
 import { getFormItem, findFormItemIndex } from "./utils";
 import { FormItems, RuleKeys } from "./types";

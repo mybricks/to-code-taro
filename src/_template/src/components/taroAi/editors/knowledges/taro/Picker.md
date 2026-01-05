@@ -8,7 +8,7 @@ ComponentType<PickerSelectorProps | PickerMultiSelectorProps | PickerTimeProps |
 ## 最佳实践
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useState } from 'react';
 import { View, Text, Picker } from '@tarojs/components';
 

@@ -9,7 +9,7 @@ ComponentType<PickerViewProps>
 ## 最佳实践
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useState } from 'react';
 import { View, PickerView, PickerViewColumn } from '@tarojs/components';
 

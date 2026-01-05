@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View } from "@tarojs/components";
 import cx from "classnames";
-import css from "./style.module.less";
+import css from "./style.less";
 import mock from "./mock";
 import Taro from "@tarojs/taro";
 import { IndexList as BrickdIndexList, Cell } from "brickd-mobile";

@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { isNumber, isObject, isString, isEmpty } from "../utils/type";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import { Input,Image } from "brickd-mobile";
 import { View } from "@tarojs/components";
-import cx from "classnames";
-import css from "./style.module.less";
+import css from "./style.less";
 import { isH5 } from "../utils/env";
+import cx from "classnames";
 import { clearable } from "./clearable";
 
 export default function (props) {
@@ -23,15 +23,15 @@ export default function (props) {
     outputs["onChange"](val);
   });
 
-  // useEffect(() => {
-  //   parentSlot?._inputs["setProps"]?.({
-  //     id: props.id,
-  //     name: props.name,
-  //     value: {
-  //       visible: props.style.display !== "none",
-  //     },
-  //   });
-  // }, [props.style.display]);
+  useEffect(() => {
+    parentSlot?._inputs["setProps"]?.({
+      id: props.id,
+      name: props.name,
+      value: {
+        visible: props.style.display !== "none",
+      },
+    });
+  }, [props.style.display]);
 
   useEffect(() => {
     /* 设置值 */
@@ -128,8 +128,7 @@ export default function (props) {
     if(data.clearable && value.length > 0){
       return <View style={{width:18,height:18}} onClick={()=>{
         setValue('')
-      }}
-      >
+      }}>
         <Image src={clearable}></Image>
       </View>
     }else{
@@ -160,7 +159,7 @@ export default function (props) {
         cursor={value.length}
         onBlur={onBlur}
         maxlength={data.maxlength}
-        confirmType='done'
+        confirmType={"done"}
         onConfirm={onConfirm}
         clearable={false}
       />

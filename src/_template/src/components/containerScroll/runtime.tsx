@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Image, ScrollView } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 
 export default function ({ env, data, inputs, outputs, slots, title, style }) {
   const [state, setState] = useState({

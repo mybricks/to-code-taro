@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect , useState } from "react";
 import { View, Video } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import { isH5 } from "../utils/env";
 
 export default function ({ env, data, inputs, outputs, title, style }) {

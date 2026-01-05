@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { View, Image } from "@tarojs/components";
 import cx from "classnames";
-import Taro from "@tarojs/taro";
-import css from "./style.module.less";
+import * as Taro from "@tarojs/taro";
+import css from "./style.less";
 import { isDesigner } from "../../../utils/env";
 import menuButtonWhite from "../icons/menuButtonWhite";
 import menuButtonBlack from "../icons/menuButtonBlack";

@@ -1,4 +1,4 @@
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 
 /**
  * 环境相关方法

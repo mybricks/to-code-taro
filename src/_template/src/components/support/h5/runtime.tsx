@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import css from './../style.module.less'
-import { View } from "../../components-h5";
+import css from './../style.less'
+import { View } from "./../../components-h5";
 
 export default function ({ env, data, inputs, outputs, title }) {
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Image } from "@tarojs/components";
 import cx from "classnames";
-import css from "./style.module.less";
+import css from "./style.less";
 import CustomTabBar from "../modules/customTabBar";
 import EmptyCom from "../../components/empty-com";
 import * as EventBus from "../modules/eventBus";

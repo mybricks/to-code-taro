@@ -1,25 +1,32 @@
-import React, { useCallback, useMemo, useState } from "react";
-import * as Icons from "@taroify/icons";
+import React, {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useLayoutEffect,
+} from "react";
 import { Cross } from "@taroify/icons";
 import css from "./index.less";
-import { basicIcons, filledIcons, outlinedIcons } from "./icons";
+import { HarmonyIcons } from "../../components/dynamic-icon/harmony-icons/icons";
+import DynamicIcon from "../../components/dynamic-icon";
 
-const { Drawer, Radio } = window.antd ?? {}
+const { Drawer, Tabs, Radio } = window.antd ?? {};
 
 const Icon = (props: any) => {
   const { type, size, className } = props;
-
-  // @ts-ignore
-  const RenderIcon = Icons[type];
-
-  if (!RenderIcon) return <></>;
-
-  return <RenderIcon className={className} size={size || 24} />;
+  return <DynamicIcon className={className} size={size || 24} name={type} />;
 };
 
 export default function ({ value }) {
   const [visible, setVisible] = useState(false);
-  const [iconSet, setIconSet] = useState("basic");
+  const [iconSet, setIconSet] = useState(HarmonyIcons[0]?.title);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const cateRef = useRef(null);
+  const cateItemRefs = useRef({}) as MutableRefObject<{
+    [key: string]: HTMLElement;
+  }>;
+  const isScrollingRef = useRef(false);
 
   const _setValue = useCallback(
     (icon) => {
@@ -33,10 +40,10 @@ export default function ({ value }) {
     setVisible(!visible);
   }, [visible]);
 
-  const renderBasicIcons = useMemo(() => {
+  const renderIcons = useCallback((icons) => {
     return (
       <div className={css["icon-list"]}>
-        {basicIcons.map((icon) => {
+        {Object.keys(icons).map((icon) => {
           return (
             <div
               className={css["icon-item"]}
@@ -49,67 +56,90 @@ export default function ({ value }) {
             </div>
           );
         })}
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
       </div>
     );
-  }, [basicIcons]);
+  }, []);
 
-  const renderOutlinedIcons = useMemo(() => {
-    return (
-      <div className={css["icon-list"]}>
-        {outlinedIcons.map((icon) => {
-          return (
-            <div
-              className={css["icon-item"]}
-              onClick={() => {
-                _setValue(icon);
-              }}
-              key={icon}
-            >
-              <Icon type={icon} />
-            </div>
-          );
-        })}
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-      </div>
-    );
-  }, [outlinedIcons]);
+  let scrollTimeout;
+  const handleChangeTab = (activeKey: string) => {
+    console.log("activeKey", activeKey);
+    setIconSet(activeKey);
+    // 滚动到对应的分类
+    isScrollingRef.current = true;
+    cateItemRefs.current[activeKey]?.scrollIntoView({
+      behavior: "instant",
+      block: "start",
+    });
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+    scrollTimeout = setTimeout(() => {
+      isScrollingRef.current = false;
+    }, 300);
+  };
 
-  const renderFilledIcons = useMemo(() => {
-    return (
-      <div className={css["icon-list"]}>
-        {filledIcons.map((icon) => {
-          return (
-            <div
-              className={css["icon-item"]}
-              onClick={() => {
-                _setValue(icon);
-              }}
-              key={icon}
-            >
-              <Icon type={icon} />
-            </div>
-          );
-        })}
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-        <div className={css["icon-item-placeholder"]}></div>
-      </div>
+  useEffect(() => {
+    setIconSet(HarmonyIcons[0]?.title);
+  }, [visible]);
+
+  useLayoutEffect(() => {
+    if (!cateRef.current) return;
+    const visibleSet = new Set();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const target =
+            entry.target instanceof HTMLElement ? entry.target : null;
+          const title = target?.dataset.title;
+          if (!title) return;
+          if (entry.isIntersecting) {
+            visibleSet.add(title);
+          } else {
+            visibleSet.delete(title);
+          }
+        });
+        if (isScrollingRef.current) return;
+
+        const firstVisible = HarmonyIcons.map((item) => item.title).filter(
+          (title) => visibleSet.has(title)
+        )?.[0];
+
+        if (firstVisible && firstVisible !== iconSet) {
+          setIconSet(firstVisible);
+        }
+      },
+      {
+        root: cateRef.current,
+        threshold: 0,
+      }
     );
-  }, [filledIcons]);
+
+    Object.values(cateItemRefs.current).forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [visible, isScrollingRef]);
+
+  // tab居中显示
+  useEffect(() => {
+    const activeIndex = HarmonyIcons.findIndex(
+      (item) => item.title === iconSet
+    );
+    const activeEl = tabsRef.current?.querySelectorAll(
+      ".ant-radio-button-wrapper"
+    )?.[activeIndex] as HTMLElement;
+    const tabsWrapWidth = tabsRef.current?.offsetWidth ?? 0;
+    const curTabWidth = activeEl?.offsetWidth;
+    const curTabLeft = activeEl?.offsetLeft;
+    const scrollTo = curTabLeft - tabsWrapWidth / 2 + curTabWidth / 2;
+
+    tabsRef.current?.scrollTo({
+      left: scrollTo,
+      behavior: "smooth",
+    });
+  }, [iconSet]);
 
   return (
     <div className={css["editor-icon"]}>
@@ -135,33 +165,46 @@ export default function ({ value }) {
         closable={false}
         destroyOnClose={true}
         visible={visible}
-        onClose={close}
         width={390}
         getContainer={() => document.querySelector('div[class^="lyStage-"]')}
         style={{ position: "absolute" }}
       >
-        <div className={css.sticky}>
+        <div className={css["drawer-content"]}>
           <div className={css["drawerTitle"]}>
             {"选择图标"}
-            <Cross onClick={close} />
+            <Cross onClick={toggle} />
           </div>
           <div className={css.styleChoose}>
-            <div>
+            <div ref={tabsRef} style={{ overflowX: "auto" }}>
               <Radio.Group
                 value={iconSet}
-                onChange={(e) => setIconSet(e.target.value)}
+                onChange={(e) => handleChangeTab(e.target.value)}
+                style={{ whiteSpace: "nowrap" }}
               >
-                <Radio.Button value="basic">基础图标</Radio.Button>
-                <Radio.Button value="outLined">线框风格</Radio.Button>
-                <Radio.Button value="Filled">实底风格</Radio.Button>
+                {HarmonyIcons.map((icons) => {
+                  return (
+                    <Radio.Button value={icons.title} key={icons.title}>
+                      {icons.title}
+                    </Radio.Button>
+                  );
+                })}
               </Radio.Group>
             </div>
           </div>
-        </div>
-        <div>
-          {iconSet === "basic" ? renderBasicIcons : null}
-          {iconSet === "outLined" ? renderOutlinedIcons : null}
-          {iconSet === "Filled" ? renderFilledIcons : null}
+          <div className={css["icon-cate-list"]} ref={cateRef}>
+            {HarmonyIcons.map((itemCate) => {
+              return (
+                <div
+                  key={itemCate.title}
+                  ref={(el) => (cateItemRefs.current[itemCate.title] = el)}
+                  data-title={itemCate.title}
+                >
+                  <h3 className={css["icon-cate-title"]}>{itemCate.title}</h3>
+                  {renderIcons(itemCate.icons)}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </Drawer>
     </div>

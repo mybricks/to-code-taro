@@ -8,10 +8,10 @@ import React, {
 import { View, Button } from "@tarojs/components";
 import { Popup } from "brickd-mobile";
 import Taro from "@tarojs/taro";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
-import { isEmpty, isString } from "../../utils/core";
-import { useFilterItemValue } from "../common";
+import { isEmpty, isString } from "./../../utils/core";
+import { useFilterItemValue } from "./../common";
 
 export default (props) => {
   const { env, data, inputs, outputs, slots } = props;

@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import { View, Canvas as TaroCanvas } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 import F2 from "@antv/f2";
 import ScrollBar from "@antv/f2/lib/plugin/scroll-bar";
 import Pan from "@antv/f2/lib/interaction/pan";

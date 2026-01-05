@@ -2,12 +2,12 @@ import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Input, DatetimePicker } from "brickd-mobile";
 import { View } from "@tarojs/components";
 import { ArrowRight, Cross } from "@taroify/icons";
-import { isObject, isString, isNumber, isEmpty } from "../utils/core/type";
-import { polyfill_taro_picker } from "../utils/h5-polyfill";
+import { isObject, isString, isNumber, isEmpty } from "./../utils/core/type";
+import { polyfill_taro_picker } from "./../utils/h5-polyfill";
 import dayjs from "dayjs";
-import css from "./style.module.less";
+import css from "./style.less";
 import InputDisplay from "../components/input-display";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import cx from "classnames";
 
 polyfill_taro_picker();

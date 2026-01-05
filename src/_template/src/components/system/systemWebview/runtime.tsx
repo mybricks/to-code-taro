@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, WebView, NavigationBar } from "@tarojs/components";
 import cx from "classnames";
-import css from "./style.module.less";
+import css from "./style.less";
 import { isDesigner } from "../../utils/env";
 import EmptyCom from "../../components/empty-com";
 import DefaultNavigation from "../modules/defaultNavigation";

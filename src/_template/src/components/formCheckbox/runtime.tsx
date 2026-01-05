@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { Checkbox, Image } from "brickd-mobile";
-import { isObject, isString, isEmpty, isNumber } from "../utils/type";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import { isObject, isString, isEmpty, isNumber } from "./../utils/type";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import cx from "classnames";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;

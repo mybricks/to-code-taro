@@ -6,9 +6,9 @@ import React, {
   useState,
 } from "react";
 import { Map, View, MapProps } from "@tarojs/components";
-import Taro from "@tarojs/taro";
-import { uuid } from "../utils";
-import css from "./style.module.less";
+import * as Taro from "@tarojs/taro";
+import { uuid } from "./../utils";
+import css from "./style.less";
 
 interface MapGeo {
   polylines?: MapProps.polyline[];

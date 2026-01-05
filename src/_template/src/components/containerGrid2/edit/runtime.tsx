@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useRef } from "react";
 import cx from "classnames";
-import Resizable from "../../components/resizable";
-import css from "../style.module.less";
+import Resizable from "./../../components/resizable";
+import css from "../style.less";
 
 export default ({ id, data, outputs, slots, env, undo }) => {
   const editFinishRef = useRef<Function>();

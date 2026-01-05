@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cx from "classnames";
-import { Swiper, SwiperItem, EmptyCom, Image } from "../../components-h5";
-import { isUndef } from "../../utils/core";
-import Taro from "@tarojs/taro";
-import css from "./../style.module.less";
+import { Swiper, SwiperItem, EmptyCom, Image } from "./../../components-h5";
+import { isUndef } from "./../../utils/core";
+import * as Taro from "@tarojs/taro";
+import css from "./../style.less";
 
 export default function ({ env, data, inputs, outputs, style }) {
   // 当前选中的tab

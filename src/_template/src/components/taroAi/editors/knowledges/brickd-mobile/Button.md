@@ -11,7 +11,7 @@
 
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useState } from 'react';
 import { Button } from 'brickd-mobile';
 
@@ -35,7 +35,7 @@ export default comDef(({ data, env, inputs, outputs, slots }) => {
 ### 获取用户信息
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useState } from 'react';
 import { Button } from 'brickd-mobile';
 

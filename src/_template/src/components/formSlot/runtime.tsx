@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { isNumber, isObject, isString, isEmpty } from "../utils/core/type";
+import { isNumber, isObject, isString, isEmpty } from "./../utils/core/type";
 import { Field, Input } from "brickd-mobile";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;

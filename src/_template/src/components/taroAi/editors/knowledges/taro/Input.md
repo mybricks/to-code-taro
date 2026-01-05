@@ -11,7 +11,7 @@ ComponentType<InputProps>
 > 使用 Input 组件时，须给 Input 的 class 额外增加一个后代选择器 input { opacity: 1; }
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useState } from 'react';
 import { Input } from '@tarojs/components';
 
@@ -41,7 +41,7 @@ export default comDef(({ data, env, inputs, outputs, slots }) => {
 
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useState } from 'react';
 import { Input } from '@tarojs/components';
 
@@ -70,7 +70,7 @@ export default comDef(({ data, env, inputs, outputs, slots }) => {
 
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useState } from 'react';
 import { Input } from '@tarojs/components';
 

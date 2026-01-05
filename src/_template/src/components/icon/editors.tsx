@@ -11,9 +11,9 @@ export default {
   ":root": {
     style: [
       {
-        title: "标签",
-        options: ["font", "background"],
-        target: ".mybricks-icon-label",
+        title: "图标",
+        options: ["border", "padding", "background", "boxshadow", "margin"],
+        target: ".mybricks-icon",
       },
     ],
     items: ({ data, output, style }, cate0, cate1, cate2) => {
@@ -24,11 +24,11 @@ export default {
           items: [
             {
               title: "图标",
-              description: "设置徽标内容时请注意为组件设置合适的尺寸",
               type: "editorRender",
+              description:"选择要显示的图标",
               options: {
                 render: (props) => {
-                  return <IconSelector value={props.editConfig.value}  />;
+                  return <IconSelector value={props.editConfig.value} />;
                 },
               },
               value: {
@@ -40,102 +40,52 @@ export default {
                 },
               },
             },
-          ],
-        },
-        {
-          title: "徽标设置",
-          items: [
             {
-              title: "徽标内容",
-              type: "text",
-              description: "设置徽标内容时请注意为组件设置合适的尺寸",
+              title: "大小",
+              type: "inputnumber",
+              description:"设置图标的大小，单位为像素",
+              options: [{ min: 1 }],
               value: {
                 get({ data }) {
-                  return data.badgeContent;
+                  return [data.fontSize];
                 },
                 set({ data }, value: string) {
-                  data.badgeContent = value;
-                },
-              },
-            },
-          ],
-        },
-        {
-          title: "标签设置",
-          items: [
-            {
-              title: "展示标签",
-              type: "switch",
-              value: {
-                get({ data }) {
-                  return data.useLabel;
-                },
-                set({ data }, value: boolean) {
-                  data.useLabel = value;
+                  if (Array.isArray(value)) {
+                    data.fontSize = value?.[0];
+                  } else {
+                    data.fontSize = value;
+                  }
                 },
               },
             },
             {
-              title: "标签文案",
-              type: "text",
-              ifVisible({ data }: any) {
-                return data.useLabel;
-              },
+              title: "颜色",
+              type: "colorpicker",
+              description:"设置图标的颜色，只支持纯色",
               value: {
                 get({ data }) {
-                  return data.labelContent;
+                  return data.fontColor;
                 },
                 set({ data }, value: string) {
-                  data.labelContent = value;
+                  data.fontColor = value;
                 },
               },
             },
-            // {
-            //   title: "标签样式",
-            //   type: "style",
-            //   options: {
-            //     defaultOpen: true,
-            //     plugins: ["font", "bgColor"],
-            //   },
-            //   value: {
-            //     get: ({ data }) => {
-            //       return data.labelStyle;
-            //     },
-            //     set: ({ data }, value) => {
-            //       data.labelStyle = { ...data.labelStyle, ...value };
-            //     },
-            //   },
-            // },
           ],
         },
-      ];
-  
-      cate1.title = "样式";
-      cate1.items = [];
-  
-      cate2.title = "动作";
-      cate2.items = [
         {
-          title: "单击",
-          type: "_event",
-          options: {
-            outputId: "onClick",
-          },
-        },
-        {
-          title: "点击时自动清空徽标内容",
-          type: "switch",
-          value: {
-            get({ data }) {
-              return data.autoClearBadgeWhenClick;
+          title: "事件",
+          items: [
+            {
+              title: "单击",
+              type: "_event",
+              options: {
+                outputId: "onClick",
+              },
             },
-            set({ data }, value: boolean) {
-              data.autoClearBadgeWhenClick = value;
-            },
-          },
+          ],
         },
       ];
     },
-  }
-  
+  },
 };

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { View } from "@tarojs/components";
 import cx from "classnames";
-import { isObject, isString, isNumber, isEmpty } from "../utils/core/type";
+import { isObject, isString, isNumber, isEmpty } from "./../utils/core/type";
 import { Rate, Field } from "brickd-mobile";
 
 export default function (props) {
@@ -36,8 +36,10 @@ export default function (props) {
       }
     });
 
-    inputs["setDisabled"]((val) => {
+    /* 设置禁用 */
+    inputs["setDisabled"]?.((val, outputRels) => {
       data.disabled = !!val;
+      outputRels["setDisabledComplete"]?.(data.disabled);
     });
   }, []);
 

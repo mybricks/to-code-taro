@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState} from "react";
 import { View, Image } from "@tarojs/components";
 import cx from "classnames";
-import { Swiper, SwiperItem } from "../components/swiper";
+import { Swiper, SwiperItem } from "./../components/swiper";
 import EmptyCom from "../components/empty-com";
-import SkeletonImage from "../components/skeleton-image";
-import { isUndef } from "../utils/core";
-import Taro from "@tarojs/taro";
-import css from "./style.module.less";
+import SkeletonImage from "./../components/skeleton-image";
+import { isUndef } from "./../utils/core";
+import * as Taro from "@tarojs/taro";
+import css from "./style.less";
 
 export default function ({ env, data, inputs, outputs, style }) {
   // 当前选中的tab

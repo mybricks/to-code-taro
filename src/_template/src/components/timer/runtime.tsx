@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import cls from "classnames";
 
 function formatTime(input) {

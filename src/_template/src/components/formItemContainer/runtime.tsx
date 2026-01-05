@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { isNumber, isObject, isString, isEmpty } from "../utils/core/type";
-import css from "./style.module.less";
+import { isNumber, isObject, isString, isEmpty } from "./../utils/core/type";
+import css from "./style.less";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;

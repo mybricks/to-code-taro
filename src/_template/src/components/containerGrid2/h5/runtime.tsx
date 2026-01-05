@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import cx from 'classnames';
-import css from './../style.module.less';
+import css from './../style.less';
 
 export default ({ id, data, outputs, slots }) => {
   const onClickNode = useCallback((node) => {

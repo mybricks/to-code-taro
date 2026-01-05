@@ -1,4 +1,11 @@
-import { defaultSelectedIconPath, defaultNormalIconPath } from "../const";
+import {
+  defaultSelectedIconPath,
+  defaultNormalIconPath,
+  defaultIcon,
+  defaultNormalFontIconStyle,
+  defaultSelectedFontIconStyle,
+} from "../const";
+import IconSelector from "../../../editors/iconSelector";
 const message = window.antd?.message;
 
 let selectedSceneId = null;
@@ -10,27 +17,216 @@ const getDefaultTabItem = (id) => {
       id,
     },
     text: "标签项",
+    selectedIconUseImg: false,
     selectedIconPath: defaultSelectedIconPath,
+    selectedIcon: defaultIcon,
+    selectedFontIconStyle: defaultSelectedFontIconStyle,
     selectedIconStyle: {
       width: "22px",
       height: "22px",
     },
     selectedTextStyle: {
+      marginTop: "6px",
       fontSize: 12,
       color: "#FD6A00",
     },
+    normalIconUseImg: false,
     normalIconPath: defaultNormalIconPath,
+    normalIcon: defaultIcon,
+    normalFontIconStyle: defaultNormalFontIconStyle,
     normalIconStyle: {
       width: "22px",
       height: "22px",
     },
     normalTextStyle: {
+      marginTop: "6px",
       fontSize: 12,
       color: "#909093",
     },
   };
 };
 
+function iconEditor(type: string) {
+  const kesMap = {
+    normal: {
+      useIconImg: "normalIconUseImg",
+      iconPath: "normalIconPath",
+      icon: "normalIcon",
+      iconStyle: "normalFontIconStyle",
+      iconImgStyle: "normalIconStyle",
+    },
+    selected: {
+      useIconImg: "selectedIconUseImg",
+      iconPath: "selectedIconPath",
+      icon: "selectedIcon",
+      iconStyle: "selectedFontIconStyle",
+      iconImgStyle: "selectedIconStyle",
+    },
+  };
+  const curKey = kesMap[type];
+  const typeStr = type === "normal" ? "默认" : "激活";
+  return [
+    {
+      catelog: `${typeStr}图标`,
+      title: "图标类型",
+      description: `图标库：从图标库中选取图标；自定义图标：上传自定义图片图标`,
+      type: "radio",
+      options: [
+        { label: "图标库", value: false },
+        { label: "自定义图标", value: true },
+      ],
+      value: {
+        get({ data, focusArea }) {
+          if (!focusArea) return;
+          return data.tabBar[focusArea.index]?.[curKey.useIconImg] !== false;
+        },
+        set({ data, focusArea }, value) {
+          let tabBar = JSON.parse(JSON.stringify(data.tabBar));
+          tabBar[focusArea.index][curKey.useIconImg] = value;
+
+          // 兼容没有图标库之前的项目，赋值初始值
+          tabBar[focusArea.index][curKey.icon] =
+            tabBar[focusArea.index][curKey.icon] ?? defaultIcon;
+          tabBar[focusArea.index][curKey.iconStyle] =
+            tabBar[focusArea.index][curKey.iconStyle] ??
+            (type === "normal"
+              ? defaultNormalFontIconStyle
+              : defaultSelectedFontIconStyle);
+
+          data.tabBar = tabBar;
+
+          window.__tabbar__?.set(tabBar);
+        },
+      },
+    },
+    {
+      ifVisible({ data, focusArea }) {
+        return data.tabBar[focusArea.index]?.[curKey.useIconImg] !== false;
+      },
+      catelog: `${typeStr}图标`,
+      description: `上传${typeStr}图标的自定义图标图片`,
+      title: "图标",
+      type: "imageSelector",
+      options: {
+        fileSizeLimit: 10,
+        useBase64Only: true,
+      },
+      value: {
+        get({ data, focusArea }) {
+          if (!focusArea) return;
+          return data.tabBar[focusArea.index]?.[curKey.iconPath];
+        },
+        set({ data, focusArea }, value) {
+          let tabBar = JSON.parse(JSON.stringify(data.tabBar));
+          tabBar[focusArea.index][curKey.iconPath] = value;
+          data.tabBar = tabBar;
+
+          window.__tabbar__?.set(tabBar);
+        },
+      },
+    },
+    {
+      ifVisible({ data, focusArea }) {
+        return data.tabBar[focusArea.index]?.[curKey.useIconImg] === false;
+      },
+      catelog: `${typeStr}图标`,
+      title: "图标",
+      description: `选择${typeStr}图标`,
+      type: "editorRender",
+      options: {
+        render: (props) => {
+          return <IconSelector value={props.editConfig.value} />;
+        },
+      },
+      value: {
+        get({ data, focusArea }) {
+          if (!focusArea) return;
+          return data.tabBar[focusArea.index]?.[curKey.icon] ?? defaultIcon;
+        },
+        set({ data, focusArea }, value) {
+          let tabBar = JSON.parse(JSON.stringify(data.tabBar));
+          tabBar[focusArea.index][curKey.icon] = value;
+          data.tabBar = tabBar;
+
+          window.__tabbar__?.set(tabBar);
+        },
+      },
+    },
+    {
+      ifVisible({ data, focusArea }) {
+        return data.tabBar[focusArea.index]?.[curKey.useIconImg] !== false;
+      },
+      catelog: `${typeStr}图标`,
+      title: "大小",
+      description: `自定义${typeStr}图标大小`,
+      type: "styleNew",
+      options: {
+        defaultOpen: true,
+        plugins: ["size"],
+      },
+      value: {
+        get({ data, focusArea }) {
+          if (!focusArea) return;
+          return data.tabBar[focusArea.index]?.[curKey.iconImgStyle];
+        },
+        set({ data, focusArea }, value) {
+          let tabBar = JSON.parse(JSON.stringify(data.tabBar));
+          tabBar[focusArea.index][curKey.iconImgStyle] = {
+            ...value,
+          };
+          data.tabBar = tabBar;
+
+          window.__tabbar__?.set(tabBar);
+        },
+      },
+    },
+    {
+      ifVisible({ data, focusArea }) {
+        return data.tabBar[focusArea.index]?.[curKey.useIconImg] === false;
+      },
+      catelog: `${typeStr}图标`,
+      title: "样式",
+      description: `${typeStr}图标样式`,
+      type: "stylenew",
+      options: {
+        defaultOpen: true,
+        plugins: [
+          {
+            type: "font",
+            config: {
+              disableTextAlign: true,
+              disableFontFamily: true,
+              disableLineHeight: true,
+              disableFontWeight: true,
+              disableLetterSpacing: true,
+            },
+          },
+        ],
+      },
+      value: {
+        get({ data, focusArea }) {
+          if (!focusArea) return;
+          const defaultStyle =
+            type === "normal"
+              ? defaultNormalFontIconStyle
+              : defaultSelectedFontIconStyle;
+          return (
+            data.tabBar[focusArea.index]?.[curKey.iconStyle] ?? defaultStyle
+          );
+        },
+        set({ data, focusArea }, value) {
+          let tabBar = JSON.parse(JSON.stringify(data.tabBar));
+          tabBar[focusArea.index][curKey.iconStyle] = {
+            ...value,
+          };
+          data.tabBar = tabBar;
+
+          window.__tabbar__?.set(tabBar);
+        },
+      },
+    },
+  ];
+}
 
 export default {
   ".mybricks-tabBar": {
@@ -53,10 +249,7 @@ export default {
             });
 
             if (value && !isContain) {
-              let tabBar = [
-                ...globalTabBar,
-                getDefaultTabItem(data.id),
-              ];
+              let tabBar = [...globalTabBar, getDefaultTabItem(data.id)];
 
               window.__tabbar__?.set(tabBar);
 
@@ -98,50 +291,25 @@ export default {
           },
         },
       },
-      {
-        title: "激活图标",
-        type: "imageSelector",
-        options: {
-          fileSizeLimit: 10,
-          useBase64Only: true,
-        },
-        value: {
-          get({ data, focusArea }) {
-            if (!focusArea) return;
-            return data.tabBar[focusArea.index]?.selectedIconPath;
-          },
-          set({ data, focusArea }, value) {
-            let tabBar = JSON.parse(JSON.stringify(data.tabBar));
-            tabBar[focusArea.index].selectedIconPath = value;
-            data.tabBar = tabBar;
 
-            window.__tabbar__?.set(tabBar);
+      {
+        title: "图标",
+        catelogChange: {
+          value: {
+            get({ data, focusArea }) {
+              if (!focusArea) return;
+              return data.selectedTabItemCatelog;
+            },
+            set({ data, focusArea, catelog }, value) {
+              if (!focusArea) return;
+              data.selectedTabItemCatelog = catelog;
+            },
           },
         },
+        items: [...iconEditor("normal"), ...iconEditor("selected")],
       },
       {
-        title: "默认图标",
-        type: "imageSelector",
-        options: {
-          fileSizeLimit: 10,
-          useBase64Only: true,
-        },
-        value: {
-          get({ data, focusArea }) {
-            if (!focusArea) return;
-            return data.tabBar[focusArea.index]?.normalIconPath;
-          },
-          set({ data, focusArea }, value) {
-            let tabBar = JSON.parse(JSON.stringify(data.tabBar));
-            tabBar[focusArea.index].normalIconPath = value;
-            data.tabBar = tabBar;
-
-            window.__tabbar__?.set(tabBar);
-          },
-        },
-      },
-      {
-        title: "标签样式",
+        title: "文案",
         catelogChange: {
           value: {
             get({ data, focusArea }) {
@@ -156,84 +324,12 @@ export default {
         },
         items: [
           {
-            catelog: "激活样式",
-            title: "图标",
+            catelog: "默认文案",
+            title: "样式",
             type: "styleNew",
             options: {
               defaultOpen: true,
-              plugins: ["size"],
-            },
-            value: {
-              get({ data, focusArea }) {
-                if (!focusArea) return;
-                return data.tabBar[focusArea.index]?.selectedIconStyle;
-              },
-              set({ data, focusArea }, value) {
-                let tabBar = JSON.parse(JSON.stringify(data.tabBar));
-                tabBar[focusArea.index].selectedIconStyle = {
-                  ...value,
-                };
-                data.tabBar = tabBar;
-
-                window.__tabbar__?.set(tabBar);
-              },
-            },
-          },
-          {
-            catelog: "激活样式",
-            title: "文案",
-            type: "styleNew",
-            options: {
-              defaultOpen: true,
-              plugins: ["font"],
-            },
-            value: {
-              get({ data, focusArea }) {
-                if (!focusArea) return;
-                return data.tabBar[focusArea.index]?.selectedTextStyle;
-              },
-              set({ data, focusArea }, value) {
-                let tabBar = JSON.parse(JSON.stringify(data.tabBar));
-                tabBar[focusArea.index].selectedTextStyle = {
-                  ...value,
-                };
-                data.tabBar = tabBar;
-
-                window.__tabbar__?.set(tabBar);
-              },
-            },
-          },
-          {
-            catelog: "默认样式",
-            title: "图标",
-            type: "styleNew",
-            options: {
-              defaultOpen: true,
-              plugins: ["size"],
-            },
-            value: {
-              get({ data, focusArea }) {
-                if (!focusArea) return;
-                return data.tabBar[focusArea.index]?.normalIconStyle;
-              },
-              set({ data, focusArea }, value) {
-                let tabBar = JSON.parse(JSON.stringify(data.tabBar));
-                tabBar[focusArea.index].normalIconStyle = {
-                  ...value,
-                };
-                data.tabBar = tabBar;
-
-                window.__tabbar__?.set(tabBar);
-              },
-            },
-          },
-          {
-            catelog: "默认样式",
-            title: "文案",
-            type: "styleNew",
-            options: {
-              defaultOpen: true,
-              plugins: ["font"],
+              plugins: ["font", "margin"],
             },
             value: {
               get({ data, focusArea }) {
@@ -243,6 +339,30 @@ export default {
               set({ data, focusArea }, value) {
                 let tabBar = JSON.parse(JSON.stringify(data.tabBar));
                 tabBar[focusArea.index].normalTextStyle = {
+                  ...value,
+                };
+                data.tabBar = tabBar;
+
+                window.__tabbar__?.set(tabBar);
+              },
+            },
+          },
+          {
+            catelog: "激活文案",
+            title: "样式",
+            type: "styleNew",
+            options: {
+              defaultOpen: true,
+              plugins: ["font", "margin"],
+            },
+            value: {
+              get({ data, focusArea }) {
+                if (!focusArea) return;
+                return data.tabBar[focusArea.index]?.selectedTextStyle;
+              },
+              set({ data, focusArea }, value) {
+                let tabBar = JSON.parse(JSON.stringify(data.tabBar));
+                tabBar[focusArea.index].selectedTextStyle = {
                   ...value,
                 };
                 data.tabBar = tabBar;
@@ -387,7 +507,6 @@ export default {
           },
         },
       },
-
-    ]
+    ];
   },
 };

@@ -7,8 +7,8 @@ import React, {
 } from "react";
 import css from "./index.less";
 import { ImageProps } from "@tarojs/components";
-import Image from '../image'
-import View from '../view'
+import Image from './../image'
+import View from './../view'
 
 interface SkeletonImageProps extends ImageProps {
   skeleton?: boolean 

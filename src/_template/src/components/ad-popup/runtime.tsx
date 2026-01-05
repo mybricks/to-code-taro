@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 import { AdType } from "./constants";
 
 enum Status {

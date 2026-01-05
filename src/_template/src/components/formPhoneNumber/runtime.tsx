@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { View, Button } from "@tarojs/components";
 import { Input } from "brickd-mobile";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
-import Taro from "@tarojs/taro";
-import { isEmpty, isString, isNumber, isObject } from "../utils/type";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import * as Taro from "@tarojs/taro";
+import { isEmpty, isString, isNumber, isObject } from "./../utils/type";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import { isH5 } from "../utils/env";
 
 export default function (props) {

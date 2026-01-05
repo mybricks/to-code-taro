@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import { uuid } from "../utils";
 import cx from "classnames";
 

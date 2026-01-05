@@ -1,5 +1,5 @@
 import { uuid } from "../utils";
-import { connectorEditor } from "../utils/connector/editor";
+import { connectorEditor } from "./../utils/connector/editor";
 
 function getColumnsFromSchema(
   schema: any,
@@ -14,7 +14,6 @@ function getColumnsFromSchema(
         properties[key].type === "string" ||
         properties[key].type === "boolean"
       ) {
-
         let uid = uuid("", 5);
         let id = `column_${uid}`;
 
@@ -95,135 +94,138 @@ export default {
     items({ data, output, input, style, slots }, cate0, cate1, cate2) {
       cate0.items = [
         {
-          title: "隐藏表头",
-          type: "switch",
-          value: {
-            get({ data }) {
-              return data.hiddenTableHeader;
-            },
-            set({ data }, value) {
-              data.hiddenTableHeader = value;
-            },
-          },
-        },
-        {},
-        {
-          title: "表格列",
-          type: "array",
-          options: {
-            getTitle: (item, index) => {
-              return [`${item.title}`];
-            },
-            onAdd() {
-              let uid = uuid("", 5);
-              let id = `column_${uid}`;
-              let title = `列${uid}`;
-              return {
-                id: id,
-                title: title,
-                dataIndex: id,
-                type: "text",
-                autoWidth: true,
-                minWidth: "90",
-                width: "100",
-              };
-            },
-            onRemove(_id) {
-              let index = data.columns.findIndex((column) => {
-                return column._id === _id;
-              });
-
-              let id = data.columns[index].id;
-              try {
-                slots.remove(id);
-              } catch (e) { }
-            },
-            items: [
-              {
-                title: "列名",
-                type: "text",
-                value: "title",
-              },
-              {
-                title: "列字段",
-                type: "text",
-                value: "dataIndex",
-              },
-            ],
-          },
-          value: {
-            get({ data }) {
-              return data.columns;
-            },
-            set({ data, slots }, value) {
-              data.columns = value;
-
-              //更新 slots 的 title
-              value.forEach((column) => {
-                let slot = slots.get(column.id);
-                if (slot) {
-                  slot.setTitle(`表格列 ${column.title} | ${column.dataIndex}`);
-                }
-              });
-            },
-          },
-        },
-        {
-          ifVisible({ data }) {
-            return data.columns.length > 1;
-          },
-          title: "固定首列",
-          type: "switch",
-          value: {
-            get({ data }) {
-              return data.useLeftSticky;
-            },
-            set({ data }, value) {
-              data.useLeftSticky = value;
-            },
-          },
-        },
-        {
-          ifVisible({ data }) {
-            return data.columns.length > 1;
-          },
-          title: "固定末列",
-          type: "switch",
-          value: {
-            get({ data }) {
-              return data.useRightSticky;
-            },
-            set({ data }, value) {
-              data.useRightSticky = value;
-            },
-          },
-        },
-        {
-          title: "展示列边框",
-          type: "switch",
-          value: {
-            get({ data }) {
-              return data.bordered;
-            },
-            set({ data }, value) {
-              data.bordered = value;
-            },
-          },
-        },
-        {},
-        {
-          title: "单击行时",
-          type: "_event",
-          options: {
-            outputId: "onClickRow",
-          },
-        },
-        {},
-        {
-          title: "分页配置",
+          title: "基础属性",
           items: [
             {
+              title: "表格列",
+              description: "表格的列配置，可配置列名、列字段",
+              type: "array",
+              options: {
+                getTitle: (item, index) => {
+                  return [`${item.title}`];
+                },
+                onAdd() {
+                  let uid = uuid("", 5);
+                  let id = `column_${uid}`;
+                  let title = `列${uid}`;
+                  return {
+                    id: id,
+                    title: title,
+                    dataIndex: id,
+                    type: "text",
+                    autoWidth: true,
+                    minWidth: "90",
+                    width: "100",
+                  };
+                },
+                onRemove(_id) {
+                  let index = data.columns.findIndex((column) => {
+                    return column._id === _id;
+                  });
+
+                  let id = data.columns[index].id;
+                  try {
+                    slots.remove(id);
+                  } catch (e) {}
+                },
+                items: [
+                  {
+                    title: "列名",
+                    type: "text",
+                    value: "title",
+                  },
+                  {
+                    title: "列字段",
+                    type: "text",
+                    value: "dataIndex",
+                  },
+                ],
+              },
+              value: {
+                get({ data }) {
+                  return data.columns;
+                },
+                set({ data, slots }, value) {
+                  data.columns = value;
+
+                  //更新 slots 的 title
+                  value.forEach((column) => {
+                    let slot = slots.get(column.id);
+                    if (slot) {
+                      slot.setTitle(
+                        `表格列 ${column.title} | ${column.dataIndex}`
+                      );
+                    }
+                  });
+                },
+              },
+            },
+            {
+              title: "展示列边框",
+              description: "列与列之间的边框",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.bordered;
+                },
+                set({ data }, value) {
+                  data.bordered = value;
+                },
+              },
+            },
+          ],
+        },
+        {
+          title: "高级属性",
+          items: [
+            {
+              title: "隐藏表头",
+              description: "是否隐藏表格的表头",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.hiddenTableHeader;
+                },
+                set({ data }, value) {
+                  data.hiddenTableHeader = value;
+                },
+              },
+            },
+            {
+              ifVisible({ data }) {
+                return data.columns.length > 1;
+              },
+              title: "固定首列",
+              description: "是否固定表格的首列",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.useLeftSticky;
+                },
+                set({ data }, value) {
+                  data.useLeftSticky = value;
+                },
+              },
+            },
+            {
+              ifVisible({ data }) {
+                return data.columns.length > 1;
+              },
+              title: "固定末列",
+              description: "是否固定表格的末列",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.useRightSticky;
+                },
+                set({ data }, value) {
+                  data.useRightSticky = value;
+                },
+              },
+            },
+            {
               title: "开启触底加载",
+              description: "开启后，表格滚动到底部时，会触发加载事件",
               type: "switch",
               value: {
                 get({ data }) {
@@ -274,6 +276,18 @@ export default {
                 },
               },
             },
+          ],
+        },
+        {
+          title: "事件",
+          items: [
+            {
+              title: "单击行时",
+              type: "_event",
+              options: {
+                outputId: "onClickRow",
+              },
+            },
             {
               title: "当触发加载时",
               type: "_event",
@@ -314,7 +328,7 @@ export default {
       value: {
         get({ data, focusArea }) {
           let _id = focusArea.ele.dataset.id;
-          console.log("table focusArea",focusArea)
+          console.log("table focusArea", focusArea);
           let index = data.columns.findIndex((column) => {
             return column._id === _id;
           });
@@ -357,6 +371,7 @@ export default {
       cate0.items = [
         {
           title: "列名",
+          description: "表格列的显示名称",
           type: "text",
           value: {
             get({ data }) {
@@ -389,6 +404,7 @@ export default {
         },
         {
           title: "列字段",
+          description: "表格列的数据字段，用于绑定数据",
           type: "text",
           value: {
             get({ data }) {
@@ -421,6 +437,7 @@ export default {
         },
         {
           title: "类型",
+          description: "表格列的显示类型，文本或自定义插槽",
           type: "select",
           options: [
             { label: "文本", value: "text" },
@@ -485,6 +502,7 @@ export default {
         {},
         {
           title: "列宽",
+          description: "表格列的宽度设置，适应剩余宽度或固定宽度",
           type: "radio",
           options: [
             { label: "适应剩余宽度", value: "auto" },
