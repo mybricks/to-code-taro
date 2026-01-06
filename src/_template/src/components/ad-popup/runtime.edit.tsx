@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 import { Button, Text, Image, View } from "@tarojs/components";
 import css from './runtime.edit.less';
 

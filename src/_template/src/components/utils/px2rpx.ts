@@ -1,4 +1,4 @@
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 
 export const px2rpx = (px: number) => {
   let ratio = Taro.getSystemInfoSync().windowWidth / 375;

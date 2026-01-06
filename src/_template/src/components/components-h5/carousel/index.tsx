@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react';
-import { useInterval, useNodeBoundingRect } from '../../utils/hooks';
+import { useInterval, useNodeBoundingRect } from './../../utils/hooks';
 import useTouch from './useTouch';
 import { CarouselProps, SLIDER_TYPE } from './type';
 import css from './index.less';

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useMemo, useState } from "react";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 import { View, Image } from "@tarojs/components";
 import { Search } from "brickd-mobile";
-import { debounce } from "../utils/core";
+import { debounce } from "./../utils/core";
 import { Button } from "@tarojs/components";
 import { clearable } from "./clearable";
 

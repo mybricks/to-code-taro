@@ -7,11 +7,11 @@ import React, {
 } from "react";
 import { View, Button } from "@tarojs/components";
 import { Input } from "brickd-mobile";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
-import Taro from "@tarojs/taro";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
-import { isEmpty, isString, isNumber, isObject } from "../utils/type";
+import * as Taro from "@tarojs/taro";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
+import { isEmpty, isString, isNumber, isObject } from "./../utils/type";
 import { isH5 } from "../utils/env";
 import cx from "classnames";
 

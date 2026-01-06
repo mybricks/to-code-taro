@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { View } from "@tarojs/components";
-import Taro from "@tarojs/taro";
-import css from "./style.module.less";
+import * as Taro from "@tarojs/taro";
+import css from "./style.less";
 import cx from "classnames";
 import { isH5 } from "../utils/env";
 

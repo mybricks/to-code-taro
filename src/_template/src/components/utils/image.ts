@@ -1,5 +1,5 @@
-import Taro from "@tarojs/taro";
 import { isNumber, isString } from './core'
+import * as Taro from "@tarojs/taro";
 
 const pixelRatio = Taro.getSystemInfoSync().pixelRatio;
 
@@ -97,41 +97,8 @@ interface CdnCutOptions {
 
 interface CdnCutMeta {
   url: string
-  width?: number | string
-  height?: number | string
-}
-
-/**
- * 从字符串中提取数字（支持 px、rpx 等单位）
- * @param value 可能是数字或字符串（如 "375px", "400rpx", "100%"）
- * @returns 提取的数字，如果无法提取则返回 null
- */
-function parseNumericValue(value: number | string | undefined): number | null {
-  if (value === undefined || value === null) {
-    return null;
-  }
-  
-  // 如果是数字，直接返回
-  if (isNumber(value)) {
-    return value;
-  }
-  
-  // 如果是字符串，尝试提取数字
-  if (isString(value)) {
-    // 排除百分比
-    if (value.includes('%')) {
-      return null;
-    }
-    
-    // 提取数字部分（支持 px、rpx 等单位）
-    const match = value.match(/^(\d+(?:\.\d+)?)/);
-    if (match) {
-      const num = parseFloat(match[1]);
-      return Number.isNaN(num) ? null : num;
-    }
-  }
-  
-  return null;
+  width?: number
+  height?: number
 }
 
 export function autoCdnCut ({
@@ -149,14 +116,10 @@ export function autoCdnCut ({
   }
   let query = '?x-oss-process=image/resize,';
 
-  // 解析 width 和 height（支持数字和字符串格式）
-  const parsedWidth = parseNumericValue(width);
-  const parsedHeight = parseNumericValue(height);
-
-  if (parsedWidth !== null) {
-    query+= `w_${(parsedWidth * dpr).toFixed(0)}`
-  } else if (parsedHeight !== null) {
-    query+= `h_${(parsedHeight * dpr).toFixed(0)}`
+  if (isNumber(width)) {
+    query+= `w_${(width * dpr).toFixed(0)}`
+  } else if (isNumber(height)) {
+    query+= `h_${(height * dpr).toFixed(0)}`
   }
 
   if (isNumber(quality)) {

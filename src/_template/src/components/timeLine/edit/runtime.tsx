@@ -1,6 +1,6 @@
 import * as React from 'react';
-import  Runtime  from '../runtime'
-import { useDisabledArea } from '../../utils/hooks';
+import  Runtime  from './../runtime'
+import { useDisabledArea } from './../../utils/hooks';
 
 export default (props) => {
 

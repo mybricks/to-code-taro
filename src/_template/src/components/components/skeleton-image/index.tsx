@@ -6,9 +6,9 @@ import React, {
   useState,
   CSSProperties,
 } from 'react'
-import css from './index.module.less'
+import css from './index.less'
 import { View, Image, ImageProps } from '@tarojs/components'
-import { autoCdnCut, IMAGE_MODE } from '../../utils/image'
+import { autoCdnCut, IMAGE_MODE } from './../../utils/image'
 
 const HtmlImage: React.FC<{
   src: string

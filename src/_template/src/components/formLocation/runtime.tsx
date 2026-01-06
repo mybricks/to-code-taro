@@ -3,11 +3,11 @@ import { View } from "@tarojs/components";
 import cx from "classnames";
 import { ArrowRight } from "@taroify/icons";
 import { Field, Input, AreaPicker } from "brickd-mobile";
-import { isObject, isString, isEmpty } from "../utils/core/type";
-import css from "./style.module.less";
-import Taro from "@tarojs/taro";
+import { isObject, isString, isEmpty } from "./../utils/core/type";
+import css from "./style.less";
+import * as Taro from "@tarojs/taro";
 import InputDisplay from "../components/input-display";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;

@@ -34,7 +34,7 @@ ComponentType<SwiperProps>
 
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useCallback } from 'react';
 import { Swiper, SwiperItem, Image} from '@tarojs/components';
 

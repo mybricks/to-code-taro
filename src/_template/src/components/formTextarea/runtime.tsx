@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { Textarea } from "brickd-mobile";
 import { isNumber, isString, isObject, isEmpty } from "../utils/type";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
-import css from "./style.module.less";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
+import css from "./style.less";
 import { isH5 } from "../utils/env";
 import cx from "classnames";
 

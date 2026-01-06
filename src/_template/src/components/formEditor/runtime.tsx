@@ -6,13 +6,13 @@ import React, {
   useRef,
 } from "react";
 import { isNumber, isObject, isString, isEmpty } from "../utils/type";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import { Input } from "brickd-mobile";
 import { View, Editor, Image } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import { isH5, isDesigner } from "../utils/env";
 import cx from "classnames";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 import { undoIcon, redoIcon, boldIcon, imageIcon, videoIcon } from "./icons";
 import { uuid } from "../utils/index";
 

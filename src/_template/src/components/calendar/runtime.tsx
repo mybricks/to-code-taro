@@ -3,7 +3,7 @@ import { View, Image } from "@tarojs/components";
 import { Calendar } from "brickd-mobile";
 // import { Calendar } from "../../../brickd-mobile/src";
 // import  Calendar  from "./calendar/index";
-import { isDate } from "../utils/core";
+import { isDate } from "./../utils/core";
 
 import css from "./runtime.less";
 

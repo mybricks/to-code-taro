@@ -7,9 +7,9 @@ import React, {
   useLayoutEffect,
 } from "react";
 import { View, ScrollView } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 import { Tabs } from "brickd-mobile";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 
 //侧边栏展示类型

@@ -1,4 +1,4 @@
-import { uuid } from "../utils";
+import { uuid } from "./../utils";
 
 function findEle({ data, focusArea }, dataname) {
   const id = focusArea.dataset[dataname];

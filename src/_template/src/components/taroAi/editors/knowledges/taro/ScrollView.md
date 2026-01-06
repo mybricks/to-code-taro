@@ -10,7 +10,7 @@ ComponentType<ScrollViewProps>
 
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useCallback } from 'react';
 import {ScrollView, Text, View} from '@tarojs/components';
 
@@ -91,7 +91,7 @@ export default comDef(({ data, env, inputs, outputs, slots })=>{
 
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useCallback, useState } from 'react';
 import {ScrollView, Text, View} from '@tarojs/components';
 

@@ -6,12 +6,12 @@ import React, {
   useEffect,
 } from "react";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 import Head from "./runtime/Head";
 import Row from "./runtime/Row";
 import { uuid, debounce } from "../utils";
-import { useConnector } from '../utils/connector/runtime'
+import { useConnector } from './../utils/connector/runtime'
 
 const rowKey = "_itemKey";
 

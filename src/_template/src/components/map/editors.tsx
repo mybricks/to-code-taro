@@ -1,14 +1,14 @@
-import GeoConfig from './editor/geoConfig'
+import GeoConfig from "./editor/geoConfig";
 
 export default {
-  '@init': ({ style, data }) => {
+  "@init": ({ style, data }) => {
     style.width = "100%";
     style.height = 300;
   },
-  '@resize': {
-    options: ['width', 'height'],
+  "@resize": {
+    options: ["width", "height"],
   },
-  ':root': {
+  ":root": {
     style: [
       {
         title: "样式",
@@ -17,7 +17,7 @@ export default {
       },
     ],
     items({ data, output, style }, cate0, cate1, cate2) {
-      cate0.title = '常规'
+      cate0.title = "地图";
       cate0.items = [
         // {
         //   title: '图标',
@@ -32,92 +32,98 @@ export default {
         //   }
         // },
         {
-          title: '控件配置',
+          title: "基础属性",
           items: [
             {
-              title: '展示比例尺',
-              type: 'switch',
+              title: "展示比例尺",
+              description: "开启后，地图上会展示比例尺",
+              type: "switch",
               value: {
                 get({ data }) {
-                  return data.showScale
+                  return data.showScale;
                 },
                 set({ data }, val) {
-                  data.showScale = val
-                }
-              }
+                  data.showScale = val;
+                },
+              },
             },
             {
-              title: '展示指南针',
-              type: 'switch',
+              title: "展示指南针",
+              description: "开启后，地图上会展示指南针",
+              type: "switch",
               value: {
                 get({ data }) {
-                  return data.showCompass
+                  return data.showCompass;
                 },
                 set({ data }, val) {
-                  data.showCompass = val
-                }
-              }
+                  data.showCompass = val;
+                },
+              },
             },
-          ]
+            {
+              title: "支持缩放",
+              description: "开启后，用户可以通过缩放地图来改变地图的缩放级别",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.enableZoom;
+                },
+                set({ data }, val) {
+                  data.enableZoom = val;
+                },
+              },
+            },
+            {
+              title: "支持拖动",
+              description: "开启后，用户可以通过拖动地图来改变地图的中心位置",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.enableScroll;
+                },
+                set({ data }, val) {
+                  data.enableScroll = val;
+                },
+              },
+            },
+          ],
         },
         {
-          title: '地图交互',
+          title: "高级属性",
           items: [
             {
-              title: '支持缩放',
-              type: 'switch',
+              title: "展示实时路况",
+              description: "开启后，地图上会展示实时路况",
+              type: "switch",
               value: {
                 get({ data }) {
-                  return data.enableZoom
+                  return data.enableTraffic;
                 },
                 set({ data }, val) {
-                  data.enableZoom = val
-                }
-              }
-            },
-            {
-              title: '支持拖动',
-              type: 'switch',
-              value: {
-                get({ data }) {
-                  return data.enableScroll
+                  data.enableTraffic = val;
                 },
-                set({ data }, val) {
-                  data.enableScroll = val
-                }
-              }
+              },
             },
-            {
-              title: '展示实时路况',
-              type: 'switch',
-              value: {
-                get({ data }) {
-                  return data.enableTraffic
-                },
-                set({ data }, val) {
-                  data.enableTraffic = val
-                }
-              }
-            },
-          ]
+          ],
         },
-        {
-          title: '覆盖物配置',
-          type: 'editorRender',
-          // description: '展示方式的区别主要在图片尺寸与配置尺寸对不齐的情况下起作用',
-          options: {
-            render: GeoConfig,
-          },
-          value: {
-            get({ data, style }) {
-              return data.geos
-            },
-            set({}, value) {
-              data.geos = value
-            }
-          }
-        },
-      ]
+
+        // {
+        //   title: "覆盖物配置",
+        //   type: "editorRender",
+        //   // description: '展示方式的区别主要在图片尺寸与配置尺寸对不齐的情况下起作用',
+        //   options: {
+        //     render: GeoConfig,
+        //   },
+        //   value: {
+        //     get({ data, style }) {
+        //       return data.geos;
+        //     },
+        //     set({}, value) {
+        //       data.geos = value;
+        //     },
+        //   },
+        // },
+      ];
       // cate1.title = '样式'
       // cate1.items = [
       //   {
@@ -139,21 +145,21 @@ export default {
       //     },
       //   },
       // ]
-      cate1.title = '动作'
-      cate1.items = [
-        {
-          title: '事件',
-          items: [
-            {
-              title: '单击',
-              type: '_event',
-              options: {
-                outputId: 'onClick',
-              },
-            },
-          ],
-        }
-      ]
+      // cate1.title = '动作'
+      // cate1.items = [
+      //   {
+      //     title: '事件',
+      //     items: [
+      //       {
+      //         title: '单击',
+      //         type: '_event',
+      //         options: {
+      //           outputId: 'onClick',
+      //         },
+      //       },
+      //     ],
+      //   }
+      // ]
     },
-  }
-}
+  },
+};

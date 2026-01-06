@@ -3,7 +3,7 @@ import { ViewProps } from "@tarojs/components/types/View"
 import classNames from "classnames"
 import * as _ from "../../../utils/lodash/index"
 import * as React from "react"
-import Taro from "@tarojs/taro"
+import * as Taro from "@tarojs/taro"
 import {
   forwardRef,
   useCallback,

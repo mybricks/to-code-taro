@@ -11,7 +11,7 @@ import f2Prompt from "./prompts/f2-summary.md";
 import brickdMobilePrompt from './prompts/brickd-mobile-summary.md';
 import MyBricksEnv from './prompts/mybricks-env-summary.md'
 
-import F2ForTaro from '../f2-for-taro';
+import F2ForTaro from './../f2-for-taro';
 import * as Taro from "@tarojs/components";
 import * as TaroAPI from "@tarojs/taro";
 import * as BrickdMobile from 'brickd-mobile';

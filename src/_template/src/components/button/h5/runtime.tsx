@@ -5,9 +5,9 @@ import React, {
   useRef,
   useState,
 } from "react";
-import css from "./../style.module.less";
+import css from "./../style.less";
 import cx from "classnames";
-import { View, Text } from "../../components-h5";
+import { View, Text } from "./../../components-h5";
 
 export default function ({ env, data, logger, slots, inputs, outputs, title }) {
   const onClick = useCallback((ev) => {

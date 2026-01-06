@@ -20,9 +20,11 @@ export default {
       cate0.title = "常规";
       cate0.items = [
         {
+          title: "基础属性",
           items: [
             {
               title: "图片链接",
+              description: "填入正确有效的图片链接地址",
               type: "imageSelector",
               value: {
                 get({ data }) {
@@ -62,55 +64,51 @@ export default {
                     style: style,
                   };
                 },
-                set({}, value) {
+                set({ }, value) {
                   console.log(data.mode);
                   data.mode = value;
                 },
               },
             },
+          ]
+        },
+        {
+          title: "高级属性",
+          items: [
             {
-              title: "加载过渡",
-              items: [
-                {
-                  title: "淡入动画",
-                  desctiption: "加载图片时支持过渡动画，使图片展示更丝滑",
-                  type: "switch",
-                  value: {
-                    get({ data }) {
-                      return data.loadSmooth;
-                    },
-                    set({ data }, value: string) {
-                      data.loadSmooth = value;
-                    },
-                  },
+              title: "淡入动画",
+              description: "加载图片时支持过渡动画，使图片展示更丝滑",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.loadSmooth;
                 },
-              ],
+                set({ data }, value: string) {
+                  data.loadSmooth = value;
+                },
+              },
             },
             {
-              title: "其它配置",
-              items: [
-                {
-                  title: "支持长按识别微信二维码或转发、保存图片",
-                  description: "支持长按识别微信二维码或转发、保存图片",
-                  type: "switch",
-                  value: {
-                    get({ data }) {
-                      return data.showMenuByLongpress ?? false;
-                    },
-                    set({ data }, value: string) {
-                      data.showMenuByLongpress = value;
-                    },
-                  },
+              title: "长按识别",
+              description: "支持长按识别微信二维码或转发、保存图片",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.showMenuByLongpress ?? false;
                 },
-              ],
+                set({ data }, value: string) {
+                  data.showMenuByLongpress = value;
+                },
+              },
             },
-          ],
+          ]
         },
         {
           title: "事件",
           items: [
             {
               title: "单击事件类型",
+              description:"设置图片单击时的行为",
               type: "select",
               options: [
                 {
@@ -168,7 +166,7 @@ export default {
               options: {
                 outputId: "onError",
               },
-            }
+            },
           ],
         },
       ];

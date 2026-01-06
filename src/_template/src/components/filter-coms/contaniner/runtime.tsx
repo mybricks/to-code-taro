@@ -7,9 +7,9 @@ import React, {
 } from "react";
 import { View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
-import { isEmpty, isObject } from "../../utils/core";
+import { isEmpty, isObject } from "./../../utils/core";
 import { getFilterItem } from "./utils";
 
 /** 去除value为undefined场景的对象 */

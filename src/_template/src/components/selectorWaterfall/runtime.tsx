@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { View, Image } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import { uuid, debounce } from "../utils";
 import cx from "classnames";
 

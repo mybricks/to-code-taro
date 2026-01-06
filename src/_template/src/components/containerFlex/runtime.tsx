@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { View } from "@tarojs/components";
 import { Flex } from "brickd-mobile";
 import cx from "classnames";
-import css from "./style.module.less";
+import css from "./style.less";
 
 export default function ({ env, data, slots, inputs, outputs }) {
   return (

@@ -6,12 +6,12 @@ import {
   RichText as DRichText,
   Image,
 } from "@tarojs/components";
-import SkeletonImage from "../components/skeleton-image";
-import css from "./style.module.less";
+import SkeletonImage from "./../components/skeleton-image";
+import css from "./style.less";
 import cx from "classnames";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 
-import RichText from "../components/rich-text";
+import RichText from "./../components/rich-text";
 
 // import mockAct from "./mockAct";
 

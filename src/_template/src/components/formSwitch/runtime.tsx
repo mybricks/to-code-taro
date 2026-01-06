@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { View } from "@tarojs/components";
 import { isObject, isString, isEmpty, isBoolean } from "../utils/type";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import { Switch, Checkbox } from "brickd-mobile";
 import cx from "classnames";
 

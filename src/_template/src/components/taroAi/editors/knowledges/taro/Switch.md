@@ -8,7 +8,7 @@ ComponentType<SwitchProps>
 ## 最佳实践
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
-import css from 'style.module.less';
+import css from 'style.less';
 import { useCallback } from 'react';
 import { Switch } from '@tarojs/components';
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, Image } from "@tarojs/components";
 import cx from 'classnames'
-import css from "./style.module.less";
+import css from "./style.less";
 
 export default function ({ env, data, inputs, outputs }) {
 

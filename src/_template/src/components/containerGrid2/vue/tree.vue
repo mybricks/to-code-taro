@@ -18,7 +18,7 @@
 </template>
 <script>
 import cx from 'classnames';
-import { transformStylePxToVw } from '../../utils/transformStyle';
+import { transformStylePxToVw } from './../../utils/transformStyle';
 
 export default {
   name: 'Tree',

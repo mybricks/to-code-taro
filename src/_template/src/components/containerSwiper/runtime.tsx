@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { Swiper, SwiperItem } from "../components/swiper";
+import { Swiper, SwiperItem } from "./../components/swiper";
 // import { Swiper } from "brickd-mobile";
-import css from "./style.module.less";
+import css from "./style.less";
 
 function getDefaultCurrTabId(tabs) {
   if (tabs.length > 0) {

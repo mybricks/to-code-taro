@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { isNumber, isObject, isString, isEmpty } from "../utils/core/type";
+import { isNumber, isObject, isString, isEmpty } from "./../utils/core/type";
 import { View } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
 import { Input } from "brickd-mobile";
 import { isH5 } from "../utils/env";

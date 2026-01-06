@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Input, View, Button, Image } from "@tarojs/components";
-import css from "./style.module.less";
+import css from "./style.less";
 import cx from "classnames";
-import Taro from "@tarojs/taro";
-import { isNumber, isObject, isString, isEmpty } from "../utils/type";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
+import * as Taro from "@tarojs/taro";
+import { isNumber, isObject, isString, isEmpty } from "./../utils/type";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import { isDesigner, isH5 } from "../utils/env";
 import { plus } from "./icon"
-import { compressImage } from "../utils/h5-compress";
+import { compressImage } from "./../utils/h5-compress";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;

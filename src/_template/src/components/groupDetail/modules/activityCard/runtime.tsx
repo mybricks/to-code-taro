@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text } from "@tarojs/components";
-import css from "./style.module.less";
-import Taro from "@tarojs/taro";
-import SkeletonImage from '../components/skeleton-image';
+import css from "./style.less";
+import * as Taro from "@tarojs/taro";
+import SkeletonImage from './../components/skeleton-image';
 
 const mockData = {
   id: 1686035574636,

@@ -8,10 +8,10 @@ import React, {
 import { View, ScrollView } from "@tarojs/components";
 import css from "./runtime.less";
 import cx from "classnames";
-import useFormItemValue from "../utils/hooks/useFormItemValue";
-import { isObject, isString, isNumber, isEmpty } from "../utils/type";
+import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
+import { isObject, isString, isNumber, isEmpty } from "./../utils/type";
 import { isH5, isDesigner } from "../utils/env";
-import Taro from "@tarojs/taro";
+import * as Taro from "@tarojs/taro";
 
 function getRandomNumber() {
   return Number(Math.random() * 0.1 + 0.01);

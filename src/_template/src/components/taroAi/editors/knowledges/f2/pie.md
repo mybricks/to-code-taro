@@ -23,7 +23,7 @@
 ```jsx file="runtime.jsx"
 import { comDef } from 'mybricks';
 import { useEffect, useState } from 'react';
-import css from 'style.module.less';
+import css from 'style.less';
 import { View } from "@tarojs/components";
 import { Pie } from "f2-for-taro";
 

@@ -5,7 +5,7 @@ import {
   SwiperItem,
   SwiperProps,
 } from '@tarojs/components'
-import { polyfill_taro_swiper } from '../../utils/h5-polyfill'
+import { polyfill_taro_swiper } from './../../utils/h5-polyfill'
 import css from './index.less'
 
 polyfill_taro_swiper()

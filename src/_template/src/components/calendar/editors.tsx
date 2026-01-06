@@ -18,81 +18,92 @@ export default {
       },
     ],
     items({ data, slot }, cate0, cate1, cate2) {
-      cate0.title = "常规";
+      cate0.title = "日历";
       cate0.items = [
         {
-          title: "选择类型",
-          type: "select",
-          options: [
+          title: "基础属性",
+          items: [
             {
-              label: "选择单个日期",
-              value: CalendarType.Single,
+              title: "选择类型",
+              description: "配置选择日期的类型，选择单个日期或日期范围",
+              type: "select",
+              options: [
+                {
+                  label: "选择单个日期",
+                  value: CalendarType.Single,
+                },
+                {
+                  label: "选择日期范围",
+                  value: CalendarType.Range,
+                },
+                // {
+                //   label: '选择多个日期',
+                //   value: CalendarType.Mutiple,
+                // }
+              ],
+              value: {
+                get({ data }) {
+                  return data.type;
+                },
+                set({ data }, value) {
+                  data.type = value;
+                },
+              },
             },
             {
-              label: "选择日期范围",
-              value: CalendarType.Range,
+              title: "时间范围选择",
+              description:
+                "开启后，可配置起始日期和终止日期，用户只能选择在起始日期和终止日期之间的日期",
+              type: "switch",
+              value: {
+                get({ data }) {
+                  return data.showRange;
+                },
+                set({ data }, value) {
+                  data.showRange = value;
+                  if (!value) {
+                    data.available_start_time = "";
+                    data.available_end_time = "";
+                  }
+                },
+              },
             },
-            // {
-            //   label: '选择多个日期',
-            //   value: CalendarType.Mutiple,
-            // }
+            {
+              title: "起始时间",
+              description:
+                "配置用户可选择的最小日期，Date()可识别的日期时间格式",
+              ifVisible({ data }) {
+                return data.showRange;
+              },
+              type: "text",
+              value: {
+                get({ data }) {
+                  return data.available_start_time;
+                },
+                set({ data }, value) {
+                  data.available_start_time = value;
+                },
+              },
+            },
+            {
+              title: "终止时间",
+              description:
+                "配置用户可选择的最大日期，Date()可识别的日期时间格式",
+              ifVisible({ data }) {
+                return data.showRange;
+              },
+              type: "text",
+              value: {
+                get({ data }) {
+                  return data.available_end_time;
+                },
+                set({ data }, value) {
+                  data.available_end_time = value;
+                },
+              },
+            },
           ],
-          value: {
-            get({ data }) {
-              return data.type;
-            },
-            set({ data }, value) {
-              data.type = value;
-            },
-          },
         },
-        {
-          title: "时间范围选择",
-          type: "switch",
-          value: {
-            get({ data }) {
-              return data.showRange;
-            },
-            set({ data }, value) {
-              data.showRange = value;
-              if(!value){
-                data.available_start_time = ""
-                data.available_end_time = ""
-              }
-            },
-          },
-        },
-        {
-          title: "起始时间",
-          ifVisible({ data }) {
-            return data.showRange;
-          },
-          type: "text",
-          value: {
-            get({ data }) {
-              return data.available_start_time;
-            },
-            set({ data }, value) {
-              data.available_start_time = value;
-            },
-          },
-        },
-        {
-          title: "终止时间",
-          ifVisible({ data }) {
-            return data.showRange;
-          },
-          type: "text",
-          value: {
-            get({ data }) {
-              return data.available_end_time;
-            },
-            set({ data }, value) {
-              data.available_end_time = value;
-            },
-          },
-        },
-        {},
         {
           title: "事件",
           items: [
@@ -124,7 +135,6 @@ export default {
         //       if (inputs.get("setCustomRange")) {
         //         return;
         //       }
-
         //       inputs.add({
         //         id: "setCustomRange",
         //         title: "设置自定义日期范围",
@@ -142,7 +152,6 @@ export default {
         //           },
         //         },
         //       });
-
         //       outputs.add({
         //         id: "afterSetCustomRange",
         //         title: "设置自定义日期范围后",
@@ -150,7 +159,6 @@ export default {
         //           type: "any"
         //         }
         //       });
-
         //       inputs.get("setCustomRange").setRels(["afterSetCustomRange"]);
         //     },
         //   },
