@@ -49,8 +49,9 @@ const processLogicalInit = (
   });
   
   if (vars.length > 0) {
+    const importParams = { isPopup: config.isPopup };
     addDependencyImport({
-      packageName: config.getUtilsPackageName(),
+      packageName: config.getUtilsPackageName(importParams),
       dependencyNames: ["createVariable"],
       importType: "named",
     });
@@ -64,8 +65,9 @@ const processLogicalInit = (
   // 2. 初始化 Fxs (使用 getFxEvents 获取 FX 列表)
   const fxEvents = config.getFxEvents();
   if (fxEvents.length > 0) {
+    const importParams = { isPopup: config.isPopup };
     addDependencyImport({
-      packageName: config.getUtilsPackageName(),
+      packageName: config.getUtilsPackageName(importParams),
       dependencyNames: ["createFx"],
       importType: "named",
     });
@@ -168,13 +170,15 @@ const processSceneInputs = (currentScene: any, config: any, addDependencyImport:
       code += `\n${indent}  inputs.${input.id} = (data: any) => {\n${process}\n${indent}  };`;
 
       if (input.id === "open") {
+        const importParams = { isPopup: config.isPopup };
+        const controllerName = config.isPopup ? "popupRouter" : "pageRouter";
         addDependencyImport({
-          packageName: config.getComponentPackageName(),
-          dependencyNames: ["page", "SUBJECT_SUBSCRIBE"],
+          packageName: config.getComponentPackageName(importParams),
+          dependencyNames: [controllerName, "SUBJECT_SUBSCRIBE"],
           importType: "named",
         });
         // 使用 SUBJECT_SUBSCRIBE 订阅，不修改 Subject.js
-        code += `\n${indent}  page.getParams()[SUBJECT_SUBSCRIBE]((val: any) => {\n${indent}    if (val) inputs.open(val);\n${indent}  });`;
+        code += `\n${indent}  ${controllerName}.getParams("${currentScene.id}")[SUBJECT_SUBSCRIBE]((val: any) => {\n${indent}    if (val) inputs.open(val);\n${indent}  });`;
       }
     }
   });

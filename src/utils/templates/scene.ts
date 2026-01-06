@@ -35,6 +35,8 @@ export const genComponentTemplate = ({
   outputsConfig,
   scopeName,
   utilsPackageName,
+  isPopup = false,
+  hasPopups = false,
 }: {
   componentName: string;
   combinedJsCode: string;
@@ -42,16 +44,26 @@ export const genComponentTemplate = ({
   outputsConfig?: Record<string, Record<string, any>>;
   scopeName?: string;
   utilsPackageName?: string;
+  isPopup?: boolean;
+  hasPopups?: boolean;
 }) => {
   // 使用 WithWrapper 作为高阶组件包裹根组件
-  // 格式：export default WithWrapper(ComponentName)
-  return `function ${componentName}() {\n` +
+  let code = `function ${componentName}() {\n` +
          `${combinedJsCode}\n` +
          `  return (\n` +
-         `${uiResult.split('\n').map(line => `    ${line}`).join('\n')}\n` +
+         `    <>\n` +
+         `${uiResult.split('\n').map(line => `      ${line}`).join('\n')}\n` +
+         (hasPopups ? `      <PopupRenderer popupMap={POPUP_MAP} />\n` : "") +
+         `    </>\n` +
          `  );\n` +
-         `}\n\n` +
-         `export default WithWrapper(${componentName})`;
+         `}\n\n`;
+  
+  if (isPopup) {
+    code += `(${componentName} as any).isPopup = true;\n\n`;
+  }
+  
+  code += `export default WithWrapper(${componentName})`;
+  return code;
 };
 
 /** 生成 useEffect 包装代码 */

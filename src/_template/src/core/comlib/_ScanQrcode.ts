@@ -25,24 +25,23 @@ export default (context: IOContext) => {
   const inputs: Inputs = context.inputs;
   const outputs: Outputs = context.outputs;
 
-  inputs?.scan?.((val: DataType | any) => {
+  inputs.scan?.((val: DataType | any) => {
     try {
-      const scanType = data?.scanType || ['barCode', 'qrCode'];
-      const onlyFromCamera = data?.onlyFromCamera ?? false;
+      const scanConfig = {
+        onlyFromCamera: val?.onlyFromCamera ?? data.onlyFromCamera ?? false,
+        scanType: val?.scanType ?? data.scanType ?? ['barCode', 'qrCode'],
+        success: (res: any) => {
+          outputs.onSuccess(res.result || res);
+        },
+        fail: (err: any) => {
+          outputs.onFail(err.errMsg || '扫码失败');
+        },
+      };
 
-      Taro.scanCode({
-        onlyFromCamera,
-        scanType,
-        success: (res) => {
-          outputs?.onSuccess(res.result || res);
-        },
-        fail: (err) => {
-          outputs?.onFail(err.errMsg || '扫码失败');
-        },
-      });
+      Taro.scanCode(scanConfig);
     } catch (error: any) {
       console.error('扫码失败:', error);
-      outputs?.onFail(error?.message || '扫码失败');
+      outputs.onFail(error?.message || '扫码失败');
     }
   });
 };

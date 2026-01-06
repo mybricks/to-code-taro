@@ -3,7 +3,7 @@ import Taro from '@tarojs/taro';
 export type DataType = {
   dynamic?: boolean;
   title?: string;
-  duration?: number | string;
+  duration?: number;
   mask?: boolean;
   asynchronous?: boolean;
   icon?: 'success' | 'error' | 'loading' | 'none';
@@ -30,68 +30,40 @@ export default (context: IOContext) => {
   const outputs: Outputs = context.outputs;
 
   inputs.showToast?.((val: DataType | string) => {
-    if (data?.dynamic) {
-      // 动态输入
-      try {
-        const toastConfig: any = {
-          title: typeof val === 'string' ? val : val?.title || data.title || '',
-          duration: Number(val && typeof val === 'object' ? (val?.duration ?? data.duration ?? 1000) : data.duration ?? 1000),
-          mask: val && typeof val === 'object' ? (val?.mask ?? data.mask ?? false) : data.mask ?? false,
-        };
-        
-        if (val && typeof val === 'object' && val.icon) {
-          toastConfig.icon = val.icon;
-        } else if (data.icon) {
-          toastConfig.icon = data.icon;
-        }
-        
-        if (val && typeof val === 'object' && val.image) {
-          toastConfig.image = val.image;
-        } else if (data.image) {
-          toastConfig.image = data.image;
-        }
+    try {
+      // 构建 Toast 配置
+      const toastConfig: any = {
+        title: typeof val === 'string' ? val : val?.title || data.title || '',
+        duration: Number(typeof val === 'object' && val?.duration ? val.duration : data.duration || 1000),
+        mask: typeof val === 'object' && val?.mask !== undefined ? val.mask : data.mask || false,
+      };
 
-        Taro.showToast(toastConfig);
-        
-        if (data.asynchronous) {
-          setTimeout(() => {
-            outputs.afterShowToast(val);
-          }, Number(val && typeof val === 'object' ? (val?.duration ?? data.duration ?? 1000) : data.duration ?? 1000));
-        } else {
-          outputs.afterShowToast(val);
-        }
-      } catch (error) {
-        console.error('显示 Toast 失败:', error);
+      // 图标配置
+      if (typeof val === 'object' && val?.icon) {
+        toastConfig.icon = val.icon;
+      } else if (data.icon) {
+        toastConfig.icon = data.icon;
       }
-    } else {
-      // 非动态输入
-      try {
-        const toastConfig: any = {
-          title: data.title || '',
-          duration: Number(data.duration || 1000),
-          mask: data.mask ?? false,
-        };
-        
-        if (data.icon) {
-          toastConfig.icon = data.icon;
-        }
-        
-        if (data.image) {
-          toastConfig.image = data.image;
-        }
 
-        Taro.showToast(toastConfig);
-        
-        if (data.asynchronous) {
-          setTimeout(() => {
-            outputs.afterShowToast(val);
-          }, Number(data.duration || 1000));
-        } else {
-          outputs.afterShowToast(val);
-        }
-      } catch (error) {
-        console.error('显示 Toast 失败:', error);
+      // 图片配置
+      if (typeof val === 'object' && val?.image) {
+        toastConfig.image = val.image;
+      } else if (data.image) {
+        toastConfig.image = data.image;
       }
+
+      Taro.showToast(toastConfig);
+
+      // 处理输出回调
+      const triggerOutput = () => outputs.afterShowToast(val);
+
+      if (data.asynchronous) {
+        setTimeout(triggerOutput, toastConfig.duration);
+      } else {
+        triggerOutput();
+      }
+    } catch (error) {
+      console.error('显示 Toast 失败:', error);
     }
   });
 };

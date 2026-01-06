@@ -148,19 +148,47 @@ export const handleProcess = (
 
     if (componentType === "js") {
       if (category === "scene") {
+        const _sceneId = props.meta.model.data._sceneId;
+        const targetScene = config.getSceneById(_sceneId);
+        const isPopup = targetScene?.type === 'popup' || targetScene?.deps?.some((dep: any) => dep.namespace === 'mybricks.taro.popup');
+        const controllerName = isPopup ? "popupRouter" : "pageRouter";
+
         config.addParentDependencyImport({
           packageName: config.getComponentPackageName(),
-          dependencyNames: ["page"],
+          dependencyNames: [controllerName],
           importType: "named",
         });
 
-        const _sceneId = props.meta.model.data._sceneId;
         const operateName =
           props.meta.model.data.openType === "redirect" ? "replace" : "open";
 
         code +=
           `${indent}/** 打开 ${props.meta.title} */` +
-          `\n${indent}${nextCode}page.${operateName}("${config.getPageId?.(_sceneId) || _sceneId}", ${nextValue})`;
+          `\n${indent}${nextCode}${controllerName}.${operateName}("${config.getPageId?.(_sceneId) || _sceneId}", ${nextValue})`;
+      } else if (category === "frameOutput") {
+        // 场景/弹窗输出（commit/cancel/apply/close）
+        const currentScene = config.getCurrentScene();
+        const pinProxy =
+          currentScene?.pinProxies?.[`${props.meta.id}-${props.id}`];
+        if (pinProxy?.type === "frame") {
+          const method = pinProxy.pinId;
+          const controllerName = (config as any).isPopup ? "popupRouter" : "pageRouter";
+
+          config.addParentDependencyImport({
+            packageName: config.getComponentPackageName(),
+            dependencyNames: [controllerName],
+            importType: "named",
+          });
+
+          // 仅支持 Page 内置的四种输出方法
+          if (["commit", "cancel", "apply", "close"].includes(method)) {
+            const sceneId = pinProxy.frameId || currentScene?.id;
+            const argCode = nextValue ? `, ${nextValue}` : "";
+            code +=
+              `${indent}/** ${props.meta.title} 输出 ${method} */` +
+              `\n${indent}${nextCode}${controllerName}.${method}("${sceneId}"${argCode})`;
+          }
+        }
       } else if (category === "normal") {
         let componentNameWithId = getComponentNameWithId(props, config, event);
         code +=

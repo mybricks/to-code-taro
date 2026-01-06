@@ -82,7 +82,8 @@ export const createEventQueries = (events: any[]) => {
     getFxEvents: createGetFxEvents(events),
     getEffectEvent: createGetEffectEvent(events),
     getEventByDiagramId: (diagramId: string) => {
-      return events.find((event) => event.diagramId === diagramId)!;
+      // 兼容：部分 event 没有 diagramId 字段，而是直接用 id 存储 diagramId
+      return events.find((event) => event.diagramId === diagramId || event.id === diagramId)!;
     },
     /** 获取场景/区块的输入项事件 */
     getFrameInputEvent: (pinId: string, frameId?: string) => {

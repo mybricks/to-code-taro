@@ -23,12 +23,12 @@ export default function ({
 
   /** setup */
   useEffect(() => {
-    // inputs["onShow"]?.(() => {
-    //   setShow(true);
-    // });
-    // inputs["onHide"]?.(() => {
-    //   setShow(false);
-    // });
+    inputs["show"]?.(() => {
+      setShow(true);
+    });
+    inputs["hide"]?.(() => {
+      setShow(false);
+    });
 
     return () => {
       // 销毁，但没有事件
@@ -130,3 +130,5 @@ export default function ({
 
   return popupView;
 }
+
+export const isPopup = true;
