@@ -13,7 +13,7 @@ export { default as Icon } from "./icon/runtime";
 // 容器
 export { default as ContainerBasic } from "./containerBasic/runtime";
 // export { default as Tabs2 } from "./tabs2/runtime";
-// export { default as ContainerList } from "./containerList/runtime";
+export { default as ContainerList } from "./containerList/runtime";
 // export { default as ContainerWaterfall } from "./containerWaterfall/runtime";
 // export { default as ContainerCondition2 } from "./containerCondition2/runtime";
 // export { default as Sidebar2 } from "./sidebar2/runtime";
@@ -21,7 +21,7 @@ export { default as ContainerBasic } from "./containerBasic/runtime";
 // 数据录入
 // export { default as FormContainer } from "./formContainer/runtime";
 export { default as FormInput } from "./formInput/runtime";
-// export { default as FormStepper } from "./formStepper/runtime";
+export { default as FormStepper } from "./formStepper/runtime";
 // export { default as FormTextarea } from "./formTextarea/runtime";
 // export { default as FormPassword } from "./formPassword/runtime";
 // export { default as FormRadio } from "./formRadio/runtime";
