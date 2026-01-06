@@ -68,8 +68,12 @@ export const processScene = (params: ProcessSceneParams): void => {
   // 创建 FX Map
   const fxsMap = Object.assign({}, defaultFxsMap);
 
+  // 参考鸿蒙逻辑：如果场景中包含 popup 组件，则标记场景类型为 popup
+  const originalScene = getSceneById(scene.id);
+  const isPopup = originalScene?.type === 'popup' || originalScene?.deps?.some((dep: any) => dep.namespace === 'mybricks.taro.popup');
+
   // 处理页面配置
-  const pageConfigContent = pageConfigHandler.handle(scene);
+  const pageConfigContent = pageConfigHandler.handle(scene, isPopup);
 
   // 创建事件查询函数
   const eventQueries = createEventQueries(event);
@@ -77,6 +81,7 @@ export const processScene = (params: ProcessSceneParams): void => {
   // 处理 Slot
   handleSlot(ui, {
     ...config,
+    isPopup, // 标记当前场景是否为弹窗
     getCurrentScene: () => {
       const originalScene = getSceneById(scene.id);
       return { ...scene, ...originalScene, event };
@@ -84,7 +89,7 @@ export const processScene = (params: ProcessSceneParams): void => {
     add: (value) => {
       params.addResult({
         ...value,
-        type: scene.type ? scene.type : "normal",
+        type: isPopup ? "popup" : (originalScene?.type ? originalScene.type : "normal"),
         meta: scene,
         pageConfigContent,
       });

@@ -18,6 +18,8 @@ interface HandleSlotConfig extends BaseConfig {
   checkIsRoot: () => boolean;
   renderManager?: RenderManager;
   addJSModule?: (module: any) => void;
+  isPopup?: boolean;
+  hasPopups?: boolean;
 }
 
 const handleSlot = (ui: UI, config: HandleSlotConfig) => {
@@ -43,7 +45,7 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
   });
 
   // 3. 处理场景逻辑 (Start, Inputs 等)
-  const effectCode = processSceneLogic(ui, config, addDependencyImport);
+  let effectCode = processSceneLogic(ui, config, addDependencyImport);
 
   // 4. 合并样式与代码
   let cssContent = (convertStyleAryToCss(props.style?.styleAry, slotId) || "") + 
@@ -74,15 +76,24 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
  * 设置基础导入
  */
 const setupImports = (addImport: any, config: any, isRoot: boolean) => {
-  const utilsPkg = config.getUtilsPackageName();
-  const comPkg = config.getComponentPackageName();
+  const importParams = { isPopup: config.isPopup };
+  const utilsPkg = config.getUtilsPackageName(importParams);
+  const comPkg = config.getComponentPackageName(importParams);
 
   addImport({ packageName: "react", dependencyNames: ["useRef", "useEffect", "useState"], importType: "named" });
   addImport({ packageName: "@tarojs/components", dependencyNames: ["View"], importType: "named" });
-  addImport({ packageName: utilsPkg, dependencyNames: ["WithCom", "WithWrapper"], importType: "named" });
+  
+  const dependencyNames = ["WithCom", "WithWrapper"];
+  if (isRoot && config.hasPopups) {
+    dependencyNames.push("PopupRenderer");
+  }
+  addImport({ packageName: utilsPkg, dependencyNames, importType: "named" });
   addImport({ packageName: comPkg, dependencyNames: ["useAppContext"], importType: "named" });
 
   if (isRoot) {
+    if (config.hasPopups) {
+      addImport({ packageName: "../../common/popup", dependencyNames: ["POPUP_MAP", "POPUP_IDS"], importType: "named" });
+    }
     addImport({ packageName: "./index.less", dependencyNames: [], importType: "module" });
   }
 };
@@ -109,7 +120,13 @@ const finalizeRootComponent = (ui: any, config: any, importManager: any, combine
   const componentId = ui.meta?.id || ui.id || ui.meta?.slotId || "Index";
   const componentName = `I${String(componentId).replace(/[^a-zA-Z0-9]/g, "_")}`;
   
-  const componentCode = genComponentTemplate({ componentName, combinedJsCode, uiResult });
+  const componentCode = genComponentTemplate({ 
+    componentName, 
+    combinedJsCode, 
+    uiResult,
+    isPopup: config.isPopup,
+    hasPopups: config.hasPopups
+  });
   
   config.add({ importManager, content: componentCode, cssContent, name: fileName });
 };

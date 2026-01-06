@@ -14,6 +14,7 @@ interface BuildResultParams {
   jsModulesMap: JSModulesMap;
   globalTabBarConfig: string | null;
   tabBarImageFiles: any[];
+  popupIds: string[];
   config: ToTaroCodeConfig;
 }
 
@@ -31,6 +32,7 @@ export const buildFinalResults = (
     jsModulesMap,
     globalTabBarConfig,
     tabBarImageFiles,
+    popupIds,
     config,
   } = params;
 
@@ -67,6 +69,28 @@ export { jsModules };
       content: commonIndexContent,
       importManager: new ImportManager(config),
       name: "commonIndex",
+    });
+  }
+
+  // 生成弹窗汇总文件 (popup.ts)
+  if (popupIds.length > 0) {
+    let registryContent = "";
+    popupIds.forEach((id) => {
+      registryContent += `import Scene_${id} from '../popupComponents/${id}/index';\n`;
+    });
+
+    registryContent += `\nexport const POPUP_MAP: Record<string, any> = {\n`;
+    popupIds.forEach((id) => {
+      registryContent += `  '${id}': Scene_${id},\n`;
+    });
+    registryContent += `};\n\n`;
+    registryContent += `export const POPUP_IDS = ${JSON.stringify(popupIds)};\n`;
+
+    files.push({
+      type: "popup",
+      content: registryContent,
+      importManager: new ImportManager(config),
+      name: "popup",
     });
   }
 

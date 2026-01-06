@@ -12,9 +12,10 @@ export class HandlePageConfig {
   /**
    * 处理页面配置（提取 systemPage 组件数据）
    * @param scene 场景数据
+   * @param isPopup 是否为弹窗场景
    * @returns 页面配置内容
    */
-  handle(scene: ReturnType<typeof toCode>["scenes"][0]["scene"]): string | undefined {
+  handle(scene: ReturnType<typeof toCode>["scenes"][0]["scene"], isPopup: boolean = false): string | undefined {
     // 提取 systemPage 组件数据，生成 pageConfigContent
     let pageConfigContent: string | undefined;
     
@@ -23,7 +24,8 @@ export class HandlePageConfig {
     });
     
     if (systemPageCom?.model?.data) {
-      const systemPageData = systemPageCom.model.data;
+      const systemPageData = { ...systemPageCom.model.data };
+      
       // 生成页面配置
       pageConfigContent = generatePageConfigContent(systemPageData);
       

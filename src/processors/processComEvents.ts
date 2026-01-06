@@ -43,9 +43,14 @@ export const processComEvents = (
       return;
     }
 
-    if (type !== "defined" || !diagramId) return;
+    if (type !== "defined") return;
 
-    const event = config.getEventByDiagramId(diagramId);
+    // 兼容：部分数据把 diagramId 放在 options.id（例如 test-data.json 的 outputEvents）
+    const resolvedDiagramId =
+      diagramId || eventInfo?.options?.diagramId || eventInfo?.options?.id;
+    if (!resolvedDiagramId) return;
+
+    const event = config.getEventByDiagramId(resolvedDiagramId);
     if (!event) return;
 
     const paramName = "value";
@@ -64,14 +69,16 @@ export const processComEvents = (
       .replace(/comRefs\.current\.slot_Index\./g, "comRefs.current.");
 
     if (process.includes("pageParams")) {
+      const importParams = { isPopup: (config as any).isPopup };
+      const controllerName = (config as any).isPopup ? "popupRouter" : "pageRouter";
       config.addParentDependencyImport({
-        packageName: config.getComponentPackageName(),
-        dependencyNames: ["page", "SUBJECT_VALUE"],
+        packageName: config.getComponentPackageName(importParams),
+        dependencyNames: [controllerName, "SUBJECT_VALUE"],
         importType: "named",
       });
       const indent = indentation(config.codeStyle!.indent * (config.depth + 3));
       // 使用 SUBJECT_VALUE 获取当前参数值，保持与 MyBricks 逻辑一致
-      process = `${indent}const pageParams: any = page.getParams("${config.getCurrentScene().id}")[SUBJECT_VALUE];\n${process}`;
+      process = `${indent}const pageParams: any = ${controllerName}.getParams("${config.getCurrentScene().id}")[SUBJECT_VALUE];\n${process}`;
     }
 
     const handlerIndent = indentation(config.codeStyle!.indent * (config.depth + 2));
@@ -87,6 +94,45 @@ export const processComEvents = (
     outputsConfig[meta.id][onEventName] = handlerCode;
     eventConfig[eventId] = { connected: true };
   });
+
+  // 针对 mybricks.taro.popup 的特殊处理
+  if (meta.def?.namespace === 'mybricks.taro.popup') {
+    if (!outputsConfig[meta.id]) {
+      outputsConfig[meta.id] = {};
+    }
+    
+    const importParams = { isPopup: (config as any).isPopup };
+    const sceneCom = config.getCurrentScene().coms?.[meta.id];
+    const popupData = (sceneCom?.model as any)?.data || {};
+    const isTrue = (v: any) => v === true || v === "true";
+
+    // 如果 onClose 没被连接，且 visibleClose=true（会渲染关闭按钮），才添加默认 close
+    // visibleClose=false 时，运行时不会触发 onClose（模板里只在 close 按钮点击时触发）
+    if (!eventConfig['onClose'] && isTrue(popupData.visibleClose)) {
+      config.addParentDependencyImport({
+        packageName: config.getComponentPackageName(importParams),
+        dependencyNames: ["popupRouter"],
+        importType: "named",
+      });
+      const handlerIndent = indentation(config.codeStyle!.indent * (config.depth + 2));
+      const processIndent = indentation(config.codeStyle!.indent * (config.depth + 3));
+      outputsConfig[meta.id]['onClose'] = `() => {\n${processIndent}popupRouter.close("${config.getCurrentScene().id}");\n${handlerIndent}}`;
+      eventConfig['onClose'] = { connected: true };
+    }
+
+    // 如果 onClickOverlay 没被连接，且组件配置了点击遮罩关闭
+    if (!eventConfig['onClickOverlay'] && isTrue(popupData.maskClose)) {
+      config.addParentDependencyImport({
+        packageName: config.getComponentPackageName(importParams),
+        dependencyNames: ["popupRouter"],
+        importType: "named",
+      });
+      const handlerIndent = indentation(config.codeStyle!.indent * (config.depth + 2));
+      const processIndent = indentation(config.codeStyle!.indent * (config.depth + 3));
+      outputsConfig[meta.id]['onClickOverlay'] = `() => {\n${processIndent}popupRouter.close("${config.getCurrentScene().id}");\n${handlerIndent}}`;
+      eventConfig['onClickOverlay'] = { connected: true };
+    }
+  }
 
   return { comEventCode, outputsConfig, eventConfig };
 };

@@ -100,7 +100,32 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
   // 一次性将所有生成的页面添加到 pages 目录
   pagesDir.children.push(...generatedPages);
 
-  // 更新 app.config.ts
+  // --- 处理弹窗场景 (popup) ---
+  const popupComponentsDir = ensureDir(srcDir, "src/popupComponents");
+  const popupScenes = files.filter((item) => item.type === "popup" && item.meta);
+
+  popupScenes.forEach((item) => {
+    const popupId = item.meta!.id;
+    const importCode = item.importManager?.toCode() || "";
+    const fullContent = `${importCode}\n${item.content || ""}`;
+
+    popupComponentsDir.children!.push({
+      path: `src/popupComponents/${popupId}`,
+      content: null,
+      children: [
+        {
+          path: `src/popupComponents/${popupId}/index.tsx`,
+          content: fullContent,
+        },
+        {
+          path: `src/popupComponents/${popupId}/index.less`,
+          content: item.cssContent || "",
+        },
+      ],
+    });
+  });
+
+  // 更新 app.config.ts (只传入 normalItems 作为真正的页面)
   const appConfigFile = srcDir.children?.find(
     (node) => node.path === "src/app.config.ts",
   );
@@ -113,6 +138,15 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
 
   // 处理 common 目录下的文件
   handleCommonDir(commonDir, files);
+
+  // 处理 popup 汇总文件 (type 为 popup 且无 meta)
+  const popupFile = files.find((f) => f.type === "popup" && !f.meta);
+  if (popupFile) {
+    commonDir.children!.push({
+      path: `src/common/${popupFile.name}.ts`,
+      content: popupFile.content,
+    });
+  }
 
   return templateJson;
 };

@@ -47,7 +47,7 @@ export interface ToTaroCodeConfig {
     callName?: string;
   };
   getComponentPackageName: (props?: any) => string;
-  getUtilsPackageName: () => string;
+  getUtilsPackageName: (props?: any) => string;
   getPageId?: (id: string) => string;
   getBus?: (namespace: string) => { title: string; name: string };
   getApi?: (namespace: string) => { title: string };
@@ -193,10 +193,22 @@ const getCode = (
   const abstractEventTypeDefMap: Record<string, any> = {};
   const jsModulesCollector = createJSModulesCollector();
   const pageConfigHandler = new HandlePageConfig();
+  
+  // 提前识别所有弹窗场景
+  const popupIds = new Set<string>();
+  tojson.scenes.forEach((s: any) => {
+    if (s.type === 'popup' || s.deps?.some((dep: any) => dep.namespace === 'mybricks.taro.popup')) {
+      popupIds.add(s.id);
+    }
+  });
 
   // ========== 第六步：处理场景 ==========
   processScenes(scenes, {
-    config,
+    config: {
+      ...config,
+      // @ts-ignore
+      hasPopups: popupIds.size > 0
+    },
     globalVarTypeDef,
     defaultFxsMap,
     abstractEventTypeDefMap,
@@ -231,6 +243,7 @@ const getCode = (
     jsModulesMap: jsModulesCollector.getMap(),
     globalTabBarConfig: pageConfigHandler.getTabBarConfig(),
     tabBarImageFiles: pageConfigHandler.getTabBarImageFiles(),
+    popupIds: Array.from(popupIds),
     config,
   });
 
