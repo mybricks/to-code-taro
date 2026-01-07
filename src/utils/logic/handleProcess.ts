@@ -168,10 +168,11 @@ export const handleProcess = (
       } else if (category === "frameOutput") {
         // 场景/弹窗输出（commit/cancel/apply/close）
         const currentScene = config.getCurrentScene();
-        const pinProxy =
-          currentScene?.pinProxies?.[`${props.meta.id}-${props.id}`];
-        if (pinProxy?.type === "frame") {
-          const method = pinProxy.pinId;
+        // pinProxies 的结构在不同数据/版本里不完全一致，这里按最小字段兼容
+        const pinProxy: any =
+          (currentScene as any)?.pinProxies?.[`${props.meta.id}-${props.id}`];
+        if (pinProxy?.frameId && pinProxy?.pinId) {
+          const method = pinProxy.pinId as string;
           const controllerName = (config as any).isPopup ? "popupRouter" : "pageRouter";
 
           config.addParentDependencyImport({
