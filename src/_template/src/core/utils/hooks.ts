@@ -17,13 +17,8 @@ export function deepProxy(target: any, onSet?: () => void): any {
 
       let value = obj[prop];
 
-      // 只有在访问不存在的对象属性时，才自动创建（实现类似 ensure 的效果）
-      // 特意排除 MyBricks 内置的方法名，以便在生成代码中进行初始化判断
-      const mybricksMethods = ['get', 'set', 'changed', 'reset', 'registerChange', 'call', 'apply', 'bind', 'push', 'pop'];
-      if (value === undefined && typeof prop === 'string' && !mybricksMethods.includes(prop)) {
-        value = obj[prop] = {};
-      }
-
+      // 只代理已存在的对象属性，不自动创建空对象
+      // 避免访问不存在的属性（如 disabled）时污染原始数据
       if (typeof value === 'object' && value !== null && !value.__isProxy) {
         obj[prop] = deepProxy(value, onSet);
       }
