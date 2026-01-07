@@ -55,7 +55,7 @@ export { default as Cascader } from "./cascader/runtime";
 
 // 微信
 export { default as Map } from "./map/runtime";
-// export { default as AdPopup } from "./ad-popup/runtime";
+export { default as AdPopup } from "./ad-popup/runtime";
 export { default as ChannelVideo } from "./channelVideo/runtime";
 
 // 其它
