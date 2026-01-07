@@ -13,7 +13,6 @@ import * as Taro from "@tarojs/taro";
 import useFormItemValue from "../utils/hooks/useFormItemValue.ts";
 import { isEmpty, isString, isNumber, isObject } from "./../utils/type";
 import { isH5 } from "../utils/env";
-import cx from "classnames";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;

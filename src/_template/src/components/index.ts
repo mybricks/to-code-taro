@@ -12,27 +12,27 @@ export { default as Icon } from "./icon/runtime";
 
 // 容器
 export { default as ContainerBasic } from "./containerBasic/runtime";
-// export { default as Tabs2 } from "./tabs2/runtime";
-export { default as ContainerList } from "./containerList/runtime";
+export { default as Tabs2 } from "./tabs2/runtime";
+// export { default as ContainerList } from "./containerList/runtime";
 // export { default as ContainerWaterfall } from "./containerWaterfall/runtime";
 // export { default as ContainerCondition2 } from "./containerCondition2/runtime";
-// export { default as Sidebar2 } from "./sidebar2/runtime";
+export { default as Sidebar2 } from "./sidebar2/runtime";
 
 // 数据录入
 // export { default as FormContainer } from "./formContainer/runtime";
 export { default as FormInput } from "./formInput/runtime";
 export { default as FormStepper } from "./formStepper/runtime";
-// export { default as FormTextarea } from "./formTextarea/runtime";
-// export { default as FormPassword } from "./formPassword/runtime";
-// export { default as FormRadio } from "./formRadio/runtime";
-// export { default as FormCheckbox } from "./formCheckbox/runtime";
-// export { default as FormSwitch } from "./formSwitch/runtime";
+export { default as FormTextarea } from "./formTextarea/runtime";
+export { default as FormPassword } from "./formPassword/runtime";
+export { default as FormRadio } from "./formRadio/runtime";
+export { default as FormCheckbox } from "./formCheckbox/runtime";
+export { default as FormSwitch } from "./formSwitch/runtime";
 // export { default as FormRate } from "./formRate/runtime";
-// export { default as FormSelect } from "./formSelect/runtime";
-// export { default as FormDatetime } from "./formDatetime/runtime";
-// export { default as FormLocation } from "./formLocation/runtime";
-// export { default as FormPhoneNumber } from "./formPhoneNumber/runtime";
-// export { default as FormPhoneSMS } from "./formPhoneSMS/runtime";
+export { default as FormSelect } from "./formSelect/runtime";
+export { default as FormDatetime } from "./formDatetime/runtime";
+export { default as FormLocation } from "./formLocation/runtime";
+export { default as FormPhoneNumber } from "./formPhoneNumber/runtime";
+export { default as FormPhoneSMS } from "./formPhoneSMS/runtime";
 // export { default as FormImageUploader } from "./formImageUploader/runtime";
 // export { default as FormFileUploader } from "./formFileUploader/runtime";
 // export { default as FormEditor } from "./formEditor/runtime";

@@ -5,7 +5,6 @@ import css from "./style.less";
 import cx from "classnames";
 import { Input } from "brickd-mobile";
 import { isH5 } from "../utils/env";
-import cx from "classnames";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;
