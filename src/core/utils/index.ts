@@ -6,3 +6,4 @@ export { popupRouter, subscribePopupRouter, closeActivePopupRouter } from './pop
 export { useAppContext } from './ComContext';
 export { createVariable, createFx, merge } from '../mybricks';
 export { SUBJECT_SUBSCRIBE, SUBJECT_VALUE } from '../mybricks/constant';
+export * from './slots';

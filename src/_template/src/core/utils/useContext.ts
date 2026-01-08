@@ -14,7 +14,9 @@ export interface ComContextStore {
 }
 
 export function useAppCreateContext(): ComContextStore {
-  const comRefs = useRef<any>(deepProxy({}));
+  // 约定：场景级 inputs 统一挂载到 $inputs，避免与组件 runtime 的 inputs 命名冲突
+  // 同时可避免 `Cannot set property 'open' of undefined`
+  const comRefs = useRef<any>(deepProxy({ $inputs: {} }));
   const [popupState, setPopupState] = useState({
     visible: false,
     name: '',

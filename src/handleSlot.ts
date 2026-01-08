@@ -20,6 +20,8 @@ interface HandleSlotConfig extends BaseConfig {
   addJSModule?: (module: any) => void;
   isPopup?: boolean;
   hasPopups?: boolean;
+  /** handleCom 处理 slots 时的 slot key（如 item/content），用于识别 scope 入参 */
+  slotKey?: string;
 }
 
 const handleSlot = (ui: UI, config: HandleSlotConfig) => {
@@ -42,6 +44,8 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
     depth: config.depth + 1,
     addParentDependencyImport: addDependencyImport,
     renderManager,
+    // 让插槽内部的组件知道当前处于哪个 slot（用于接收父容器 inputValues）
+    currentSlotId: isRoot ? undefined : (config.slotKey || slotId),
   });
 
   // 3. 处理场景逻辑 (Start, Inputs 等)

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+// @ts-ignore 运行时由宿主项目提供 @tarojs/components
 import { View } from '@tarojs/components';
 import { useModel, useBindInputs, useBindEvents, subscribePopupRouter, closeActivePopupRouter } from './index';
 import { useAppCreateContext } from './useContext';
 import ComContext, { useAppContext } from './ComContext';
+import { useEnhancedSlots, useResolvedParentSlot } from './slots';
 // @ts-ignore 运行时由宿主项目提供 @tarojs/taro
 import { useTabItemTap } from '@tarojs/taro';
 
@@ -54,17 +56,23 @@ export const WithCom: React.FC<WithComProps> = (props) => {
 
   // 绑定输入
   const inputProxy = useBindInputs(comRefs, id, handlers);
-  const eventProxy = useBindEvents(rest);
+  const { slots: rawSlots, parentSlot: parentSlotProp, ...restProps } = rest as any;
+  const eventProxy = useBindEvents(restProps);
+  console.log('comRefs',comRefs.current)
 
   comRefs.current[id] = inputProxy;
+  const enhancedSlots = useEnhancedSlots(rawSlots, id);
+  const parentSlot = useResolvedParentSlot(parentSlotProp);
 
   return (
     show || isPopup ? (
       <View className={className} style={{ ...style, ...dynamicStyle }} >
         <Component
-          {...rest}
+          {...restProps}
           inputs={inputProxy}
           outputs={eventProxy}
+          slots={enhancedSlots}
+          parentSlot={parentSlot}
           data={_data}
           env={env}
           id={id}

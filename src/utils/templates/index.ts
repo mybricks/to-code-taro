@@ -8,6 +8,8 @@ export const getUiComponentCode = (
     meta: any;
     props: any;
     resultStyle: Record<string, Record<string, string | number>>;
+    /** 可选：自定义 data 的表达式代码（用于插槽动态入参等场景） */
+    dataCode?: string;
     componentInputs?: string[];
     componentOutputs?: string[];
     comEventCode?: string;
@@ -25,6 +27,7 @@ export const getUiComponentCode = (
     meta,
     props,
     resultStyle,
+    dataCode,
     componentInputs,
     componentOutputs,
     comEventCode,
@@ -47,9 +50,9 @@ export const getUiComponentCode = (
     ui += `\n${indent2}style={${styleCode}}`;
   }
 
-  // 添加 data（直接传递 props.data，WithCom 内部会使用 useModel）
-  const initialData = JSON.stringify(props.data || {});
-  ui += `\n${indent2}data={${initialData}}`;
+  // 添加 data（默认传递 props.data；插槽等场景可传入 dataCode 以注入动态表达式）
+  const initialDataCode = dataCode ?? JSON.stringify(props.data || {});
+  ui += `\n${indent2}data={${initialDataCode}}`;
 
   // 添加事件处理函数（onClick, onScroll 等）
   Object.entries(eventHandlers).forEach(([eventName, handlerCode]) => {

@@ -27,7 +27,7 @@ export class RenderManager {
     const indent2 = indentation(indentSize); // 函数体内部缩进
 
     this._renders.forEach((renderCode, renderId) => {
-      code += `${indent}const ${renderId}_Render = (params?: { style?: any }) => {\n`;
+      code += `${indent}const ${renderId}_Render = (params?: { style?: any; inputValues?: any; key?: any; cache?: any }) => {\n`;
       code += `${indent}${indent2}return (\n`;
       // renderCode 已经包含了正确的缩进，直接拼接
       code += renderCode;

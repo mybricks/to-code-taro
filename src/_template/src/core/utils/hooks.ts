@@ -79,7 +79,9 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
     });
 
     // 将代理对象挂载到作用域，供外部 comRefs.current.id.pin() 调用
-    scope[id] = proxy;
+    if (scope && scope.current) {
+      scope.current[id] = proxy;
+    }
     return proxy;
   }, [scope, id]);
 }

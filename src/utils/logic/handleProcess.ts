@@ -236,17 +236,11 @@ export const handleProcess = (
       }
     } else {
       // UI 组件处理
-      const currentProvider = getCurrentProvider({ isSameScope, props }, config);
-      currentProvider.controllers.add(props.meta.id);
-      const componentController =
-        config.getComponentController?.({
-          com: props.meta,
-          scene: config.getCurrentScene(),
-        }) || `controller_${props.meta.id}`;
-
       code +=
         `${indent}/** 调用 ${props.meta.title} 的 ${props.title} */` +
-        `\n${indent}${nextCode}this.${currentProvider.name}.${componentController}.${props.id}(${nextValue})`;
+        // 新架构：WithCom 会把 inputProxy 挂到 comRefs.current[comId]
+        // 因此这里直接调用 this.<comId>.<pinId>(...)，后续会被 replace 成 comRefs.current.<comId>.<pinId>(...)
+        `\n${indent}${nextCode}this.${props.meta.id}.${props.id}(${nextValue})`;
     }
   });
 
@@ -396,13 +390,16 @@ const getCurrentProvider = (
       ? "slot_Index"
       : `slot_${frameId[0].toUpperCase() + frameId.slice(1)}_${parentComId}`);
 
-  const provider = providerMap[providerName];
+  const provider = providerMap?.[providerName];
 
-  if (!isSameScope) {
-    config.addConsumer(provider);
+  // 兜底：如果 provider 不存在（例如新架构未构建 slot provider），回退到当前 provider
+  const safeProvider = provider || config.getCurrentProvider?.();
+
+  if (!isSameScope && safeProvider) {
+    config.addConsumer?.(safeProvider);
   }
 
-  return provider;
+  return safeProvider;
 };
 
 /**

@@ -149,7 +149,8 @@ const processSceneInputs = (currentScene: any, config: any, addDependencyImport:
   const sceneInputs = currentScene?.inputs || [];
   if (!Array.isArray(sceneInputs) || sceneInputs.length === 0) return code;
 
-  code += `\n${indent}  const inputs = comRefs.current.inputs;`;
+  // 约定：场景级 inputs 挂载到 $inputs，避免与组件 runtime 的 inputs 冲突
+  code += `\n${indent}  const inputs = comRefs.current.$inputs;`;
   
   sceneInputs.forEach((input: any) => {
     const event = config.getFrameInputEvent(input.id, currentScene.id);
