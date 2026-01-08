@@ -36,7 +36,7 @@ async function runCode() {
         }
 
         // 普通组件：从 namespace 中提取组件名
-        const componentName = namespace.split(".").pop() || "Component";
+        const componentName = namespace.split(".").pop()?.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase()) || "Component";
         return {
           importInfo: {
             name: componentName,
