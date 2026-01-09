@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import { deepProxy } from './hooks'
 
 export interface ComContextStore {
@@ -26,7 +26,7 @@ export function useAppCreateContext(): ComContextStore {
     controller: null
   });
 
-  const appContext: any = {
+  const appContext = useRef({
     canvas: {
       id: "u_7VvVn", // 使用 data 中的 id
     },
@@ -41,12 +41,15 @@ export function useAppCreateContext(): ComContextStore {
     isDebug: false,
     isLocal: false,
     isTest: false,
-  };
-  return {
+    tabBar: [],
+    useTabBar: false,
+  }).current;
+
+  return useMemo(() => ({
     comRefs,
     outputs,
     appContext,
     popupState,
     setPopupState
-  }
+  }), [popupState]);
 }

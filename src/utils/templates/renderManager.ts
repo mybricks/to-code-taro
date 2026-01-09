@@ -2,14 +2,14 @@ import { indentation, toPascalCase } from "./index";
 
 /** Render 函数管理器 */
 export class RenderManager {
-  /** 存储格式：renderId -> { renderCode, children?, logicCode?, slotType?, useWrap? } */
-  private _renders: Map<string, { renderCode: string; children?: any[]; logicCode?: string; slotType?: string; useWrap?: boolean }> = new Map();
+  /** 存储格式：renderId -> { renderCode, children?, logicCode?, slotType?, useWrap?, description? } */
+  private _renders: Map<string, { renderCode: string; children?: any[]; logicCode?: string; slotType?: string; useWrap?: boolean; description?: string }> = new Map();
 
   /**
    * 注册一个 render 函数
    */
-  register(renderId: string, renderCode: string, children?: any[], logicCode?: string, slotType?: string, useWrap?: boolean) {
-    this._renders.set(renderId, { renderCode, children, logicCode, slotType, useWrap });
+  register(renderId: string, renderCode: string, children?: any[], logicCode?: string, slotType?: string, useWrap?: boolean, description?: string) {
+    this._renders.set(renderId, { renderCode, children, logicCode, slotType, useWrap, description });
   }
 
   /**
@@ -28,10 +28,13 @@ export class RenderManager {
     const indent5 = indentation(indentSize * 4);
     const indent6 = indentation(indentSize * 5);
 
-    this._renders.forEach(({ renderCode, children, logicCode, useWrap }, renderId) => {
+    this._renders.forEach(({ renderCode, children, logicCode, useWrap, description }, renderId) => {
       const renderFunctionName = toPascalCase(`${renderId}_Render`);
       
-      code += `${indent}const ${renderFunctionName} = (params: any) => {\n`;
+      if (description) {
+        code += `${indent}/** ${description} */\n`;
+      }
+      code += `${indent}function ${renderFunctionName}(params: any) {\n`;
       code += `${indent}${indent2}const { comRefs, outputs } = useAppContext();\n`;
 
       if (logicCode) {
@@ -93,7 +96,7 @@ export class RenderManager {
         code += `${indent}${indent3}</>\n`;
       }
       code += `${indent}${indent2});\n`;
-      code += `${indent}};\n\n`;
+      code += `${indent}}\n\n`;
     });
 
     return code;

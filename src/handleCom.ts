@@ -157,13 +157,17 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
     // 生成插槽内的驱动逻辑 (jsModules 驱动输入)
     const logicCode = buildSlotLogicCode(slotId, result.childrenResults, config);
 
+    // 生成插槽描述注释内容
+    const description = `${meta.title || meta.id}的${slot.title || slotId}插槽`;
+
     renderManager.register(
       renderId, 
       formattedContent, 
       result.childrenResults, 
       logicCode,
       slot.type,
-      slot.wrap || slot.itemWrap || COM_PROTOCOL[meta.def.namespace]?.useWrap
+      slot.wrap || slot.itemWrap || COM_PROTOCOL[meta.def.namespace]?.useWrap,
+      description
     );
     
     if (result.childrenResults) {

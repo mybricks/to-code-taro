@@ -73,15 +73,15 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
   let cssContent = (convertStyleAryToCss(props.style?.styleAry, slotId) || "") + 
                     (childResults.cssContent ? "\n" + childResults.cssContent : "");
 
-  let renderCodeBlock = isRoot && renderManager ? renderManager.toCode(indentation(config.codeStyle!.indent)) : "";
-  const combinedJsCode = `${envDefineCode}${childResults.js}${renderCodeBlock ? `\n${renderCodeBlock}` : ""}${wrapInEffect(indent2, effectCode)}`;
+  const combinedJsCode = `${envDefineCode}${childResults.js}${wrapInEffect(indent2, effectCode)}`;
 
   // 5. 生成 UI 结构
   const uiResult = generateSlotUi(ui, props, childResults.ui, config);
 
   // 6. 如果是根场景，生成完整文件
   if (isRoot) {
-    finalizeRootComponent(ui, config, importManager, combinedJsCode, uiResult, cssContent);
+    const renderDefinitions = renderManager ? renderManager.toCode("") : ""; // 顶层定义不需要缩进
+    finalizeRootComponent(ui, config, importManager, combinedJsCode, renderDefinitions, uiResult, cssContent);
   }
 
   return {
@@ -138,7 +138,7 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, config: any) =>
 /**
  * 完成根组件的注册
  */
-const finalizeRootComponent = (ui: any, config: any, importManager: any, combinedJsCode: string, uiResult: string, cssContent: string) => {
+const finalizeRootComponent = (ui: any, config: any, importManager: any, combinedJsCode: string, renderDefinitions: string, uiResult: string, cssContent: string) => {
   const fileName = config.getFileName?.(ui.meta.slotId) || ui.meta.title || "index";
   const componentId = ui.meta?.id || ui.id || ui.meta?.slotId || "Index";
   const componentName = `I${String(componentId).replace(/[^a-zA-Z0-9]/g, "_")}`;
@@ -146,6 +146,7 @@ const finalizeRootComponent = (ui: any, config: any, importManager: any, combine
   const componentCode = genComponentTemplate({ 
     componentName, 
     combinedJsCode, 
+    renderDefinitions,
     uiResult,
     isPopup: config.isPopup,
     hasPopups: config.hasPopups
