@@ -12,6 +12,12 @@ export interface TabBarItemSource {
   };
   text?: string;
   type?: string;
+  normalIconUseImg?: boolean;
+  selectedIconUseImg?: boolean;
+  normalIcon?: string;
+  selectedIcon?: string;
+  normalFontIconStyle?: Record<string, any>;
+  selectedFontIconStyle?: Record<string, any>;
   normalIconPath?: string;
   selectedIconPath?: string;
   normalTextStyle?: Record<string, any>;
@@ -46,6 +52,7 @@ export interface TaroTabBarItem {
  * Taro TabBar 配置
  */
 export interface TaroTabBarConfig {
+  custom?: boolean;
   color?: string;
   selectedColor?: string;
   backgroundColor?: string;
