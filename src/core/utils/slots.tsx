@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import ComContext, { SlotProvider, useAppContext, useParentSlot } from "./ComContext";
 import { createReactiveInputHandler } from "../mybricks/createReactiveInputHandler";
 
@@ -49,7 +49,7 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
   const slotStoreRef = useRef<Record<string, SlotState>>({});
 
   return useMemo(() => {
-    if (!rawSlots) return rawSlots;
+    if (!rawSlots) return {};
     const nextSlots: AnyRecord = {};
 
     Object.entries(rawSlots).forEach(([slotKey, slotDef]: any) => {
@@ -66,10 +66,13 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
             // 只有存在 key 或 index 时才认为是“多实例作用域插槽”，需要实例隔离
             const rawScope = params?.key ?? params?.inputValues?.index ?? params?.inputValues?.itemData?.id;
             
+            const SlotComp = r;
+            const content = r ? <SlotComp {...(params || {})} /> : null;
+
             if (rawScope === undefined || rawScope === null) {
               return (
-                <SlotProvider value={state}>
-                  {typeof r === "function" ? r(params) : null}
+                <SlotProvider value={{ ...state, params }}>
+                  {content}
                 </SlotProvider>
               );
             }
@@ -78,9 +81,9 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
             const scopedComRefs =
               (state._scopedComRefs![scopeId] ||= { current: { $inputs: {} } });
             return (
-              <SlotProvider value={state}>
+              <SlotProvider value={{ ...state, params }}>
                 <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
-                  {typeof r === "function" ? r(params) : null}
+                  {content}
                 </ScopedComContextProvider>
               </SlotProvider>
             );
@@ -101,17 +104,17 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
   }, [rawSlots, id]);
 }
 
-function ScopedComContextProvider(props: {
-  comRefs: any;
+export function ScopedComContextProvider(props: {
+  comRefs?: any;
   scopeId: string;
   children: React.ReactNode;
 }) {
   const parent = useAppContext();
   const value = useMemo(() => {
-    // 只覆写 comRefs + 附带 scopeId（方便后续事件流/JS 计算读取上下文）
+    // 如果没有显式传 comRefs，则沿用父级的，但依然带上新的 scopeId
     return {
       ...parent,
-      comRefs: props.comRefs,
+      comRefs: props.comRefs || parent.comRefs,
       $scopeId: props.scopeId,
     } as any;
   }, [parent, props.comRefs, props.scopeId]);

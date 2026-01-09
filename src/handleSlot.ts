@@ -26,14 +26,32 @@ interface HandleSlotConfig extends BaseConfig {
 
 const handleSlot = (ui: UI, config: HandleSlotConfig) => {
   const importManager = new ImportManager(config);
-  const { props = {} as any, children = [] } = ui;
+  const { props = {} as any } = ui;
+  // 支持 children 或 comAry (DSL 常用名)
+  const children = ui.children || (ui as any).comAry || [];
   const isRoot = config.checkIsRoot();
   const slotId = (ui as any).meta?.id || (ui as any).id;
 
   // 1. 初始化依赖与基础定义
-  const addDependencyImport = config.addParentDependencyImport || importManager.addImport.bind(importManager);
-  setupImports(addDependencyImport, config, isRoot);
-  
+    const addDependencyImport = config.addParentDependencyImport || importManager.addImport.bind(importManager);
+    setupImports(addDependencyImport, config, isRoot);
+
+    // 鸿蒙规范：插槽组件内部需要使用 context 访问 comRefs/outputs
+    if (!isRoot) {
+      const utilsPkg = config.getUtilsPackageName({ isRoot, isPopup: config.isPopup });
+      addDependencyImport({
+        packageName: utilsPkg,
+        dependencyNames: ["useAppContext", "ScopedComContextProvider"],
+        importType: "named",
+      });
+      // 补全 useEffect 导入（用于插槽逻辑驱动）
+      addDependencyImport({
+        packageName: "react",
+        dependencyNames: ["useEffect"],
+        importType: "named",
+      });
+    }
+
   const indent2 = indentation(config.codeStyle!.indent);
   const envDefineCode = isRoot ? genRootDefineCode(indent2, config.getUtilsPackageName()) : genSlotDefineCode(indent2);
 
@@ -55,15 +73,15 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
   let cssContent = (convertStyleAryToCss(props.style?.styleAry, slotId) || "") + 
                     (childResults.cssContent ? "\n" + childResults.cssContent : "");
 
-  let renderCodeBlock = isRoot && renderManager ? renderManager.toCode(indentation(config.codeStyle!.indent)) : "";
-  const combinedJsCode = `${envDefineCode}${childResults.js}${renderCodeBlock ? `\n${renderCodeBlock}` : ""}${wrapInEffect(indent2, effectCode)}`;
+  const combinedJsCode = `${envDefineCode}${childResults.js}${wrapInEffect(indent2, effectCode)}`;
 
   // 5. 生成 UI 结构
   const uiResult = generateSlotUi(ui, props, childResults.ui, config);
 
   // 6. 如果是根场景，生成完整文件
   if (isRoot) {
-    finalizeRootComponent(ui, config, importManager, combinedJsCode, uiResult, cssContent);
+    const renderDefinitions = renderManager ? renderManager.toCode("") : ""; // 顶层定义不需要缩进
+    finalizeRootComponent(ui, config, importManager, combinedJsCode, renderDefinitions, uiResult, cssContent);
   }
 
   return {
@@ -73,6 +91,7 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
     cssContent,
     slots: [],
     scopeSlots: [],
+    childrenResults: childResults.childrenResults,
   };
 };
 
@@ -87,7 +106,7 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
   addImport({ packageName: "react", dependencyNames: ["useRef", "useEffect", "useState"], importType: "named" });
   addImport({ packageName: "@tarojs/components", dependencyNames: ["View"], importType: "named" });
   
-  const dependencyNames = ["WithCom", "WithWrapper"];
+  const dependencyNames = ["WithCom", "WithWrapper", "SlotProvider"];
   if (isRoot && config.hasPopups) {
     dependencyNames.push("PopupRenderer");
   }
@@ -98,7 +117,7 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
     if (config.hasPopups) {
       addImport({ packageName: "../../common/popup", dependencyNames: ["POPUP_MAP", "POPUP_IDS"], importType: "named" });
     }
-    addImport({ packageName: "./index.less", dependencyNames: [], importType: "module" });
+    addImport({ packageName: "./index.global.less", dependencyNames: [], importType: "module" });
   }
 };
 
@@ -119,7 +138,7 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, config: any) =>
 /**
  * 完成根组件的注册
  */
-const finalizeRootComponent = (ui: any, config: any, importManager: any, combinedJsCode: string, uiResult: string, cssContent: string) => {
+const finalizeRootComponent = (ui: any, config: any, importManager: any, combinedJsCode: string, renderDefinitions: string, uiResult: string, cssContent: string) => {
   const fileName = config.getFileName?.(ui.meta.slotId) || ui.meta.title || "index";
   const componentId = ui.meta?.id || ui.id || ui.meta?.slotId || "Index";
   const componentName = `I${String(componentId).replace(/[^a-zA-Z0-9]/g, "_")}`;
@@ -127,6 +146,7 @@ const finalizeRootComponent = (ui: any, config: any, importManager: any, combine
   const componentCode = genComponentTemplate({ 
     componentName, 
     combinedJsCode, 
+    renderDefinitions,
     uiResult,
     isPopup: config.isPopup,
     hasPopups: config.hasPopups

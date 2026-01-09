@@ -1,102 +1,53 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  convertComponentStyle,
-  ImportManager,
-  firstCharToUpperCase,
-  convertStyleAryToCss,
-  indentation,
-} from "./utils";
-import { getUiComponentCode } from "./utils/templates";
-import handleSlot from "./handleSlot";
+import { convertComponentStyle, convertStyleAryToCss } from "./utils/style/converter";
+import { indentation, firstCharToUpperCase, formatSlotContent, getUiComponentCode } from "./utils/templates/index";
+import { genSlotRenderRef } from "./utils/templates/component";
 import { RenderManager } from "./utils/templates/renderManager";
+import handleSlot from "./handleSlot";
 import { processComEvents } from "./processors/processComEvents";
-import { genSlotRenderRef, formatSlotContent } from "./utils/templates/component";
 
-import type { UI, BaseConfig } from "./toCodeTaro";
-
-export type Com = Extract<UI["children"][0], { type: "com" }>;
-
-type HandleComResult = {
-  ui: string;
-  js: string;
-  slots: string[];
-  scopeSlots: string[];
-  cssContent: string;
-  renderCode?: string;
-  outputsConfig?: Record<string, any>;
-};
-
-export interface HandleComConfig extends BaseConfig {
-  addParentDependencyImport: (typeof ImportManager)["prototype"]["addImport"];
-  addConsumer: (provider: ReturnType<BaseConfig["getCurrentProvider"]>) => void;
-  addComId: (comId: string) => void;
-  renderManager?: RenderManager;
-  /** 当前是否处于某个插槽内部（scope slot id，如 item / content 等） */
-  currentSlotId?: string;
-  addJSModule?: (module: {
-    id: string;
-    title: string;
-    transformCode: string;
-    inputs: string[];
-    outputs: string[];
-    data: any;
-  }) => void;
-}
+export type Com = any;
+export type HandleComConfig = any;
+export type HandleComResult = any;
 
 /**
- * 组件特例识别与配置（后续可迁移至外部 JSON 或由 config 提供）
- * 架构意义：集中化组件特有行为，保持生成器主逻辑纯净
+ * 组件协议配置（参考鸿蒙规范）
+ * - useWrap: 是否支持容器协议（如 Form 容器需要 metadata 包装）
  */
-const COMPONENT_REGISTRY = {
-  jsCalculationNamespaces: new Set([
-    "mybricks.taro._muilt-inputJs",
-    "mybricks.core-comlib.js-ai",
-  ]),
-  inputDataMapping: {
-    "mybricks.taro.text": { value: "text" },
-    "mybricks.taro.image": { setSrc: "src" },
-  } as Record<string, Record<string, string>>,
-  
-  isJsCalculation(namespace: string) {
-    return this.jsCalculationNamespaces.has(namespace);
-  },
-  
-  resolveDataKey(namespace: string, pinId: string, staticData: any): string {
-    const mapped = this.inputDataMapping[namespace]?.[pinId];
-    if (mapped) return mapped;
-
-    // 通用推导：setXxx -> xxx
-    if (pinId.startsWith("set") && pinId.length > 3) {
-      const candidate = pinId[3].toLowerCase() + pinId.slice(4);
-      if (staticData && Object.prototype.hasOwnProperty.call(staticData, candidate)) {
-        return candidate;
-      }
-    }
-    return pinId;
-  }
+const COM_PROTOCOL: Record<string, { useWrap?: boolean }> = {
+  "mybricks.taro.formContainer": { useWrap: true },
+  "mybricks.taro.formAdditionContainer": { useWrap: true },
 };
 
-const FRAME_INPUT_NS = "mybricks.core-comlib.frame-input";
-
-const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
+/**
+ * 处理组件
+ */
+export const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
   const { meta, props } = com;
   const namespace = meta.def.namespace;
 
-  // 1. 处理 JS 计算组件（逻辑节点）
-  if (COMPONENT_REGISTRY.isJsCalculation(namespace)) {
+  // 鸿蒙规范：确保组件具有稳定的 DSL 名称（用于容器识别）
+  if (!meta.name && config.getDslComNameById) {
+    (meta as any).name = config.getDslComNameById(meta.id);
+  }
+
+  // 1. 如果是 JS 计算组件
+  if (namespace === "mybricks.core-comlib.js-calculation") {
     return handleJsCalculation(com, config);
   }
 
-  // 2. 准备基础信息与事件处理
+  // 2. 准备组件元数据
   const { componentName, eventHandlers, comEventCode } = prepareComponent(com, config);
 
-  // 3. 处理样式
+  // 3. 准备样式
   const { cssContent, rootStyle } = prepareStyles(com);
+  let accumulatedCssContent = cssContent;
 
-  // 4. 处理插槽（递归处理子树）
-  const { slotsCode, accumulatedCssContent, eventCode } = processComSlots(com, config, cssContent);
+  // 4. 处理插槽
+  const { slotsCode, accumulatedCssContent: slotCss, eventCode, childrenResults } = processComSlots(com, config, accumulatedCssContent);
+  accumulatedCssContent = slotCss;
 
-  // 5. 生成最终 UI 代码（整合动态注入数据）
+  // 5. 生成 UI 代码
   const ui = generateUiCode(com, config, componentName, rootStyle, comEventCode, slotsCode, eventHandlers);
 
   return {
@@ -106,6 +57,9 @@ const handleCom = (com: Com, config: HandleComConfig): HandleComResult => {
     js: eventCode,
     cssContent: accumulatedCssContent,
     outputsConfig: Object.keys(eventHandlers).length > 0 ? { [meta.id]: eventHandlers } : undefined,
+    childrenResults,
+    name: (meta as any).name, // 返回解析后的稳定名称
+    rootStyle, // 返回转换后的根样式
   };
 };
 
@@ -156,20 +110,21 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
   let slotsCode = "";
   let accumulatedCssContent = initialCss;
   let eventCode = "";
+  let allChildrenResults: any[] = [];
 
-  if (!slots) return { slotsCode, accumulatedCssContent, eventCode };
+  if (!slots) return { slotsCode, accumulatedCssContent, eventCode, childrenResults: [] };
 
   const renderManager = config.renderManager || new RenderManager();
   const slotEntries = Object.entries(slots);
   
   slotEntries.forEach(([slotId, slot]: [string, any], index) => {
-    // 注入布局配置
-    const rawSlotInfo = (props.style as any)?.slots?.[slotId];
-    if (rawSlotInfo?.layout) {
-      slot.layout = rawSlotInfo.layout;
+    // 鸿蒙规范：如果插槽内没有组件，跳过渲染
+    const children = slot.comAry || slot.children || [];
+    if (children.length === 0) {
+      return;
     }
 
-    const result = handleSlot(slot, {
+    const result = (handleSlot as any)(slot, {
       ...config,
       checkIsRoot: () => false,
       depth: 1,
@@ -186,14 +141,39 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
     const baseIndentSize = config.codeStyle!.indent;
     const renderBodyIndent = indentation(config.codeStyle!.indent * 2);
 
-    const formattedContent = formatSlotContent({
-      uiContent: result.ui,
-      baseIndentSize,
-      renderBodyIndent,
-    });
+    const formattedContent = formatSlotContent(result.ui, baseIndentSize, renderBodyIndent);
     
-    renderManager.register(renderId, formattedContent);
+    // 鸿蒙化处理：针对表单容器进行别名对齐
+    if (meta.def.namespace === "mybricks.taro.formContainer" && Array.isArray((props.data as any)?.items) && result.childrenResults) {
+      const items = (props.data as any)?.items;
+      result.childrenResults.forEach((childRes: any) => {
+        const itemConfig = items.find((it: any) => it.id === childRes.id);
+        if (itemConfig?.comName) {
+          childRes.name = itemConfig.comName;
+        }
+      });
+    }
+
+    // 生成插槽内的驱动逻辑 (jsModules 驱动输入)
+    const logicCode = buildSlotLogicCode(slotId, result.childrenResults, config);
+
+    // 生成插槽描述注释内容
+    const description = `${meta.title || meta.id}的${slot.title || slotId}插槽`;
+
+    renderManager.register(
+      renderId, 
+      formattedContent, 
+      result.childrenResults, 
+      logicCode,
+      slot.type,
+      slot.wrap || slot.itemWrap || COM_PROTOCOL[meta.def.namespace]?.useWrap,
+      description
+    );
     
+    if (result.childrenResults) {
+      allChildrenResults = allChildrenResults.concat(result.childrenResults);
+    }
+
     const slotIndent = indentation(config.codeStyle!.indent * (config.depth + 2));
     slotsCode += genSlotRenderRef({
       slotId,
@@ -203,11 +183,53 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
     });
   });
 
-  return { slotsCode, accumulatedCssContent, eventCode };
+  return { slotsCode, accumulatedCssContent, eventCode, childrenResults: allChildrenResults };
 };
 
 /**
- * 生成 UI 组件代码，包含动态数据注入
+ * 生成插槽内部的驱动逻辑 (useEffect 监听 inputValues 并调用子组件 inputs)
+ */
+const buildSlotLogicCode = (slotId: string, children: any[], config: HandleComConfig): string => {
+  const scene = config.getCurrentScene();
+  const indent = indentation(2);
+  const indent2 = indentation(4);
+  const indent3 = indentation(6);
+
+  let bodyCode = "";
+  children?.forEach(child => {
+    if (child.type !== 'com') return;
+
+    // 寻找连线：frame-input -> child.id
+    const mapping = collectSlotInputMappingForCom({
+      slotFrameId: slotId,
+      scene,
+      targetComId: child.id
+    });
+
+    Object.entries(mapping).forEach(([pinId, slotKey]) => {
+      bodyCode += `${indent3}const val_${child.id}_${pinId} = params.inputValues['${slotKey}'];\n`;
+      bodyCode += `${indent3}if (val_${child.id}_${pinId} !== undefined) {\n`;
+      // 生成调用代码：comRefs.current['u_TXC0P']?.['value']?.(val)
+      bodyCode += `${indent3}${indent}comRefs.current['${child.id}']?.['${pinId}']?.(val_${child.id}_${pinId});\n`;
+      bodyCode += `${indent3}}\n`;
+    });
+  });
+
+  if (!bodyCode) {
+    return "";
+  }
+
+  let code = `${indent}useEffect(() => {\n`;
+  code += `${indent2}if (params?.inputValues) {\n`;
+  code += bodyCode;
+  code += `${indent2}}\n`;
+  code += `${indent}}, [params?.inputValues]);\n`;
+
+  return code;
+};
+
+/**
+ * 生成 UI 代码
  */
 const generateUiCode = (
   com: Com,
@@ -216,22 +238,11 @@ const generateUiCode = (
   rootStyle: any,
   comEventCode: string,
   slotsCode: string,
-  eventHandlers: any
+  eventHandlers: any,
 ) => {
   const { meta, props } = com;
   const scene = config.getCurrentScene();
   const sceneCom = scene.coms?.[meta.id];
-  
-  // 处理插槽场景下的动态数据绑定
-  const dataCode = config.currentSlotId
-    ? buildSlotInjectedDataCode({
-        slotFrameId: config.currentSlotId,
-        scene,
-        comMeta: meta,
-        propsData: props.data,
-        paramsVar: "params",
-      })
-    : undefined;
 
   return getUiComponentCode(
     {
@@ -239,7 +250,6 @@ const generateUiCode = (
       meta,
       props,
       resultStyle: { root: rootStyle },
-      dataCode,
       componentInputs: (sceneCom?.inputs?.length || 0) > 0 ? sceneCom.inputs : undefined,
       componentOutputs: (sceneCom?.outputs?.length || 0) > 0 ? sceneCom.outputs : (meta.outputs?.length || 0) > 0 ? meta.outputs : undefined,
       comEventCode,
@@ -274,50 +284,7 @@ const handleJsCalculation = (com: Com, config: HandleComConfig): HandleComResult
 };
 
 /**
- * 解析并生成动态注入的 data 表达式
- */
-function buildSlotInjectedDataCode(params: {
-  slotFrameId: string;
-  scene: any;
-  comMeta: any;
-  propsData: any;
-  paramsVar: string;
-}): string | undefined {
-  const { slotFrameId, scene, comMeta, propsData, paramsVar } = params;
-  if (!scene || !slotFrameId || !comMeta?.id) return undefined;
-
-  const mapping = collectSlotInputMappingForCom({
-    slotFrameId,
-    scene,
-    targetComId: comMeta.id
-  });
-
-  if (!mapping || Object.keys(mapping).length === 0) return undefined;
-
-  const namespace = comMeta.def.namespace;
-  const staticData = propsData || {};
-  const overrides: Record<string, string> = {};
-
-  Object.entries(mapping).forEach(([targetPinId, slotInputKey]) => {
-    const dataKey = COMPONENT_REGISTRY.resolveDataKey(namespace, targetPinId, staticData);
-    const baseExpr = `${paramsVar}?.inputValues?.${slotInputKey}`;
-    
-    // 合并逻辑：若原始数据有值，用 ?? 兜底
-    overrides[dataKey] = Object.prototype.hasOwnProperty.call(staticData, dataKey)
-      ? `(${baseExpr} ?? ${JSON.stringify(staticData[dataKey])})`
-      : baseExpr;
-  });
-
-  const allKeys = new Set([...Object.keys(staticData), ...Object.keys(overrides)]);
-  const entries = Array.from(allKeys).map(key => 
-    `${JSON.stringify(key)}: ${overrides[key] ?? JSON.stringify(staticData[key])}`
-  );
-
-  return `{ ${entries.join(", ")} }`;
-}
-
-/**
- * 鸿蒙化解析逻辑：通过连线关系（cons）和 作用域代理（pinValueProxies）推导数据源
+ * 鸿蒙化解析逻辑：通过连线关系（cons）和 作用域代理（pinValueProxies）推导数据源映射
  */
 function collectSlotInputMappingForCom(params: {
   slotFrameId: string;
@@ -331,12 +298,12 @@ function collectSlotInputMappingForCom(params: {
   const pinValueProxies = scene?.pinValueProxies || {};
   const coms = scene?.coms || {};
 
-  // 1. 找出当前插槽下所有的 frame-input -> 作用域 key 映射
+  // 1. 识别属于当前插槽的 frame-input
   const frameInputComIdToKey: Record<string, string> = {};
   Object.entries(pinValueProxies).forEach(([key, proxy]: any) => {
     if (proxy?.type === "frame" && proxy.frameId === slotFrameId && proxy.pinId) {
       const [comId] = String(key).split("-");
-      if (comId && coms[comId]?.def?.namespace === FRAME_INPUT_NS) {
+      if (comId && coms[comId]?.def?.namespace === "mybricks.core-comlib.frame-input") {
         frameInputComIdToKey[comId] = proxy.pinId;
       }
     }
@@ -344,7 +311,7 @@ function collectSlotInputMappingForCom(params: {
 
   if (Object.keys(frameInputComIdToKey).length === 0) return mapping;
 
-  // 2. 根据连线推导：frame-input 的输出连向了哪些组件 pin
+  // 2. 推导连线：frame-input -> targetCom
   Object.entries(cons).forEach(([sourceKey, targets]) => {
     if (!Array.isArray(targets)) return;
     const [sourceComId] = String(sourceKey).split("-");
@@ -352,8 +319,10 @@ function collectSlotInputMappingForCom(params: {
     
     if (slotInputKey) {
       targets.forEach(t => {
-        if (t?.comId === targetComId && t.pinId) {
-          mapping[t.pinId] = slotInputKey;
+        const targetId = typeof t === 'string' ? t.split('-')[0] : t.comId;
+        const targetPin = typeof t === 'string' ? t.split('-')[1] : t.pinId;
+        if (targetId === targetComId && targetPin) {
+          mapping[targetPin] = slotInputKey;
         }
       });
     }

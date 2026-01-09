@@ -86,7 +86,7 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
   }, [scope, id]);
 }
 
-export function useBindEvents(props: any) {
+export function useBindEvents(props: any, context?: { id: string, name: string, parentSlot?: any }) {
   return useMemo(() => {
     const _events: Record<string, any> = {};
 
@@ -94,7 +94,17 @@ export function useBindEvents(props: any) {
     Object.keys(props).forEach(key => {
       if (key.startsWith('on') && typeof props[key] === 'function') {
         const handler = props[key];
-        const wrapped = (...args: any[]) => handler(...args);
+        const wrapped = (originalValue: any) => {
+          // 鸿蒙/render-web 规范：如果是在插槽中触发事件，且存在父级协议，则自动封装元数据
+          // 这解决了 FormContainer 等组件识别子项的需求
+          const value = context ? {
+            id: context.id,
+            name: context.name,
+            value: originalValue
+          } : originalValue;
+          
+          return handler(value);
+        };
         wrapped.getConnections = () => [{ id: 'default' }];
         _events[key] = wrapped;
       }
@@ -114,5 +124,5 @@ export function useBindEvents(props: any) {
         return target[key];
       }
     });
-  }, [props]);
+  }, [props, context]);
 }

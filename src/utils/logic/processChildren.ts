@@ -9,6 +9,7 @@ export type ChildResult = {
   cssContent: string;
   slots: string[];
   scopeSlots: string[];
+  childrenResults?: any[];
 };
 
 /**
@@ -23,6 +24,7 @@ export const processChildren = (
   let cssContent = "";
   const slots: string[] = [];
   const scopeSlots: string[] = [];
+  const allChildrenResults: any[] = [];
 
   children.forEach((child) => {
     let result: any;
@@ -35,6 +37,20 @@ export const processChildren = (
     }
 
     if (result) {
+      // 收集组件元数据（用于 RenderManager 的 wrap/itemWrap）
+      if (child.type === "com") {
+        const comId = (child as any).id || (child as any).meta?.id;
+        allChildrenResults.push({
+          ...result,
+          id: comId,
+          // 优先使用 handleCom 解析出的稳定名称 (如 comName 别名)
+          name: result.name || (child as any).name || (child as any).props?.data?.name || (child as any).meta?.title || comId,
+          type: child.type,
+          meta: child.meta,
+          props: child.props,
+        });
+      }
+
       if (result.ui) {
         uiCode += (uiCode ? "\n" : "") + result.ui;
       }
@@ -59,6 +75,6 @@ export const processChildren = (
     cssContent,
     slots,
     scopeSlots,
+    childrenResults: allChildrenResults,
   };
 };
-

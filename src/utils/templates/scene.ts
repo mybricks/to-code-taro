@@ -31,6 +31,7 @@ export const genControllerInitCode = (indent: string, providerName: string) => {
 export const genComponentTemplate = ({
   componentName,
   combinedJsCode,
+  renderDefinitions = "", // 新增：外部定义的渲染函数
   uiResult,
   outputsConfig,
   scopeName,
@@ -40,6 +41,7 @@ export const genComponentTemplate = ({
 }: {
   componentName: string;
   combinedJsCode: string;
+  renderDefinitions?: string;
   uiResult: string;
   outputsConfig?: Record<string, Record<string, any>>;
   scopeName?: string;
@@ -47,8 +49,9 @@ export const genComponentTemplate = ({
   isPopup?: boolean;
   hasPopups?: boolean;
 }) => {
-  // 使用 WithWrapper 作为高阶组件包裹根组件
-  let code = `function ${componentName}() {\n` +
+  // 渲染定义放在组件外部，保持引用稳定
+  let code = `${renderDefinitions}\n` +
+         `function ${componentName}() {\n` +
          `${combinedJsCode}\n` +
          `  return (\n` +
          `    <>\n` +
