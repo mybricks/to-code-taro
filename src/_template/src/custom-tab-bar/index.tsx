@@ -10,7 +10,7 @@ import { tabbarIns } from "./utils/tabbar";
 
 tabbarIns.initWithLength(tabBarJson.length);
 
-export default () => {
+function CustomTabBar() {
   const [configList, setConfigList] = useState(tabbarIns.list);
 
   const switchTab = useCallback((url) => {
@@ -147,4 +147,9 @@ export default () => {
       <View className={css.safearea}></View>
     </View>
   );
+}
+
+export default CustomTabBar;
+CustomTabBar.options = {
+  addGlobalClass: true,
 };
