@@ -1,5 +1,5 @@
 import toCode from "@mybricks/to-code-react/dist/cjs/toCode";
-import { generatePageConfigContent, generateTabBarConfigContent, type ImageFileInfo } from "./content";
+import { generatePageConfigContent, generateTabBarConfigContent, formatTabBarConfigForAppConfig, generateCustomTabBarFileContent, type ImageFileInfo } from "./content";
 
 /**
  * 处理页面配置的类
@@ -8,6 +8,7 @@ import { generatePageConfigContent, generateTabBarConfigContent, type ImageFileI
 export class HandlePageConfig {
   private globalTabBarConfig: string | null = null;
   private tabBarImageFiles: ImageFileInfo[] = [];
+  private customTabbarFileContent: string | null = null;
 
   /**
    * 处理页面配置（提取 systemPage 组件数据）
@@ -33,11 +34,15 @@ export class HandlePageConfig {
       if (!this.globalTabBarConfig && systemPageData.tabBar && Array.isArray(systemPageData.tabBar)) {
         // 使用 tabBar[x].scene.id 作为路径的 id
         const pageIdToPath = (pageId: string) => `pages/${pageId}/index`;
-        this.globalTabBarConfig = generateTabBarConfigContent(
+        const globalTabBarConfigJson = generateTabBarConfigContent(
           systemPageData.tabBar,
           pageIdToPath,
           this.tabBarImageFiles,
         );
+        this.globalTabBarConfig = formatTabBarConfigForAppConfig(globalTabBarConfigJson);
+        if (this.globalTabBarConfig) {
+          this.customTabbarFileContent = generateCustomTabBarFileContent(systemPageData.tabBar, globalTabBarConfigJson);
+        }
       }
     }
 
@@ -56,5 +61,13 @@ export class HandlePageConfig {
    */
   getTabBarImageFiles(): ImageFileInfo[] {
     return this.tabBarImageFiles;
+  }
+
+  /**
+   * 获取自定义 TabBar 配置文件数据
+   * 用于生成文件/src/custom-tab-bar/mybricks/tabbar-config.ts
+   */
+  getCustomTabBarFileContent(): string | null {
+    return this.customTabbarFileContent;
   }
 }

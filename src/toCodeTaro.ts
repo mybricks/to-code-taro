@@ -96,7 +96,8 @@ export interface GeneratedFile {
     | "extension-event"
     | "jsModules"
     | "commonIndex"
-    | "tabBarConfig";
+    | "tabBarConfig"
+    | "customTabBar";
   meta?: ReturnType<typeof toCode>["scenes"][0]["scene"];
   name: string;
   tabBarConfig?: string; // TabBar 配置内容（用于 app.config.ts）
@@ -243,6 +244,7 @@ const getCode = (
     jsModulesMap: jsModulesCollector.getMap(),
     globalTabBarConfig: pageConfigHandler.getTabBarConfig(),
     tabBarImageFiles: pageConfigHandler.getTabBarImageFiles(),
+    customTabBarFileContent: pageConfigHandler.getCustomTabBarFileContent(),
     popupIds: Array.from(popupIds),
     config,
   });

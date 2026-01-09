@@ -1,5 +1,6 @@
-import HarmonyIcon from "./harmony-icons";
-import TaroiIcon from "./taroify-icons";
+import SystemIcons from "./icons";
+import { View } from "@tarojs/components";
+import css from "./index.less";
 
 type DynamicIconProps = {
   name: string;
@@ -9,18 +10,13 @@ type DynamicIconProps = {
 };
 
 export default function (props: DynamicIconProps) {
-  const { name } = props;
-  if (!name) {
-    return HarmonyIcon({
-      ...props,
-      name: "HM_plus",
-    });
-  }
-
-  // 兼容taroi图标
-  if (!name.startsWith("HM_")) {
-    return TaroiIcon(props);
-  }
-
-  return HarmonyIcon(props);
+  const { size = 24, color = "#000", name = "HM_plus", className = "" } = props;
+  return (
+    <View
+      className={`${css.hmIcon} ${className}`}
+      style={{ fontSize: size, color }}
+    >
+      {SystemIcons[name] || SystemIcons["HM_plus"]}
+    </View>
+  );
 }
