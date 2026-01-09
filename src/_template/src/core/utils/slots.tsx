@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import ComContext, { SlotProvider, useAppContext, useParentSlot } from "./ComContext";
 import { createReactiveInputHandler } from "../mybricks/createReactiveInputHandler";
 
@@ -20,7 +20,7 @@ function createChannelProxy(title: string) {
     {},
     {
       get: (_t, pin: string) => {
-          return (arg: any) => {
+        return (arg: any) => {
           if (typeof arg === "function") {
             handlersMap[pin] = arg;
             return;
@@ -46,12 +46,10 @@ function createChannelProxy(title: string) {
  * - render 时通过 SlotProvider 注入 parentSlot（slot 内子组件可 useParentSlot 获取）
  */
 export function useEnhancedSlots(rawSlots: any, id: string) {
-  // 让 React 在 classic JSX 下被视为“使用”，避免 TS/编辑器告警
-  void React;
   const slotStoreRef = useRef<Record<string, SlotState>>({});
 
   return useMemo(() => {
-    if (!rawSlots) return rawSlots;
+    if (!rawSlots) return {};
     const nextSlots: AnyRecord = {};
 
     Object.entries(rawSlots).forEach(([slotKey, slotDef]: any) => {
@@ -68,10 +66,13 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
             // 只有存在 key 或 index 时才认为是“多实例作用域插槽”，需要实例隔离
             const rawScope = params?.key ?? params?.inputValues?.index ?? params?.inputValues?.itemData?.id;
             
+            const SlotComp = r;
+            const content = r ? <SlotComp {...(params || {})} /> : null;
+
             if (rawScope === undefined || rawScope === null) {
               return (
-                <SlotProvider value={state}>
-                  {typeof r === "function" ? r(params) : null}
+                <SlotProvider value={{ ...state, params }}>
+                  {content}
                 </SlotProvider>
               );
             }
@@ -80,9 +81,9 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
             const scopedComRefs =
               (state._scopedComRefs![scopeId] ||= { current: { $inputs: {} } });
             return (
-              <SlotProvider value={state}>
+              <SlotProvider value={{ ...state, params }}>
                 <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
-                  {typeof r === "function" ? r(params) : null}
+                  {content}
                 </ScopedComContextProvider>
               </SlotProvider>
             );
@@ -103,16 +104,17 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
   }, [rawSlots, id]);
 }
 
-function ScopedComContextProvider(props: {
-  comRefs: any;
+export function ScopedComContextProvider(props: {
+  comRefs?: any;
   scopeId: string;
   children: React.ReactNode;
 }) {
   const parent = useAppContext();
   const value = useMemo(() => {
+    // 如果没有显式传 comRefs，则沿用父级的，但依然带上新的 scopeId
     return {
       ...parent,
-      comRefs: props.comRefs,
+      comRefs: props.comRefs || parent.comRefs,
       $scopeId: props.scopeId,
     } as any;
   }, [parent, props.comRefs, props.scopeId]);
@@ -125,5 +127,3 @@ export function useResolvedParentSlot(parentSlotProp: any) {
   const parentSlotFromCtx = useParentSlot();
   return parentSlotProp ?? parentSlotFromCtx;
 }
-
-

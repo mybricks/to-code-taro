@@ -3,6 +3,7 @@ import { deepProxy } from './hooks'
 
 export interface ComContextStore {
   comRefs: any;
+  outputs: any;
   appContext: any;  
   popupState: {
     visible: boolean;
@@ -17,6 +18,7 @@ export function useAppCreateContext(): ComContextStore {
   // 约定：场景级 inputs 统一挂载到 $inputs，避免与组件 runtime 的 inputs 命名冲突
   // 同时可避免 `Cannot set property 'open' of undefined`
   const comRefs = useRef<any>(deepProxy({ $inputs: {} }));
+  const outputs = useRef<any>(deepProxy({}));
   const [popupState, setPopupState] = useState({
     visible: false,
     name: '',
@@ -42,6 +44,7 @@ export function useAppCreateContext(): ComContextStore {
   };
   return {
     comRefs,
+    outputs,
     appContext,
     popupState,
     setPopupState

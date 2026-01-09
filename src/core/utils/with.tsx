@@ -15,11 +15,15 @@ interface WithComProps {
   data?: any;
   className?: string;
   style?: any;
+  /** 插槽传入的原始数据 */
+  inputValues?: any;
+  /** 插槽数据到组件输入的映射: { pinId: slotKey } */
+  inputValuesMapping?: Record<string, string>;
   [key: string]: any;
 }
 
 export const WithCom: React.FC<WithComProps> = (props) => {
-  const { component: Component, id = '', data, className, style, ...rest } = props;
+  const { component: Component, id = '', data, className, style, inputValues, inputValuesMapping, ...rest } = props;
   const { comRefs, appContext } = useAppContext();
   const env = appContext; //TODO: 需要根据实际情况修改
 
@@ -57,29 +61,59 @@ export const WithCom: React.FC<WithComProps> = (props) => {
 
   // 绑定输入，传入初始 handlers
   const inputProxy = useBindInputs(comRefs, id, handlers);
+
   const { slots: rawSlots, parentSlot: parentSlotProp, ...restProps } = rest as any;
-  const eventProxy = useBindEvents(restProps);
-
-  comRefs.current[id] = inputProxy;
-  const enhancedSlots = useEnhancedSlots(rawSlots, id);
+  const { outputs: globalOutputs } = useAppContext();
   const parentSlot = useResolvedParentSlot(parentSlotProp);
-  console.log('comRefs',comRefs.current)
 
+  // 绑定事件，带上上下文（用于事件流自动封装 id/name）
+  const eventProxy = useBindEvents(restProps, { 
+    id, 
+    name: props.name || id, 
+    parentSlot 
+  });
+
+  // 注册到全局 IO 管理
+  if (globalOutputs && globalOutputs.current) {
+    globalOutputs.current[id] = eventProxy;
+  }
+
+  // 鸿蒙规范：确保 comRefs 中挂载的是最新的 inputProxy
+  comRefs.current[id] = inputProxy;
+
+  const enhancedSlots = useEnhancedSlots(rawSlots, id);
+
+  const jsx = (
+    <Component
+      {...restProps}
+      inputs={inputProxy}
+      outputs={eventProxy}
+      slots={enhancedSlots}
+      parentSlot={parentSlot}
+      data={_data}
+      env={env}
+      id={id}
+      style={style}
+    />
+  );
+
+  // 鸿蒙化处理：支持 itemWrap 协议
+  if (parentSlot?.params?.itemWrap) {
+    return parentSlot.params.itemWrap({
+      id,
+      name: props.name || id,
+      jsx,
+      def: (Component as any).def,
+      inputs: inputProxy,
+      outputs: eventProxy,
+      style
+    });
+  }
 
   return (
     show || isPopup ? (
       <View className={className} style={{ ...style, ...dynamicStyle }} >
-        <Component
-          {...restProps}
-          inputs={inputProxy}
-          outputs={eventProxy}
-          slots={enhancedSlots}
-          parentSlot={parentSlot}
-          data={_data}
-          env={env}
-          id={id}
-          style={style}
-        />
+        {jsx}
       </View>
     ) : null
   );

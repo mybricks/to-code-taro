@@ -5,6 +5,7 @@
 
 import { ImportManager } from "../utils";
 import handleSlot from "../handleSlot";
+import { RenderManager } from "../utils/templates/renderManager";
 import type { ToTaroCodeConfig, GeneratedFile } from "../toCodeTaro";
 import toCode from "@mybricks/to-code-react/dist/cjs/toCode";
 import {
@@ -78,10 +79,40 @@ export const processScene = (params: ProcessSceneParams): void => {
   // 创建事件查询函数
   const eventQueries = createEventQueries(event);
 
+  // 创建 RenderManager
+  const renderManager = new RenderManager();
+
+  // 鸿蒙规范：建立全局组件 ID -> DSL 名称映射表，确保在任何层级都能获取到稳定的名称
+  const dslComIdToNameMap: Record<string, string> = {};
+  if (originalScene?.slot?.comAry) {
+    const scanComs = (coms: any) => {
+      if (!Array.isArray(coms)) return;
+      coms.forEach(com => {
+        if (com.name) dslComIdToNameMap[com.id] = com.name;
+        if (com.slots) {
+          const slotList = Array.isArray(com.slots) ? com.slots : Object.values(com.slots);
+          slotList.forEach((slot: any) => {
+            if (slot.comAry) scanComs(slot.comAry);
+            if (slot.children) scanComs(slot.children);
+          });
+        }
+        // 特殊处理表单容器
+        if (com.def?.namespace === 'mybricks.taro.formContainer' && com.model?.data?.items) {
+          com.model.data.items.forEach((item: any) => {
+            if (item.comName) dslComIdToNameMap[item.id] = item.comName;
+          });
+        }
+      });
+    };
+    scanComs(originalScene.slot.comAry);
+  }
+
   // 处理 Slot
   handleSlot(ui, {
     ...config,
+    renderManager, // 显式传入 renderManager
     isPopup, // 标记当前场景是否为弹窗
+    getDslComNameById: (id: string) => dslComIdToNameMap[id],
     getCurrentScene: () => {
       const originalScene = getSceneById(scene.id);
       return { ...scene, ...originalScene, event };

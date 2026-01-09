@@ -80,7 +80,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
         content: configContent,
       },
       {
-        path: `src/pages/${pageName}/index.less`,
+        path: `src/pages/${pageName}/index.global.less`,
         content: item.cssContent || "",
       },
       {
@@ -118,7 +118,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
           content: fullContent,
         },
         {
-          path: `src/popupComponents/${popupId}/index.less`,
+          path: `src/popupComponents/${popupId}/index.global.less`,
           content: item.cssContent || "",
         },
       ],

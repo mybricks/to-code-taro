@@ -26,14 +26,32 @@ interface HandleSlotConfig extends BaseConfig {
 
 const handleSlot = (ui: UI, config: HandleSlotConfig) => {
   const importManager = new ImportManager(config);
-  const { props = {} as any, children = [] } = ui;
+  const { props = {} as any } = ui;
+  // 支持 children 或 comAry (DSL 常用名)
+  const children = ui.children || (ui as any).comAry || [];
   const isRoot = config.checkIsRoot();
   const slotId = (ui as any).meta?.id || (ui as any).id;
 
   // 1. 初始化依赖与基础定义
-  const addDependencyImport = config.addParentDependencyImport || importManager.addImport.bind(importManager);
-  setupImports(addDependencyImport, config, isRoot);
-  
+    const addDependencyImport = config.addParentDependencyImport || importManager.addImport.bind(importManager);
+    setupImports(addDependencyImport, config, isRoot);
+
+    // 鸿蒙规范：插槽组件内部需要使用 context 访问 comRefs/outputs
+    if (!isRoot) {
+      const utilsPkg = config.getUtilsPackageName({ isRoot, isPopup: config.isPopup });
+      addDependencyImport({
+        packageName: utilsPkg,
+        dependencyNames: ["useAppContext", "ScopedComContextProvider"],
+        importType: "named",
+      });
+      // 补全 useEffect 导入（用于插槽逻辑驱动）
+      addDependencyImport({
+        packageName: "react",
+        dependencyNames: ["useEffect"],
+        importType: "named",
+      });
+    }
+
   const indent2 = indentation(config.codeStyle!.indent);
   const envDefineCode = isRoot ? genRootDefineCode(indent2, config.getUtilsPackageName()) : genSlotDefineCode(indent2);
 
@@ -73,6 +91,7 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
     cssContent,
     slots: [],
     scopeSlots: [],
+    childrenResults: childResults.childrenResults,
   };
 };
 
@@ -87,7 +106,7 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
   addImport({ packageName: "react", dependencyNames: ["useRef", "useEffect", "useState"], importType: "named" });
   addImport({ packageName: "@tarojs/components", dependencyNames: ["View"], importType: "named" });
   
-  const dependencyNames = ["WithCom", "WithWrapper"];
+  const dependencyNames = ["WithCom", "WithWrapper", "SlotProvider"];
   if (isRoot && config.hasPopups) {
     dependencyNames.push("PopupRenderer");
   }
@@ -98,7 +117,7 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
     if (config.hasPopups) {
       addImport({ packageName: "../../common/popup", dependencyNames: ["POPUP_MAP", "POPUP_IDS"], importType: "named" });
     }
-    addImport({ packageName: "./index.less", dependencyNames: [], importType: "module" });
+    addImport({ packageName: "./index.global.less", dependencyNames: [], importType: "module" });
   }
 };
 

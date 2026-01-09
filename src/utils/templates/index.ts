@@ -1,5 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { indentation, genObjectCode } from "../index";
+import { indentation } from "../index";
+
+export { indentation };
+
+/** 将第一个字符转大写 */
+export const firstCharToUpperCase = (str: string): string => {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+/** 格式化插槽内容缩进 */
+export const formatSlotContent = (uiContent: string, baseIndentSize: number, renderBodyIndent: string): string => {
+  return uiContent
+    .split("\n")
+    .map((line) => `${renderBodyIndent}${line}`)
+    .join("\n");
+};
+
+/** 将字符串转为大驼峰 */
+export const toPascalCase = (str: string): string => {
+  return str
+    .split(/[_-]/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("");
+};
 
 /** Taro/React UI 组件代码生成 */
 export const getUiComponentCode = (
@@ -14,7 +38,7 @@ export const getUiComponentCode = (
     componentOutputs?: string[];
     comEventCode?: string;
     slotsCode?: string;
-    eventHandlers?: Record<string, string>; // 事件处理函数代码，例如 { onClick: "() => { ... }" }
+    eventHandlers?: Record<string, string>; // 事件处理函数代码
   },
   config: {
     codeStyle: { indent: number };
@@ -28,9 +52,6 @@ export const getUiComponentCode = (
     props,
     resultStyle,
     dataCode,
-    componentInputs,
-    componentOutputs,
-    comEventCode,
     slotsCode,
     eventHandlers = {},
   } = params;
@@ -44,29 +65,34 @@ export const getUiComponentCode = (
   ui += `\n${indent2}id='${meta.id}'`;
   ui += `\n${indent2}className='${meta.id}'`;
   
-  // 添加 style（从 resultStyle.root 中提取）
+  if (meta.name) {
+    ui += `\n${indent2}name='${meta.name}'`;
+  }
+
+  // 添加 style
   if (resultStyle.root && Object.keys(resultStyle.root).length > 0) {
     const styleCode = JSON.stringify(resultStyle.root);
     ui += `\n${indent2}style={${styleCode}}`;
   }
 
-  // 添加 data（默认传递 props.data；插槽等场景可传入 dataCode 以注入动态表达式）
+  // 添加 data
   const initialDataCode = dataCode ?? JSON.stringify(props.data || {});
   ui += `\n${indent2}data={${initialDataCode}}`;
 
-  // 添加事件处理函数（onClick, onScroll 等）
+  // 添加事件处理函数
   Object.entries(eventHandlers).forEach(([eventName, handlerCode]) => {
-    // eventName 已经是 onXxx 格式（onClick, onScroll 等），直接使用
     ui += `\n${indent2}${eventName}={${handlerCode}}`;
   });
 
   // 添加插槽
   if (slotsCode) {
+    console.log(`[getUiComponentCode] Component ${meta.id} has slotsCode, length: ${slotsCode.length}`);
     ui += `\n${indent2}slots={{\n${slotsCode}${indent2}}}`;
+  } else {
+    console.log(`[getUiComponentCode] Component ${meta.id} has NO slotsCode`);
   }
   
   ui += `\n${indent}/>`;
 
   return ui;
 };
-

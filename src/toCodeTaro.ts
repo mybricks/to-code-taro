@@ -346,6 +346,8 @@ export interface BaseConfig extends ToTaroCodeConfig {
     typeDef: any;
     schema: any;
   }) => void;
+  /** 根据 ID 获取 DSL 中的稳定组件名（参考鸿蒙实现） */
+  getDslComNameById?: (id: string) => string | undefined;
 }
 
 export default toCodeTaro;

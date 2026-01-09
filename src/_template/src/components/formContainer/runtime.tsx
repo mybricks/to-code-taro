@@ -212,6 +212,7 @@ export default function ({ env, data, inputs, outputs, slots }) {
               <Field
                 className={cx(
                   "mybricks-field",
+                  com.id,
                   { ["border-bottom"]: !isLast },
                   { ["border-none"]: isLast },
                   { [css.hidden]: !env?.edit && item.hidden },
