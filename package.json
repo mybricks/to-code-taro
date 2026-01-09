@@ -1,6 +1,6 @@
 {
   "name": "@mybricks/to-code-taro",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "To code for Taro",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
