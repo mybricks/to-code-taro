@@ -146,50 +146,38 @@ export const handleProcess = (
       code += "\n";
     }
 
+    // 优先尝试使用 config 提供的调用模板（解耦核心）
+    const callTemplate = config.getCallTemplate?.({
+      com: {
+        ...props.meta,
+        // 鸿蒙化：透传可能的场景 ID，增强识别能力
+        sceneId: props.meta.model?.data?._sceneId || props.meta.id 
+      },
+      pinId: props.id,
+      args: nextValue
+    });
+
+    if (callTemplate) {
+      if (callTemplate.import) {
+        config.addParentDependencyImport(callTemplate.import);
+      }
+      code += `${indent}/** ${props.meta.title} */\n${indent}${nextCode}${callTemplate.code}`;
+      return;
+    }
+
+    // 路由/场景输出处理（默认策略）
     if (componentType === "js") {
       if (category === "scene") {
+        // [默认策略] 此处不再硬编码 commit/cancel，仅作为备选兜底
         const _sceneId = props.meta.model.data._sceneId;
-        const targetScene = config.getSceneById(_sceneId);
-        const isPopup = targetScene?.type === 'popup' || targetScene?.deps?.some((dep: any) => dep.namespace === 'mybricks.taro.popup');
-        const controllerName = isPopup ? "popupRouter" : "pageRouter";
-
-        config.addParentDependencyImport({
-          packageName: config.getComponentPackageName(),
-          dependencyNames: [controllerName],
-          importType: "named",
-        });
-
-        const operateName =
-          props.meta.model.data.openType === "redirect" ? "replace" : "open";
-
-        code +=
-          `${indent}/** 打开 ${props.meta.title} */` +
-          `\n${indent}${nextCode}${controllerName}.${operateName}("${config.getPageId?.(_sceneId) || _sceneId}", ${nextValue})`;
+        const operateName = props.meta.model.data.openType === "redirect" ? "replace" : "open";
+        code += `${indent}/** 打开 ${props.meta.title} */\n${indent}${nextCode}this.${_sceneId}.${operateName}(${nextValue})`;
       } else if (category === "frameOutput") {
-        // 场景/弹窗输出（commit/cancel/apply/close）
         const currentScene = config.getCurrentScene();
-        // pinProxies 的结构在不同数据/版本里不完全一致，这里按最小字段兼容
-        const pinProxy: any =
-          (currentScene as any)?.pinProxies?.[`${props.meta.id}-${props.id}`];
-        if (pinProxy?.frameId && pinProxy?.pinId) {
-          const method = pinProxy.pinId as string;
-          const controllerName = (config as any).isPopup ? "popupRouter" : "pageRouter";
-
-          config.addParentDependencyImport({
-            packageName: config.getComponentPackageName(),
-            dependencyNames: [controllerName],
-            importType: "named",
-          });
-
-          // 仅支持 Page 内置的四种输出方法
-          if (["commit", "cancel", "apply", "close"].includes(method)) {
-            const sceneId = pinProxy.frameId || currentScene?.id;
-            const argCode = nextValue ? `, ${nextValue}` : "";
-            code +=
-              `${indent}/** ${props.meta.title} 输出 ${method} */` +
-              `\n${indent}${nextCode}${controllerName}.${method}("${sceneId}"${argCode})`;
-          }
-        }
+        const pinProxy: any = (currentScene as any)?.pinProxies?.[`${props.meta.id}-${props.id}`];
+        const method = pinProxy?.pinId || props.id;
+        const sceneId = pinProxy?.frameId || currentScene?.id;
+        code += `${indent}/** ${props.meta.title} 输出 ${method} */\n${indent}${nextCode}this.${sceneId}.${method}(${nextValue})`;
       } else if (category === "normal") {
         let componentNameWithId = getComponentNameWithId(props, config, event);
         code +=
@@ -238,8 +226,6 @@ export const handleProcess = (
       // UI 组件处理
       code +=
         `${indent}/** 调用 ${props.meta.title} 的 ${props.title} */` +
-        // 新架构：WithCom 会把 inputProxy 挂到 comRefs.current[comId]
-        // 因此这里直接调用 this.<comId>.<pinId>(...)，后续会被 replace 成 comRefs.current.<comId>.<pinId>(...)
         `\n${indent}${nextCode}this.${props.meta.id}.${props.id}(${nextValue})`;
     }
   });
@@ -526,4 +512,3 @@ const generateJsApiComponentCode = (params: {
     `\n${indent}})\n`
   );
 };
-

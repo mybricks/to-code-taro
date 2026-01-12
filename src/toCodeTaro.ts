@@ -348,6 +348,19 @@ export interface BaseConfig extends ToTaroCodeConfig {
     typeDef: any;
     schema: any;
   }) => void;
+  /** 获取组件/场景调用的代码模板（解耦核心） */
+  getCallTemplate?: (params: {
+    com: any;
+    pinId: string;
+    args: string;
+  }) => {
+    code: string;
+    import?: {
+      packageName: string;
+      dependencyNames: string[];
+      importType: "default" | "named";
+    };
+  } | undefined;
   /** 根据 ID 获取 DSL 中的稳定组件名（参考鸿蒙实现） */
   getDslComNameById?: (id: string) => string | undefined;
 }
