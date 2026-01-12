@@ -8,17 +8,17 @@ import { convertToTaroTabBarConfig } from './converter';
 import { processTabBarIcon } from './saveBase64Image';
 
 /**
- * 从 tabBar 数据生成 TabBar 配置字符串（用于 app.config.ts）
+ * 从 tabBar 数据生成 TabBar 配置JSON（用于 app.config.ts）
  * @param tabBar tabBar 数据数组（来自 scenes[x].coms[id].model.data.tabBar）
  * @param pageIdToPath 页面 ID 到路径的映射函数（默认使用 pages/${pageId}/index）
  * @param imageFiles 用于收集需要保存的图片文件的数组（可选）
- * @returns TabBar 配置字符串，如果验证失败则返回 null
+ * @returns TabBar 配置JSON，如果验证失败则返回 null
  */
 export function generateTabBarConfigContent(
   tabBar: any[] | undefined,
   pageIdToPath: (pageId: string) => string = (pageId) => `pages/${pageId}/index`,
   imageFiles?: ImageFileInfo[],
-): string | null {
+): TaroTabBarConfig | null {
   if (!tabBar || !Array.isArray(tabBar)) {
     return null;
   }
@@ -36,8 +36,10 @@ export function generateTabBarConfigContent(
     return null;
   }
 
+  return config
+
   // 转换为 app.config.ts 中的字符串格式
-  return formatTabBarConfigForAppConfig(config);
+  // return formatTabBarConfigForAppConfig(config);
 }
 
 /**
@@ -46,7 +48,7 @@ export function generateTabBarConfigContent(
  * @param indent 缩进字符串，默认为 2 个空格
  * @returns 配置字符串
  */
-function formatTabBarConfigForAppConfig(
+export function formatTabBarConfigForAppConfig(
   config: TaroTabBarConfig,
   indent: string = "  ",
 ): string {
@@ -68,3 +70,23 @@ function formatTabBarConfigForAppConfig(
     .join("\n");
 }
 
+/**
+ * 生成转换后的自定义Tabbar项配置文件内容
+ * 增加页面路径pagePath
+ * normalIconPath/selectedIconPath替换成本地图片路径
+ * @param tabBar tabBar 数据数组（来自 scenes[x].coms[id].model.data.tabBar）
+ * @param config TabBar 配置
+ */
+export function generateCustomTabBarFileContent(
+  tabBar: any[] | undefined,
+  config: TaroTabBarConfig
+): string {
+  const customTabbarConfig = tabBar.map((item, index) => ({
+    ...item,
+    pagePath: config.list[index].pagePath,
+    normalIconPath: config.list[index].iconPath,
+    selectedIconPath: config.list[index].selectedIconPath,
+  }))
+  const tabBarJson = JSON.stringify(customTabbarConfig, null, 2);
+  return `export default ${tabBarJson} as any`;
+}

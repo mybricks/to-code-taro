@@ -83,6 +83,7 @@ export function convertToTaroTabBarConfig(
 
   // 构建 TabBar 配置
   const config: TaroTabBarConfig = {
+    custom: true,
     list,
   };
 

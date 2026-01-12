@@ -16,6 +16,7 @@ interface BuildResultParams {
   tabBarImageFiles: any[];
   popupIds: string[];
   config: ToTaroCodeConfig;
+  customTabBarFileContent: string | null;
 }
 
 /**
@@ -34,6 +35,7 @@ export const buildFinalResults = (
     tabBarImageFiles,
     popupIds,
     config,
+    customTabBarFileContent,
   } = params;
 
   const files: GeneratedFile[] = [];
@@ -102,6 +104,13 @@ export { jsModules };
       importManager: new ImportManager(config),
       name: "tabBarConfig",
       tabBarConfig: globalTabBarConfig,
+    });
+
+    files.push({
+      type: "customTabBar",
+      content: customTabBarFileContent,
+      importManager: new ImportManager(config),
+      name: "customTabBar",
     });
   }
 

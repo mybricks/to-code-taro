@@ -1,0 +1,72 @@
+.tabBar {
+  width: 375px;
+  background: #ffffff;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+
+  .items {
+    width: 375px;
+    height: 54px;
+    display: flex;
+  }
+
+  .safearea {
+    width: 375px;
+    height: constant(safe-area-inset-bottom);
+    height: env(safe-area-inset-bottom);
+  }
+
+  .item {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    padding-top: 6px;
+    padding-bottom: 6px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .iconSlot {
+      position: relative;
+      .fontIcon {
+        display: block;
+      }
+
+      .badge {
+        position: absolute;
+
+        transform-origin: 100% 0%;
+        transform: translate(50%, -40%);
+
+        top: 0px;
+        right: 0px;
+
+        background-color: #ff4d4f;
+      }
+      .badge.normal {
+        padding: 0px 3px;
+        min-width: 14px;
+        height: 14px;
+        border-radius: 100px;
+        font-size: 10px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+      }
+      .badge.small {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+    }
+
+    .textSlot {
+      margin-top: 6px;
+      height: 14px;
+    }
+  }
+}

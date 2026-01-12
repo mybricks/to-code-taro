@@ -12,6 +12,12 @@ export interface TabBarItemSource {
   };
   text?: string;
   type?: string;
+  normalIconUseImg?: boolean;
+  selectedIconUseImg?: boolean;
+  normalIcon?: string;
+  selectedIcon?: string;
+  normalFontIconStyle?: Record<string, any>;
+  selectedFontIconStyle?: Record<string, any>;
   normalIconPath?: string;
   selectedIconPath?: string;
   normalTextStyle?: Record<string, any>;
@@ -20,16 +26,15 @@ export interface TabBarItemSource {
   selectedIconStyle?: Record<string, any>;
   normalBackgroundStyle?: Record<string, any>;
   selectedBackgroundStyle?: Record<string, any>;
-  subMenu?: Array<{
-    scene: {
-      id: string;
-      title?: string;
-    };
-    normalIconPath?: string;
-    normalTextStyle?: Record<string, any>;
-    normalIconStyle?: Record<string, any>;
-    normalBackgroundStyle?: Record<string, any>;
-  }>;
+}
+
+/**
+ * 转换后的自定义Tabbar项配置
+ * 增加页面路径pagePath
+ * normalIconPath/selectedIconPath替换成本地图片路径
+ */
+export interface CustomTabbarConfig extends TabBarItemSource {
+  pagePath: string;
 }
 
 /**
@@ -46,6 +51,7 @@ export interface TaroTabBarItem {
  * Taro TabBar 配置
  */
 export interface TaroTabBarConfig {
+  custom?: boolean;
   color?: string;
   selectedColor?: string;
   backgroundColor?: string;
