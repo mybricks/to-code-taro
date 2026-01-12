@@ -97,7 +97,12 @@ const prepareComponent = (com: Com, config: HandleComConfig) => {
  */
 const prepareStyles = (com: Com) => {
   const { meta, props } = com;
-  const resultStyle = convertComponentStyle(props.style);
+  // 鸿蒙化：合并 data.layout 到样式中，确保容器布局生效
+  const styleWithLayout = {
+    ...(props.style || {}),
+    layout: props.data?.layout || props.style?.layout
+  };
+  const resultStyle = convertComponentStyle(styleWithLayout);
   const cssContent = convertStyleAryToCss((props.style as any)?.styleAry, meta.id);
   return { cssContent, rootStyle: resultStyle.root || {} };
 };
@@ -124,12 +129,15 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
       return;
     }
 
+    const slotLayout = com.props.data?.layout;
     const result = (handleSlot as any)(slot, {
       ...config,
       checkIsRoot: () => false,
       depth: 1,
       renderManager,
       slotKey: slotId,
+      // 鸿蒙化：传递父容器的布局配置给插槽
+      layout: slotLayout,
     });
 
     eventCode += result.js;

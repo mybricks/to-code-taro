@@ -127,7 +127,9 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
 const generateSlotUi = (ui: any, props: any, childrenUi: string, config: any) => {
   const indent = indentation(config.codeStyle!.indent * config.depth);
   const mergedStyle = { width: "100%", height: "100%", ...(ui.style || {}), ...(props.style || {}) };
-  const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout: ui.layout || mergedStyle.layout }));
+  // 鸿蒙化：优先使用 config 中传递的 layout（来自父容器 data.layout），否则使用 slot 自身的 layout
+  const layout = config.layout || ui.layout || mergedStyle.layout;
+  const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout }));
   
   const rootClassName = getRootComponentClassName(config.getCurrentScene(), config.checkIsRoot());
   const classNameAttr = rootClassName ? ` className='${rootClassName}'` : "";
