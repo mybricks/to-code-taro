@@ -81,12 +81,15 @@ export function generateCustomTabBarFileContent(
   tabBar: any[] | undefined,
   config: TaroTabBarConfig
 ): string {
-  const customTabbarConfig = tabBar.map((item, index) => ({
-    ...item,
-    pagePath: config.list[index].pagePath,
-    normalIconPath: config.list[index].iconPath,
-    selectedIconPath: config.list[index].selectedIconPath,
-  }))
+  const customTabbarConfig = tabBar.map((item, index) => {
+    const {iconPath, selectedIconPath} = config.list[index]
+    return {
+      ...item,
+      pagePath: config.list[index].pagePath,
+      normalIconPath: iconPath ? `/${iconPath}` : undefined,
+      selectedIconPath: selectedIconPath ? `/${selectedIconPath}` : undefined,
+    }
+  })
   const tabBarJson = JSON.stringify(customTabbarConfig, null, 2);
   return `export default ${tabBarJson} as any`;
 }
