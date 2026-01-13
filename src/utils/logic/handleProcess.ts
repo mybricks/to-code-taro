@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ImportManager } from "../common/ImportManager";
 import { indentation } from "../common/helper";
+import { getSafeVarName } from "../common/string";
 import { genObjectCode } from "../common/object";
 import type { BaseConfig } from "../../toCodeTaro";
 
@@ -184,6 +185,7 @@ export const handleProcess = (
           `${indent}/** 调用 ${props.meta.title} */` +
           `\n${indent}${nextCode}${componentNameWithId}(${runType === "input" ? nextValue : ""})`;
       } else if (category === "var") {
+        const varKey = getSafeVarName(props.meta);
         if (props.meta.global) {
           config.addParentDependencyImport({
             packageName: config.getComponentPackageName(),
@@ -192,7 +194,7 @@ export const handleProcess = (
           });
           code +=
             `${indent}/** ${props.title} 全局变量 ${props.meta.title} */` +
-            `\n${indent}${nextCode}globalVars.${props.meta.title}.${props.id}(${nextValue})`;
+            `\n${indent}${nextCode}globalVars.${varKey}.${props.id}(${nextValue})`;
         } else {
           const currentProvider = getCurrentProvider(
             { isSameScope, props },
@@ -200,7 +202,7 @@ export const handleProcess = (
           );
           code +=
             `${indent}/** ${props.title} 变量 ${props.meta.title} */` +
-            `\n${indent}${nextCode}this.${currentProvider.name}_Vars.${props.meta.title}.${props.id}(${nextValue})`;
+            `\n${indent}${nextCode}this.$vars.${varKey}.${props.id}(${nextValue})`;
         }
       } else if (category === "fx") {
         if (props.meta.global) {
@@ -219,7 +221,7 @@ export const handleProcess = (
           );
           code +=
             `${indent}/** 调用Fx ${props.meta.title} */` +
-            `\n${indent}${nextCode}this.${currentProvider.name}_Fxs.${props.meta.ioProxy.id}(${nextValue})`;
+            `\n${indent}${nextCode}this.$fxs.${props.meta.ioProxy.id}(${nextValue})`;
         }
       }
     } else {

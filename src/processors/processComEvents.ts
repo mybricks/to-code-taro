@@ -88,10 +88,10 @@ export const processComEvents = (
       outputsConfig[meta.id] = {};
     }
     
-    const onEventName = eventId.startsWith("on")
-      ? eventId
-      : `on${eventId.charAt(0).toUpperCase()}${eventId.slice(1)}`;
-    outputsConfig[meta.id][onEventName] = handlerCode;
+    // 事件名必须与组件 runtime 的 outputs pin id 保持一致：
+    // - 例如 tabs2 的输出是 `changeTab`（不是 `onChangeTab`）
+    // - searchBar 的输出是 `onSearch`（本身就以 on 开头）
+    outputsConfig[meta.id][eventId] = handlerCode;
     eventConfig[eventId] = { connected: true };
   });
 

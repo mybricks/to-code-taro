@@ -35,7 +35,10 @@ export class RenderManager {
         code += `${indent}/** ${description} */\n`;
       }
       code += `${indent}function ${renderFunctionName}(params: any) {\n`;
-      code += `${indent}${indent2}const { comRefs, outputs } = useAppContext();\n`;
+      // render 函数内的事件处理代码可能会用到 appContext（例如 jsModules.xxx(..., appContext)）
+      // outputs 统一从 comRefs.current.$outputs 读取（不再通过 context.outputs 透出）
+      code += `${indent}${indent2}const { comRefs, appContext } = useAppContext();\n`;
+      code += `${indent}${indent2}const outputs = comRefs.current.$outputs;\n`;
 
       if (logicCode) {
         code += logicCode.split("\n").map(line => `${indent}${line}`).join("\n") + "\n";
@@ -77,7 +80,7 @@ export class RenderManager {
         code += `${indent}${indent4}name: ${child.name !== undefined ? `'${child.name}'` : 'undefined'},\n`;
         code += `${indent}${indent4}style: ${childStyle},\n`;
         code += `${indent}${indent4}get inputs() { return comRefs.current['${child.id}'] },\n`;
-        code += `${indent}${indent4}get outputs() { return outputs.current['${child.id}'] },\n`;
+        code += `${indent}${indent4}get outputs() { return outputs['${child.id}'] },\n`;
         code += `${indent}${indent4}jsx: ${varName},\n`;
             code += `${indent}${indent3}},\n`;
           }

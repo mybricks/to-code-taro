@@ -1,6 +1,13 @@
-import { indentation } from "../utils";
+import { indentation, getSafeVarName, getInitValueBySchema } from "../utils";
 import { handleProcess } from "../utils/logic/handleProcess";
 import type { BaseConfig } from "../toCodeTaro";
+
+function sanitizeBlockComment(text: any) {
+  const s = String(text ?? "").trim();
+  if (!s) return "";
+  // 避免 title 中出现 */ 破坏注释
+  return s.replace(/\*\//g, "* /");
+}
 
 /**
  * 处理场景/插槽的逻辑（事件流、输入项等）
@@ -55,10 +62,14 @@ const processLogicalInit = (
       dependencyNames: ["createVariable"],
       importType: "named",
     });
-    code += `\n${indent}const vars = comRefs.current.${providerName}_Vars;`;
+    // 鸿蒙化：统一使用 $vars 注册表（scope 由 ScopedComContextProvider 负责隔离）
+    code += `\n${indent}const vars = (comRefs.current.$vars ||= {});`;
     vars.forEach(([comId, com]: [string, any]) => {
-      const initValue = JSON.stringify(com.model?.data?.initValue || {});
-      code += `\n${indent}if (!vars.${com.title}.get) vars.${com.title} = createVariable(${initValue});`;
+      const varName = getSafeVarName(com);
+      const varTitle = sanitizeBlockComment(com?.title || com?.model?.title || com?.model?.data?.title || varName);
+      const initValue = JSON.stringify(getInitValueBySchema(com.schema, com.model?.data?.initValue));
+      code += `\n${indent}/** 初始化 变量 ${varTitle} */`;
+      code += `\n${indent}if (!vars.${varName}) vars.${varName} = createVariable(${initValue});`;
     });
   }
 
@@ -71,7 +82,8 @@ const processLogicalInit = (
       dependencyNames: ["createFx"],
       importType: "named",
     });
-    code += `\n${indent}const fxs = comRefs.current.${providerName}_Fxs;`;
+    // 鸿蒙化：统一使用 $fxs 注册表（scope 由 ScopedComContextProvider 负责隔离）
+    code += `\n${indent}const fxs = (comRefs.current.$fxs ||= {});`;
     fxEvents.forEach((fxEvent: any) => {
       const res = handleProcess(fxEvent, {
         ...config,
@@ -101,7 +113,7 @@ const processLogicalInit = (
         })
         .join(", ");
 
-      code += `\n${indent}if (!fxs.${fxEvent.frameId}.call) fxs.${fxEvent.frameId} = createFx((${values}) => {\n${res}\n${indent}});`;
+      code += `\n${indent}if (!fxs.${fxEvent.frameId}) fxs.${fxEvent.frameId} = createFx((${values}) => {\n${res}\n${indent}});`;
     });
   }
 

@@ -151,6 +151,7 @@ export const ContainerList = ({ env, data, inputs, outputs, slots }) => {
     });
 
     inputs["refreshDataSource"]((val) => {
+      console.log("refreshDataSource==", val);
       if (Array.isArray(val)) {
         const ds = val.map((item, index) => ({
           item,

@@ -1,5 +1,4 @@
 import { useState, useRef, useMemo } from 'react';
-import { SUBJECT_SUBSCRIBE } from '../mybricks/constant';
 import { createReactiveInputHandler } from '../mybricks/createReactiveInputHandler';
 
 /**
@@ -92,12 +91,15 @@ export function useBindEvents(props: any, context?: { id: string, name: string, 
 
     // 预处理已存在的事件
     Object.keys(props).forEach(key => {
-      if (key.startsWith('on') && typeof props[key] === 'function') {
+      // 兼容：MyBricks 输出 pin 既可能是 onChange，也可能是 changeTab 这种非 on 前缀
+      if (typeof props[key] === 'function') {
         const handler = props[key];
         const wrapped = (originalValue: any) => {
           // 鸿蒙/render-web 规范：如果是在插槽中触发事件，且存在父级协议，则自动封装元数据
           // 这解决了 FormContainer 等组件识别子项的需求
-          const value = context ? {
+          // 注意：不要仅凭 parentSlot 存在就封装，否则会影响 Tabs2/changeTab 这类事件直接给 JS 计算组件传参
+          // 仅在父级 slot 使用 itemWrap 协议时才需要这层元数据
+          const value = context?.parentSlot?.params?.itemWrap ? {
             id: context.id,
             name: context.name,
             value: originalValue
@@ -112,6 +114,7 @@ export function useBindEvents(props: any, context?: { id: string, name: string, 
 
     return new Proxy(_events, {
       get(target, key: string) {
+        // 对 onXXX 事件（不少组件 runtime 直接 outputs["onChange"](...)）提供兜底函数，避免未连线时报错
         if (typeof key === 'string' && key.startsWith('on')) {
           if (target[key]) {
             return target[key];

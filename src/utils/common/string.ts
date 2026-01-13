@@ -18,3 +18,19 @@ export const kebabToCamel = (str: string) => {
   return str.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
 };
 
+/** 检查字符串是否包含中文 */
+export const hasChinese = (str: string): boolean => {
+  return /[\u4e00-\u9fa5]/.test(str);
+};
+
+/** 
+ * 获取安全的变量名
+ * 优先使用 title，如果 title 包含中文则使用 id
+ */
+export const getSafeVarName = (com: { title?: string; id: string }): string => {
+  if (com.title && !hasChinese(com.title)) {
+    return com.title;
+  }
+  return com.id;
+};
+

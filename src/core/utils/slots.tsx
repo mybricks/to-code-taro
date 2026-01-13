@@ -79,7 +79,7 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
 
             const scopeId = `${id}.${slotKey}::${String(rawScope)}`;
             const scopedComRefs =
-              (state._scopedComRefs![scopeId] ||= { current: { $inputs: {} } });
+              (state._scopedComRefs![scopeId] ||= { current: { $inputs: {}, $vars: {}, $fxs: {} } });
             return (
               <SlotProvider value={{ ...state, params }}>
                 <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
@@ -111,6 +111,7 @@ export function ScopedComContextProvider(props: {
 }) {
   const parent = useAppContext();
   const value = useMemo(() => {
+    // $outputs 与 $inputs 一样：在 scoped 下应当隔离（由 scopedComRefs.current.$outputs 提供）
     // 如果没有显式传 comRefs，则沿用父级的，但依然带上新的 scopeId
     return {
       ...parent,
