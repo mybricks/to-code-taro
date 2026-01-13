@@ -63,7 +63,7 @@ export const getUiComponentCode = (
   let ui = `${indent}<WithCom`;
   ui += `\n${indent2}component={${componentName}}`;
   ui += `\n${indent2}id='${meta.id}'`;
-  ui += `\n${indent2}className='${meta.id}'`;
+  ui += `\n${indent2}className='${meta.id} mybricks_com'`;
   
   if (meta.name) {
     ui += `\n${indent2}name='${meta.name}'`;

@@ -29,6 +29,7 @@ export const genControllerInitCode = (indent: string, providerName: string) => {
 
 /** 生成完整的函数组件模板 */
 export const genComponentTemplate = ({
+  componentId,
   componentName,
   combinedJsCode,
   renderDefinitions = "", // 新增：外部定义的渲染函数
@@ -39,6 +40,7 @@ export const genComponentTemplate = ({
   isPopup = false,
   hasPopups = false,
 }: {
+  componentId: string;
   componentName: string;
   combinedJsCode: string;
   renderDefinitions?: string;
@@ -65,7 +67,7 @@ export const genComponentTemplate = ({
     code += `(${componentName} as any).isPopup = true;\n\n`;
   }
   
-  code += `export default WithWrapper(${componentName})`;
+  code += `export default WithWrapper("${componentId}", ${componentName})`;
   return code;
 };
 

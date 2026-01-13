@@ -146,6 +146,7 @@ const finalizeRootComponent = (ui: any, config: any, importManager: any, combine
   const componentName = `I${String(componentId).replace(/[^a-zA-Z0-9]/g, "_")}`;
   
   const componentCode = genComponentTemplate({ 
+    componentId,
     componentName, 
     combinedJsCode, 
     renderDefinitions,
