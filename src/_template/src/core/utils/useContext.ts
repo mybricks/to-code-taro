@@ -13,7 +13,7 @@ export interface ComContextStore {
   setPopupState: (state: any) => void;
 }
 
-export function useAppCreateContext(): ComContextStore {
+export function useAppCreateContext(id: string): ComContextStore {
   // 约定：场景级 inputs 统一挂载到 $inputs，避免与组件 runtime 的 inputs 命名冲突
   // 同时可避免 `Cannot set property 'open' of undefined`
   // 统一注册表（均挂载到 comRefs.current 上）
@@ -30,7 +30,7 @@ export function useAppCreateContext(): ComContextStore {
 
   const appContext = useRef({
     canvas: {
-      id: "u_7VvVn", // 使用 data 中的 id
+      id, // 使用 data 中的 id
     },
     runtime: {
       debug: false,
