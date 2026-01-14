@@ -44,6 +44,10 @@ export type { DataType as mybricks_taro_getSystemInfo_DataType } from './_GetSys
 export { default as mybricks_taro_aesEncode } from './_AesEncode';
 export type { DataType as mybricks_taro_aesEncode_DataType } from './_AesEncode';
 
+// 模态对话框
+export { default as mybricks_taro_modal } from './_Modal';
+export type { DataType as mybricks_taro_modal_DataType } from './_Modal';
+
 export { default as mybricks_taro_format } from './_Format';
 export type { DataType as mybricks_taro_format_DataType } from './_Format';
 

@@ -1,5 +1,5 @@
 export const log = (...args) => {
-  console.log("[MyBricks]", ...args)
+  // console.log("[MyBricks]", ...args)
 }
 
 export const logger = {

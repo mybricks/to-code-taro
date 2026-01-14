@@ -15,15 +15,15 @@ export function deepProxy(target: any, onSet?: () => void): any {
       if (prop === '__isProxy') return true;
       if (prop === 'toJSON') return () => obj;
 
-      let value = obj[prop];
+      let value = (obj as any)[prop];
 
       // 只代理已存在的对象属性，不自动创建空对象
       // 避免访问不存在的属性（如 disabled）时污染原始数据
       if (typeof value === 'object' && value !== null && !value.__isProxy) {
-        obj[prop] = deepProxy(value, onSet);
+        (obj as any)[prop] = deepProxy(value, onSet);
       }
 
-      return obj[prop];
+      return (obj as any)[prop];
     },
     set(obj, prop, value) {
       const result = Reflect.set(obj, prop, value);
@@ -117,16 +117,18 @@ export function useBindEvents(props: any, context?: { id: string, name: string, 
       get(target, key: string) {
         // 对 onXXX 事件（不少组件 runtime 直接 outputs["onChange"](...)）提供兜底函数，避免未连线时报错
         if (typeof key === 'string' && key.startsWith('on')) {
-          if (target[key]) {
-            return target[key];
+          if ((target as any)[key]) {
+            return (target as any)[key];
           }
           // 对未连接的事件返回兜底函数
-          const emptyFn = () => { };
+          const emptyFn: any = () => { };
           emptyFn.getConnections = () => [];
           return emptyFn;
         }
-        return target[key];
+        return (target as any)[key];
       }
     });
   }, [props, context]);
 }
+
+ 

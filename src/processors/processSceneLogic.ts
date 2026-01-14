@@ -36,7 +36,72 @@ export const processSceneLogic = (
   // 3. 处理场景级输入（如 open）
   effectCode += processSceneInputs(currentScene, config, addDependencyImport, indent2);
 
+  // 4. 处理变量监听事件（starter.type === 'var'，例如 changed）
+  effectCode += processVarEvents(currentScene, config, addDependencyImport, indent2);
+
   return { initCode, effectCode };
+};
+
+/**
+ * 处理变量监听事件（例如变量 changed -> 驱动一条 diagram）
+ * 关键点：更新 UI 不是靠 React state，而是靠 runtime inputs（例如 Text.value）
+ */
+const processVarEvents = (
+  currentScene: any,
+  config: any,
+  addDependencyImport: any,
+  indent: string,
+) => {
+  let code = "";
+  const varEvents = config.getVarEvents?.() || [];
+  if (!Array.isArray(varEvents) || varEvents.length === 0) return code;
+
+  // 用于订阅 variable.changed() 结果
+  const importParams = { isPopup: config.isPopup };
+  addDependencyImport({
+    packageName: config.getUtilsPackageName(importParams),
+    dependencyNames: ["SUBJECT_SUBSCRIBE", "SUBJECT_VALUE"],
+    importType: "named",
+  });
+  varEvents.forEach((varEvent: any) => {
+    if (varEvent?.type !== "var") return;
+    // toCode-react 的 var event 自带 meta（变量组件）+ paramId（输出 pin，如 changed/return）
+    const com = varEvent?.meta;
+    if (!com?.id) return;
+    const pinId = varEvent?.paramId || "changed";
+    const varName = getSafeVarName(com);
+
+    // params 映射：toCode-react 会用 paramSource: [{type:'params', id:'changed'}]
+    // 这里用 Proxy 保证任何 params.xxx 都能落到 value 上（避免强依赖 paramPins）
+    const paramsProxy = new Proxy(
+      {},
+      { get: () => "value" },
+    ) as any;
+
+    const process = handleProcess(varEvent, {
+      ...config,
+      target: "comRefs.current",
+      depth: 3,
+      addParentDependencyImport: addDependencyImport,
+      getParams: () => paramsProxy,
+    } as any)
+      .replace(/this\.\$vars\./g, "$vars.current.")
+      .replace(/this\.\$fxs\./g, "$fxs.current.")
+      .replace(/this\./g, "comRefs.current.")
+      .replace(/comRefs\.current\.([a-zA-Z0-9_]+)\.controller_/g, "comRefs.current.$1.")
+      .replace(/comRefs\.current\.slot_Index\./g, "comRefs.current.");
+
+    if (!process.trim()) return;
+
+    code += `\n${indent}  /** 变量 ${sanitizeBlockComment(com.title || varName)} 的 ${pinId} */`;
+    // 统一逻辑函数：changed 触发 + 首次 get() 回放（解决“set 早于订阅”的丢事件）
+    code += `\n${indent}  const run_${varName}_${pinId} = (value: any) => {\n${process}\n${indent}  };`;
+    code += `\n${indent}  $vars.current.${varName}.${pinId}?.()[SUBJECT_SUBSCRIBE](run_${varName}_${pinId});`;
+    code += `\n${indent}  const init_${varName}_${pinId} = $vars.current.${varName}.get?.();`;
+    code += `\n${indent}  run_${varName}_${pinId}(init_${varName}_${pinId}?.[SUBJECT_VALUE]);`;
+  });
+
+  return code;
 };
 
 /**
