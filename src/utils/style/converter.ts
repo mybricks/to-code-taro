@@ -164,14 +164,17 @@ export const convertStyleAryToCss = (
       let finalSelector = selector.trim();
       if (parentSelector) {
         const prefix = `.${parentSelector}`;
-        if (finalSelector.startsWith(">")) {
-          // 移除 >，改为后代选择器以提升兼容性（Taro 可能会插入组件层级）
-          const subSelector = finalSelector.substring(1).trim();
-          finalSelector = `${prefix} ${subSelector}, ${prefix}${subSelector}`;
-        } else {
-          // 同时支持后代选择器和同级选择器（针对 itemWrap 场景）
-          finalSelector = `${prefix} ${finalSelector}, ${prefix}${finalSelector}`;
-        }
+        // if (finalSelector.startsWith(">")) {
+        //   // 移除 >，改为后代选择器以提升兼容性（Taro 可能会插入组件层级）
+        //   const subSelector = finalSelector.substring(1).trim();
+        //   finalSelector = `${prefix} ${subSelector}, ${prefix}${subSelector}`;
+        // } else {
+        //   // 同时支持后代选择器和同级选择器（针对 itemWrap 场景）
+        //   finalSelector = `${prefix} ${finalSelector}, ${prefix}${finalSelector}`;
+        // }
+
+        // 同时支持后代选择器和同级选择器（针对 itemWrap 场景）
+        finalSelector = `${prefix} ${finalSelector}, ${prefix}${finalSelector}`;
       }
 
       const transformedCss: Record<string, string | number> = {};
