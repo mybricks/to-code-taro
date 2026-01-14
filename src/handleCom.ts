@@ -373,6 +373,7 @@ const generateUiCode = (
       codeStyle: config.codeStyle!,
       depth: config.depth + 1,
       verbose: config.verbose,
+      checkIsRoot: config.checkIsRoot,
     } as any,
   );
 };

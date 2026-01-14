@@ -15,6 +15,7 @@ import CustomNavigation from "../modules/customNavigation";
 import NoneNavigation from "../modules/noneNavigation";
 import CustomTabBar from "../modules/customTabBar";
 import { isH5, isDesigner } from "../../utils/env";
+import tabBarJson from "@/custom-tab-bar/mybricks/tabbar-config";
 
 const isIOS = Taro.getSystemInfoSync().platform === "ios";
 
@@ -178,18 +179,18 @@ export default function (props) {
     if (!data.useTabBar) {
       return false;
     }
-    if (data.tabBar.length < 2 || data.tabBar.length > 5) {
+    if (tabBarJson?.length < 2 || tabBarJson?.length > 5) {
       return false;
     }
 
-    let isContain = data.tabBar.find((item) => {
+    let isContain = tabBarJson.find((item) => {
       return item.scene.id == env.canvas.id;
     });
     if (!isContain) {
       return false;
     }
     return true;
-  }, [data.useTabBar, data.tabBar, env.canvas.id, data.id]);
+  }, [data.useTabBar, tabBarJson, env.canvas.id, data.id]);
 
   useEffect(() => {
     env.useTabBar = useTabBar;
