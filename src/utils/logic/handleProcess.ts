@@ -326,6 +326,25 @@ const getNextCode = (props: any, config: HandleProcessConfig, isSameScope: boole
   return `const ${componentNameWithId}_result = `;
 };
 
+/**
+ * frame-input：把「当前项/索引」这类 slot 输入，映射到 params.inputValues 上
+ * - 优先使用 pinValueProxies（连接线解析后的稳定映射）：`${comId}-${inputPinId}` -> { pinId: 'itemData' | 'index' | ... }
+ * - 再次从父组件 frames[frameId].inputs 元数据中解析（结构化 pinAry）
+ * - 最后兜底返回 params?.inputValues（不崩溃）
+ */
+function getFrameInputValueExpr(meta: any, config: HandleProcessConfig, event: any) {
+  const scene = config.getCurrentScene?.();
+
+  // 1) pinValueProxies（最直接、最稳定：由 diagrams.conAry 解析而来）
+  const inputPinId = meta?.inputs?.[0] || "getCurValue";
+  const proxyKey = `${meta?.id}-${inputPinId}`;
+  const pinProxy = (scene as any)?.pinValueProxies?.[proxyKey];
+  const pinId = pinProxy?.pinId;
+  if (typeof pinId === "string" && pinId) {
+    return `params?.inputValues?.[${JSON.stringify(pinId)}]`;
+  }
+}
+
 const getNextValue = (props: any, config: HandleProcessConfig, event: any) => {
   const { paramSource } = props;
   const nextValue = paramSource.map((param: any) => {
@@ -335,6 +354,12 @@ const getNextValue = (props: any, config: HandleProcessConfig, event: any) => {
     } else if (param.type === "constant") {
       return JSON.stringify(param.value);
     }
+
+    // frame-input：直接从 slot params 读取（不生成 frameInput_xxx_result 临时变量）
+    if (param.meta?.def?.namespace === "mybricks.core-comlib.frame-input" && param.id === "return") {
+      return getFrameInputValueExpr(param.meta, config, event);
+    }
+
     const componentNameWithId = getComponentNameWithId(param, config, event);
     // 变量组件直接返回 Subject，不加 .id 后缀
     if (param.meta?.def?.namespace?.includes(".var")) {
@@ -355,6 +380,12 @@ const getNextValueWithParam = (
     const params = config.getParams();
     return params[param.id];
   }
+
+  // frame-input：直接从 slot params 读取（不生成 frameInput_xxx_result 临时变量）
+  if (param.meta?.def?.namespace === "mybricks.core-comlib.frame-input" && param.id === "return") {
+    return getFrameInputValueExpr(param.meta, config, event);
+  }
+
   const componentNameWithId = getComponentNameWithId(param, config, event);
   // 变量组件直接返回 Subject
   if (param.meta?.def?.namespace?.includes(".var")) {

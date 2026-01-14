@@ -66,14 +66,14 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
     currentSlotId: isRoot ? undefined : (config.slotKey || slotId),
   });
 
-  // 3. 处理场景逻辑 (Start, Inputs 等)
-  let effectCode = processSceneLogic(ui, config, addDependencyImport);
+  // 3. 处理场景逻辑 (变量/FX 初始化 + Start/Inputs 等)
+  const { initCode, effectCode } = processSceneLogic(ui, config, addDependencyImport);
 
   // 4. 合并样式与代码
   let cssContent = (convertStyleAryToCss(props.style?.styleAry, slotId) || "") + 
                     (childResults.cssContent ? "\n" + childResults.cssContent : "");
 
-  const combinedJsCode = `${envDefineCode}${childResults.js}${wrapInEffect(indent2, effectCode)}`;
+  const combinedJsCode = `${envDefineCode}${childResults.js}${initCode}${wrapInEffect(indent2, effectCode)}`;
 
   // 5. 生成 UI 结构
   const uiResult = generateSlotUi(ui, props, childResults.ui, config);

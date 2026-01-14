@@ -17,17 +17,18 @@ export const processSceneLogic = (
   config: any,
   addDependencyImport: any
 ) => {
+  let initCode = "";
   let effectCode = "";
   const indent2 = indentation(config.codeStyle!.indent);
 
   const currentScene = config.getCurrentScene();
   const providerName = config.getCurrentProvider().name;
 
-  // 1. 初始化变量和 FX (非 root 也要初始化，因为子场景也有自己的变量)
-  effectCode += processLogicalInit(currentScene, config, addDependencyImport, indent2, providerName);
+  // 1. 初始化变量和 FX：放在 render 阶段（useEffect 之前），避免用户在首帧触发事件时 $vars/$fxs 仍未初始化
+  initCode += processLogicalInit(currentScene, config, addDependencyImport, indent2, providerName);
   
   // 如果不是 root，目前只处理初始化逻辑
-  if (!config.checkIsRoot()) return effectCode;
+  if (!config.checkIsRoot()) return { initCode, effectCode };
 
   // 2. 处理场景级事件（如 Start 节点）
   effectCode += processSceneEvents(ui, currentScene, config, addDependencyImport, indent2);
@@ -35,7 +36,7 @@ export const processSceneLogic = (
   // 3. 处理场景级输入（如 open）
   effectCode += processSceneInputs(currentScene, config, addDependencyImport, indent2);
 
-  return effectCode;
+  return { initCode, effectCode };
 };
 
 /**
@@ -62,8 +63,8 @@ const processLogicalInit = (
       dependencyNames: ["createVariable"],
       importType: "named",
     });
-    // 鸿蒙化：统一使用 $vars 注册表（scope 由 ScopedComContextProvider 负责隔离）
-    code += `\n${indent}const vars = (comRefs.current.$vars ||= {});`;
+    // $vars 是页面级共享注册表（与 comRefs 同级）
+    code += `\n${indent}const vars = ($vars.current ||= {});`;
     vars.forEach(([comId, com]: [string, any]) => {
       const varName = getSafeVarName(com);
       const varTitle = sanitizeBlockComment(com?.title || com?.model?.title || com?.model?.data?.title || varName);
@@ -82,8 +83,8 @@ const processLogicalInit = (
       dependencyNames: ["createFx"],
       importType: "named",
     });
-    // 鸿蒙化：统一使用 $fxs 注册表（scope 由 ScopedComContextProvider 负责隔离）
-    code += `\n${indent}const fxs = (comRefs.current.$fxs ||= {});`;
+    // $fxs 是页面级共享注册表（与 comRefs 同级）
+    code += `\n${indent}const fxs = ($fxs.current ||= {});`;
     fxEvents.forEach((fxEvent: any) => {
       const res = handleProcess(fxEvent, {
         ...config,
@@ -100,6 +101,8 @@ const processLogicalInit = (
           );
         },
       } as any)
+        .replace(/this\.\$vars\./g, "$vars.current.")
+        .replace(/this\.\$fxs\./g, "$fxs.current.")
         .replace(/this\./g, "comRefs.current.")
         .replace(/comRefs\.current\.([a-zA-Z0-9_]+)\.controller_/g, "comRefs.current.$1.")
         .replace(/comRefs\.current\.slot_Index\./g, "comRefs.current.");
@@ -140,6 +143,8 @@ const processSceneEvents = (ui: any, currentScene: any, config: any, addDependen
           addParentDependencyImport: addDependencyImport,
           getParams: () => ({}),
         })
+          .replace(/this\.\$vars\./g, "$vars.current.")
+          .replace(/this\.\$fxs\./g, "$fxs.current.")
           .replace(/this\./g, "comRefs.current.")
           .replace(/comRefs\.current\.([a-zA-Z0-9_]+)\.controller_/g, "comRefs.current.$1.")
           .replace(/comRefs\.current\.slot_Index\./g, "comRefs.current.");
@@ -175,6 +180,8 @@ const processSceneInputs = (currentScene: any, config: any, addDependencyImport:
       addParentDependencyImport: addDependencyImport,
       getParams: () => ({ [input.id]: "data" }),
     })
+      .replace(/this\.\$vars\./g, "$vars.current.")
+      .replace(/this\.\$fxs\./g, "$fxs.current.")
       .replace(/this\./g, "comRefs.current.")
       .replace(/comRefs\.current\.([a-zA-Z0-9_]+)\.controller_/g, "comRefs.current.$1.")
       .replace(/comRefs\.current\.slot_Index\./g, "comRefs.current.");

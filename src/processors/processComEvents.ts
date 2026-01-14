@@ -61,6 +61,8 @@ export const processComEvents = (
       addParentDependencyImport: config.addParentDependencyImport,
       getParams: () => ({ [eventId]: paramName }),
     })
+      .replace(/this\.\$vars\./g, "$vars.current.")
+      .replace(/this\.\$fxs\./g, "$fxs.current.")
       .replace(/this\./g, "comRefs.current.")
       .replace(
         /comRefs\.current\.([a-zA-Z0-9_]+)\.controller_/g,

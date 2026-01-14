@@ -3,6 +3,8 @@ import { deepProxy } from './hooks'
 
 export interface ComContextStore {
   comRefs: any;
+  $vars: any;
+  $fxs: any;
   appContext: any;  
   popupState: {
     visible: boolean;
@@ -16,11 +18,12 @@ export interface ComContextStore {
 export function useAppCreateContext(): ComContextStore {
   // 约定：场景级 inputs 统一挂载到 $inputs，避免与组件 runtime 的 inputs 命名冲突
   // 同时可避免 `Cannot set property 'open' of undefined`
-  // 统一注册表（均挂载到 comRefs.current 上）
-  // - $inputs: 场景级 inputs（open 等）
-  // - $vars/$fxs: 逻辑能力注册表（变量/Fx）
-  // - $outputs: 组件 outputs 注册表（按组件 id）
-  const comRefs = useRef<any>(deepProxy({ $inputs: {}, $vars: {}, $fxs: {}, $outputs: {} }));
+  // 注册表拆分：
+  // - comRefs: 组件实例/inputs/outputs 注册表（可 scoped）
+  // - $vars/$fxs: 逻辑能力注册表（仅页面级，全作用域共享）
+  const comRefs = useRef<any>(deepProxy({ $inputs: {}, $outputs: {} }));
+  const $vars = useRef<any>({});
+  const $fxs = useRef<any>({});
   const [popupState, setPopupState] = useState({
     visible: false,
     name: '',
@@ -49,6 +52,8 @@ export function useAppCreateContext(): ComContextStore {
 
   return useMemo(() => ({
     comRefs,
+    $vars,
+    $fxs,
     appContext,
     popupState,
     setPopupState

@@ -5,6 +5,7 @@ import { genSlotRenderRef } from "./utils/templates/component";
 import { RenderManager } from "./utils/templates/renderManager";
 import handleSlot from "./handleSlot";
 import { processComEvents } from "./processors/processComEvents";
+import { handleProcess } from "./utils/logic/handleProcess";
 
 export type Com = any;
 export type HandleComConfig = any;
@@ -210,136 +211,43 @@ const buildSlotLogicCode = (args: {
   children: any[];
   config: HandleComConfig;
 }): string => {
-  const { parentComId, slotKey, children, config } = args;
-  const scene = config.getCurrentScene();
+  const { parentComId, slotKey, config } = args;
   const indent = indentation(2);
   const indent2 = indentation(4);
-  const indent3 = indentation(6);
 
-  const cons = scene?.cons || {};
-  const coms = scene?.coms || {};
+  // 更直接：用 to-code-react 已经解析好的“effect event”（底层来自 diagrams[].conAry）
+  // buildSlotLogicCode 只负责包一层 useEffect，不再自己扫描/猜测 cons/pinValueProxies
+  const effectEvent = config.getEffectEvent?.({ comId: parentComId, slotId: slotKey });
+  if (!effectEvent) return "";
 
-  const bodyLines: string[] = [];
+  // 任意 slot 入参都映射到 params.inputValues[pinId]
+  const paramsProxy = new Proxy(
+    {},
+    {
+      get: (_t, key: string) => `params?.inputValues?.['${String(key)}']`,
+    },
+  ) as any;
 
-  // 1) 直连：slot inputValues -> 子组件 inputs（最小可读版）
-  children?.forEach((child: any) => {
-    if (child?.type !== "com") return;
+  let process = handleProcess(effectEvent, {
+    ...config,
+    target: "comRefs.current",
+    depth: 3,
+    addParentDependencyImport: config.addParentDependencyImport,
+    addConsumer: config.addConsumer,
+    getParams: () => paramsProxy,
+  } as any)
+    .replace(/this\./g, "comRefs.current.")
+    .replace(/comRefs\.current\.([a-zA-Z0-9_]+)\.controller_/g, "comRefs.current.$1.")
+    .replace(/comRefs\.current\.slot_Index\./g, "comRefs.current.");
 
-    const mapping = collectSlotInputMappingForCom({
-      parentComId,
-      slotKey,
-      slotFrameId: slotKey,
-      scene,
-      targetComId: child.id,
-    });
-
-    Object.entries(mapping).forEach(([pinId, slotParamKey]) => {
-      const safePin = String(pinId).replace(/[^a-zA-Z0-9_]/g, "_");
-      const varName = `val_${child.id}_${safePin}`;
-      bodyLines.push(`${indent3}const ${varName} = params?.inputValues?.['${slotParamKey}'];\n`);
-      bodyLines.push(`${indent3}if (${varName} !== undefined) {\n`);
-      bodyLines.push(`${indent3}${indent}comRefs.current['${child.id}']?.['${pinId}']?.(${varName});\n`);
-      bodyLines.push(`${indent3}}\n`);
-    });
-  });
-
-  // 2) js-autorun：执行并路由 outputs（保持短小：不注入 transformCode）
-  // 注意：js 计算组件本身不一定出现在 childrenResults（因为它不渲染 UI），因此这里从 scene.coms 按 parentComId/frameId 扫描
-  getSlotJsAutoruns(coms, parentComId, slotKey).forEach((jsCom) => {
-    const jsId = jsCom.id;
-    const jsInputs: string[] = (jsCom.model as any)?.inputs || jsCom.inputs || [];
-    const jsOutputs: string[] = (jsCom.model as any)?.outputs || jsCom.outputs || [];
-    if (!Array.isArray(jsInputs) || jsInputs.length === 0) return;
-
-    // dead code elimination：outputs 没有任何下游连线就不生成
-    if (!hasDownstream(cons, jsId, jsOutputs)) return;
-
-    const jsInputMapping = collectSlotInputMappingForCom({
-      parentComId,
-      slotKey,
-      slotFrameId: slotKey,
-      scene,
-      targetComId: jsId,
-    });
-
-    const jsArgVars: string[] = [];
-    jsInputs.forEach((jsPin, idx) => {
-      const slotParamKey = jsInputMapping[jsPin];
-      const varName = `slot_${jsId}_arg_${idx}`;
-      bodyLines.push(`${indent3}const ${varName} = ${getSlotParamExpr(slotParamKey, idx)};\n`);
-      jsArgVars.push(varName);
-    });
-
-    const jsHandleVar = `jsModules_${jsId}`;
-    const jsResVar = `jsModules_${jsId}_result`;
-    bodyLines.push(
-      `${indent3}const ${jsHandleVar} = jsModules["${jsId}"]({ inputs: ${JSON.stringify(jsInputs)}, outputs: ${JSON.stringify(jsOutputs)}, title: "${jsCom.title || "JS计算"}", data: ${JSON.stringify({})} }, appContext);\n`,
-    );
-    bodyLines.push(`${indent3}const ${jsResVar} = ${jsHandleVar}(${jsArgVars.join(", ")});\n`);
-
-    getRoutes(cons, jsId, jsOutputs).forEach(({ outPin, targetId, targetPin }) => {
-      bodyLines.push(`${indent3}comRefs.current['${targetId}']?.['${targetPin}']?.(${jsResVar}?.['${outPin}']);\n`);
-    });
-  });
-
-  if (bodyLines.length === 0) return "";
+  if (!process.trim()) return "";
 
   let code = `${indent}useEffect(() => {\n`;
   code += `${indent2}if (!params?.inputValues) return;\n`;
-  code += bodyLines.join("");
+  code += `${process}\n`;
   code += `${indent}}, [params?.inputValues]);\n`;
   return code;
 };
-
-function getSlotJsAutoruns(coms: any, parentComId: string, slotKey: string) {
-  return Object.values(coms || {}).filter((com: any) => {
-    return (
-      com &&
-      com?.def?.namespace === "mybricks.taro._muilt-inputJs" &&
-      com?.def?.rtType === "js-autorun" &&
-      com?.parentComId === parentComId &&
-      com?.frameId === slotKey
-    );
-  }) as any[];
-}
-
-function hasDownstream(cons: any, jsId: string, jsOutputs: any) {
-  if (!Array.isArray(jsOutputs) || jsOutputs.length === 0) return false;
-  return jsOutputs.some((outPin) => {
-    const targets = cons?.[`${jsId}-${outPin}`];
-    return Array.isArray(targets) && targets.length > 0;
-  });
-}
-
-function parseTarget(t: any) {
-  if (typeof t === "string") {
-    const [targetId, targetPin] = t.split("-");
-    return { targetId, targetPin };
-  }
-  return { targetId: t?.comId, targetPin: t?.pinId };
-}
-
-function getRoutes(cons: any, jsId: string, jsOutputs: string[]) {
-  const routes: Array<{ outPin: string; targetId: string; targetPin: string }> = [];
-  (jsOutputs || []).forEach((outPin) => {
-    const targets = cons?.[`${jsId}-${outPin}`];
-    if (!Array.isArray(targets) || targets.length === 0) return;
-    targets.forEach((t: any) => {
-      const { targetId, targetPin } = parseTarget(t);
-      if (targetId && targetPin) routes.push({ outPin, targetId, targetPin });
-    });
-  });
-  return routes;
-}
-
-function getSlotParamExpr(slotParamKey: any, idx: number) {
-  if (slotParamKey) {
-    return `params?.inputValues?.['${slotParamKey}']`;
-  }
-  // 兜底：列表 item 场景最常见 inputValue0 -> itemData, inputValue1 -> index
-  const fallbackKey = idx === 0 ? "itemData" : idx === 1 ? "index" : undefined;
-  return fallbackKey ? `params?.inputValues?.['${fallbackKey}']` : "undefined";
-}
 
 /**
  * 生成 UI 代码
@@ -395,74 +303,5 @@ const handleJsCalculation = (com: Com, config: HandleComConfig): HandleComResult
   }
   return { slots: [], scopeSlots: [], ui: "", js: "", cssContent: "", outputsConfig: undefined };
 };
-
-/**
- * 鸿蒙化解析逻辑：通过连线关系（cons）和 作用域代理（pinValueProxies）推导数据源映射
- */
-function collectSlotInputMappingForCom(params: {
-  parentComId?: string;
-  slotKey?: string;
-  slotFrameId: string;
-  scene: any;
-  targetComId: string;
-}): Record<string, string> {
-  const { parentComId, slotKey, slotFrameId, scene, targetComId } = params;
-  const mapping: Record<string, string> = {};
-
-  const cons = scene?.cons || {};
-  const pinValueProxies = scene?.pinValueProxies || {};
-  const coms = scene?.coms || {};
-
-  // 1. 识别属于当前插槽的 frame-input
-  const frameInputComIdToKey: Record<string, string> = {};
-  Object.entries(pinValueProxies).forEach(([key, proxy]: any) => {
-    if (proxy?.type === "frame" && proxy.frameId === slotFrameId && proxy.pinId) {
-      const [comId] = String(key).split("-");
-      if (comId && coms[comId]?.def?.namespace === "mybricks.core-comlib.frame-input") {
-        frameInputComIdToKey[comId] = proxy.pinId;
-      }
-    }
-  });
-
-  // 1.1 pinValueProxies 不存在时（部分 DSL 导出没有该字段），fallback 到 cons 的 slot-key 约定：
-  // `${parentComId}-${slotKey}-${slotParamKey}` -> `${targetComId}-${pinId}`
-  if (Object.keys(frameInputComIdToKey).length === 0 && parentComId && slotKey) {
-    const prefix = `${parentComId}-${slotKey}-`;
-    Object.entries(cons).forEach(([sourceKey, targets]) => {
-      if (!String(sourceKey).startsWith(prefix)) return;
-      if (!Array.isArray(targets)) return;
-      const slotParamKey = String(sourceKey).slice(prefix.length);
-      targets.forEach((t: any) => {
-        const targetId = typeof t === "string" ? t.split("-")[0] : t.comId;
-        const targetPin = typeof t === "string" ? t.split("-")[1] : t.pinId;
-        if (targetId === targetComId && targetPin) {
-          mapping[targetPin] = slotParamKey;
-        }
-      });
-    });
-    return mapping;
-  }
-
-  if (Object.keys(frameInputComIdToKey).length === 0) return mapping;
-
-  // 2. 推导连线：frame-input -> targetCom
-  Object.entries(cons).forEach(([sourceKey, targets]) => {
-    if (!Array.isArray(targets)) return;
-    const [sourceComId] = String(sourceKey).split("-");
-    const slotInputKey = frameInputComIdToKey[sourceComId];
-    
-    if (slotInputKey) {
-      targets.forEach(t => {
-        const targetId = typeof t === 'string' ? t.split('-')[0] : t.comId;
-        const targetPin = typeof t === 'string' ? t.split('-')[1] : t.pinId;
-        if (targetId === targetComId && targetPin) {
-          mapping[targetPin] = slotInputKey;
-        }
-      });
-    }
-  });
-
-  return mapping;
-}
 
 export default handleCom;

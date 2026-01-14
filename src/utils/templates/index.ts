@@ -86,10 +86,8 @@ export const getUiComponentCode = (
 
   // 添加插槽
   if (slotsCode) {
-    console.log(`[getUiComponentCode] Component ${meta.id} has slotsCode, length: ${slotsCode.length}`);
     ui += `\n${indent2}slots={{\n${slotsCode}${indent2}}}`;
   } else {
-    console.log(`[getUiComponentCode] Component ${meta.id} has NO slotsCode`);
   }
   
   ui += `\n${indent}/>`;

@@ -14,6 +14,24 @@ type SlotState = {
   render: (params?: any) => any;
 };
 
+function SlotParamsBridge(props: {
+  state: SlotState;
+  params: any;
+  render?: any;
+  children?: React.ReactNode;
+}) {
+  const parentSlot = useParentSlot<any>();
+  const mergedParams =
+    props.params?.inputValues === undefined && parentSlot?.params?.inputValues
+      ? { ...(props.params || {}), inputValues: parentSlot.params.inputValues }
+      : props.params;
+
+  const SlotComp = props.render;
+  const content = SlotComp ? <SlotComp {...(mergedParams || {})} /> : props.children ?? null;
+
+  return <SlotProvider value={{ ...props.state, params: mergedParams }}>{content}</SlotProvider>;
+}
+
 function createChannelProxy(title: string) {
   const handlersMap: Record<string, any> = {};
   return new Proxy(
@@ -66,24 +84,19 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
             // 只有存在 key 或 index 时才认为是“多实例作用域插槽”，需要实例隔离
             const rawScope = params?.key ?? params?.inputValues?.index ?? params?.inputValues?.itemData?.id;
             
-            const SlotComp = r;
-            const content = r ? <SlotComp {...(params || {})} /> : null;
-
             if (rawScope === undefined || rawScope === null) {
               return (
-                <SlotProvider value={{ ...state, params }}>
-                  {content}
-                </SlotProvider>
+                <SlotParamsBridge state={state} params={params} render={r} />
               );
             }
 
             const scopeId = `${id}.${slotKey}::${String(rawScope)}`;
             const scopedComRefs =
-              (state._scopedComRefs![scopeId] ||= { current: { $inputs: {}, $vars: {}, $fxs: {} } });
+              (state._scopedComRefs![scopeId] ||= { current: { $inputs: {}, $outputs: {} } });
             return (
               <SlotProvider value={{ ...state, params }}>
                 <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
-                  {content}
+                  <SlotParamsBridge state={state} params={params} render={r} />
                 </ScopedComContextProvider>
               </SlotProvider>
             );
