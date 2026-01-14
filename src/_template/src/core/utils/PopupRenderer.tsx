@@ -13,7 +13,7 @@ export const PopupRenderer: React.FC<PopupRendererProps> = ({ popupMap }) => {
     ? popupMap[popupState.name] 
     : null;
 
-  if (!ActivePopup) return null;
+  if (!ActivePopup) return <View></View>;
 
   return (
     <View 

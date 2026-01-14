@@ -25,6 +25,14 @@ export const toPascalCase = (str: string): string => {
     .join("");
 };
 
+/** 根节点data去除无用属性 */
+const formatData = (data: any, isRoot: boolean) => {
+  if (!data) return {}
+  if (!isRoot) return data
+  const delKeys = ['tabBar', 'navigationStyle', 'navigationBarBackgroundColor', 'navigationBarTextStyle', 'navigationBarTitleText', 'backgroundColorTop', 'backgroundColorBottom']
+  return Object.fromEntries(Object.entries(data).filter(([key]) => !delKeys.includes(key)))
+}
+
 /** Taro/React UI 组件代码生成 */
 export const getUiComponentCode = (
   params: {
@@ -44,6 +52,7 @@ export const getUiComponentCode = (
     codeStyle: { indent: number };
     depth: number;
     verbose?: boolean;
+    checkIsRoot: () => boolean;
   },
 ): string => {
   const {
@@ -56,6 +65,7 @@ export const getUiComponentCode = (
     eventHandlers = {},
   } = params;
 
+  const isRoot = config.checkIsRoot();
   const indent = indentation(config.codeStyle.indent * config.depth);
   const indent2 = indentation(config.codeStyle.indent * (config.depth + 1));
 
@@ -76,7 +86,7 @@ export const getUiComponentCode = (
   }
 
   // 添加 data
-  const initialDataCode = dataCode ?? JSON.stringify(props.data || {});
+  const initialDataCode = dataCode ?? JSON.stringify(formatData(props.data, isRoot));
   ui += `\n${indent2}data={${initialDataCode}}`;
 
   // 添加事件处理函数
