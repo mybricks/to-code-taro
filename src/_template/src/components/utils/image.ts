@@ -114,12 +114,16 @@ export function autoCdnCut ({
   if (url.indexOf('https') === -1 || url.indexOf('assets.mybricks.world') === -1) {
     return url
   }
-  let query = '?x-oss-process=image/resize,';
+  let query = '?x-oss-process=image';
 
-  if (isNumber(width)) {
-    query+= `w_${(width * dpr).toFixed(0)}`
-  } else if (isNumber(height)) {
-    query+= `h_${(height * dpr).toFixed(0)}`
+  // 尺寸
+  const numWidth = isNumber(width) ? width : parseFloat(width ?? '0');
+  const numHeight = isNumber(height) ? height : parseFloat(height ?? '0');
+
+  if (numWidth) {
+    query+= `/resize,w_${(numWidth * dpr).toFixed(0)}`
+  } else if (numHeight) {
+    query+= `/resize,h_${(numHeight * dpr).toFixed(0)}`
   }
 
   if (isNumber(quality)) {
