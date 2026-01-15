@@ -139,7 +139,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
   // 替换自定义 Tabbar 配置文件
   const CUSTOM_TAB_BAR_CONFIG_PATH = "src/custom-tab-bar/mybricks/tabbar-config.ts"
   const customTabBarItem = files.find((item) => item.type === 'customTabBar');
-  if (customTabBarItem.content) {
+  if (customTabBarItem?.content) {
     const customTabBarDir = ensureDir(srcDir, "src/custom-tab-bar");
     const mybricksDir = ensureDir(customTabBarDir, "src/custom-tab-bar/mybricks");
     const tabbarConfigFileIndex = mybricksDir.children?.findIndex(
