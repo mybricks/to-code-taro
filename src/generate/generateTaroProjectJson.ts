@@ -6,6 +6,7 @@ import { handleCommonDir } from "./utils/commonDir";
 import { handleTabBarImages } from "./utils/tabBarImages";
 import { updateAppConfig } from "./utils/appConfig";
 import type { GenerationResult, GeneratedFile } from "../toCodeTaro";
+import { genScopedJSModules } from "../utils/logic/genJSModules";
 
 interface FileNode {
   path: string;
@@ -88,6 +89,17 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
         content: fullContent,
       },
     ];
+    // 生成页面级 jsModules（如果有 JS 计算组件）
+    if (item.jsModules && item.jsModules.length > 0) {
+      pageChildren.push({
+        path: `src/pages/${pageName}/index.jsModules.ts`,
+        content: genScopedJSModules(
+          item.jsModules as any,
+          "../../core/mybricks/index",
+          "../../common/jsModulesRuntime",
+        ),
+      });
+    }
 
     // 返回页面目录节点
     return {
@@ -109,19 +121,32 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
     const importCode = item.importManager?.toCode() || "";
     const fullContent = `${importCode}\n${item.content || ""}`;
 
+    const popupChildren: FileNode[] = [
+      {
+        path: `src/popupComponents/${popupId}/index.tsx`,
+        content: fullContent,
+      },
+      {
+        path: `src/popupComponents/${popupId}/index.global.less`,
+        content: item.cssContent || "",
+      },
+    ];
+
+    if (item.jsModules && item.jsModules.length > 0) {
+      popupChildren.push({
+        path: `src/popupComponents/${popupId}/index.jsModules.ts`,
+        content: genScopedJSModules(
+          item.jsModules as any,
+          "../../core/mybricks/index",
+          "../../common/jsModulesRuntime",
+        ),
+      });
+    }
+
     popupComponentsDir.children!.push({
       path: `src/popupComponents/${popupId}`,
       content: null,
-      children: [
-        {
-          path: `src/popupComponents/${popupId}/index.tsx`,
-          content: fullContent,
-        },
-        {
-          path: `src/popupComponents/${popupId}/index.global.less`,
-          content: item.cssContent || "",
-        },
-      ],
+      children: popupChildren,
     });
   });
 

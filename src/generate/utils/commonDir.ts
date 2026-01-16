@@ -23,24 +23,15 @@ interface GenerateItem {
 export function handleCommonDir(commonDir: FileNode, items: GenerateItem[]): void {
   commonDir.children = commonDir.children || [];
 
-  // 处理 jsModules
-  const jsModulesItem = items.find((item) => item.type === 'jsModules');
-  if (jsModulesItem) {
-    const importCode = jsModulesItem.importManager?.toCode() || '';
-    const fileContent = jsModulesItem.content || '';
+  // 处理 jsModulesRuntime
+  const jsModulesRuntimeItem = items.find((item) => item.type === 'jsModulesRuntime');
+  if (jsModulesRuntimeItem) {
+    const importCode = jsModulesRuntimeItem.importManager?.toCode() || '';
+    const fileContent = jsModulesRuntimeItem.content || '';
     const fullContent = importCode ? `${importCode}\n${fileContent}` : fileContent;
     commonDir.children.push({
-      path: 'src/common/jsModules.ts',
+      path: 'src/common/jsModulesRuntime.ts',
       content: fullContent,
-    });
-  }
-
-  // 处理 commonIndex
-  const commonIndexItem = items.find((item) => item.type === 'commonIndex');
-  if (commonIndexItem) {
-    commonDir.children.push({
-      path: 'src/common/index.ts',
-      content: commonIndexItem.content || '',
     });
   }
 }

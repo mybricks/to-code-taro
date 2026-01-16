@@ -81,6 +81,8 @@ export interface GeneratedFile {
   content: string;
   cssContent?: string;
   pageConfigContent?: string; // 页面配置内容（definePageConfig）
+  /** 当前页面/弹窗内用到的 JS 计算组件（用于生成 index.jsModules.ts） */
+  jsModules?: import("./utils/context/collectJSModules").JSModule[];
   importManager: ImportManager;
   type:
     | "normal"
@@ -94,8 +96,7 @@ export interface GeneratedFile {
     | "fx"
     | "api"
     | "extension-event"
-    | "jsModules"
-    | "commonIndex"
+    | "jsModulesRuntime"
     | "tabBarConfig"
     | "customTabBar";
   meta?: ReturnType<typeof toCode>["scenes"][0]["scene"];

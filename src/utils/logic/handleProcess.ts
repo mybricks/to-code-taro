@@ -50,7 +50,7 @@ export const handleProcess = (
   // 如果有 JS 计算组件，导入已初始化的 jsModules
   if (hasJsCalculationComponent) {
     config.addParentDependencyImport({
-      packageName: "../../common/index",
+      packageName: "./index.jsModules",
       dependencyNames: ["jsModules"],
       importType: "named",
     });

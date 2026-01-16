@@ -1,28 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * 生成 JSModules.ts 文件内容
- * 参考鸿蒙的实现方式
+ * 生成 jsModules 运行时工具（公共部分，避免每个页面重复 & 避免单文件过大）
  */
-export const genJSModules = (jsModules: Array<{
-  id: string;
-  title: string;
-  transformCode: string;
-  inputs: string[];
-  outputs: string[];
-  data: any;
-}>) => {
-  if (jsModules.length === 0) {
-    return `export default function({ createJSHandle }) {
-  const comModules = {};
-  return comModules;
-}`;
-  }
+export const genJSModulesRuntime = () => {
+  return `/* eslint-disable @typescript-eslint/no-explicit-any */
 
-  // 工具函数：将对象转换为数组
-  const convertObject2ArrayCode = `
-function convertObject2Array(input) {
-  let result = [];
+function convertObject2Array(input: any) {
+  let result: any[] = [];
   Object.keys(input)
     .sort((a, b) => {
       let _a = extractNumbers(a) || 0;
@@ -30,23 +15,25 @@ function convertObject2Array(input) {
       return +_a - +_b;
     })
     .forEach((key) => {
-      result.push(input[key]);
+      result.push((input as any)[key]);
     });
   return result;
 }
-function extractNumbers(str) {
+
+function extractNumbers(str: string) {
   let number = "";
   for (let i = 0; i < str.length; i++) {
-    if (!isNaN(parseInt(str[i]))) {
+    if (!isNaN(parseInt(str[i] as any))) {
       number += str[i];
     }
   }
   return number;
 }
-function _execJs(script) {
-  return function ({ env, data, inputs, outputs, logger, onError }) {
+
+export function _execJs(script: any) {
+  return function ({ env, data, inputs, outputs, logger, onError }: any) {
     const { fns, runImmediate } = data || {};
-    const runJSParams = {
+    const runJSParams: any = {
       logger,
       outputs: convertObject2Array(outputs),
     };
@@ -54,7 +41,7 @@ function _execJs(script) {
       if (runImmediate) {
         script(runJSParams);
       }
-      inputs["input"]((val) => {
+      inputs["input"]((val: any) => {
         try {
           script({
             ...runJSParams,
@@ -70,37 +57,47 @@ function _execJs(script) {
   };
 }
 `;
+};
 
-  let code = `export default function({ createJSHandle }) {
-  const comModules = {};
-  ${convertObject2ArrayCode}
+/**
+ * 生成“页面级/弹窗级”的 jsModules（只包含当前页面用到的 JS 计算组件）
+ * 输出：export const jsModules = { u_xxx: (props, appContext) => createJSHandle(...) }
+ */
+export const genScopedJSModules = (
+  jsModules: Array<{
+    id: string;
+    title: string;
+    transformCode: string;
+    inputs: string[];
+    outputs: string[];
+    data: any;
+  }>,
+  importCreateJSHandleFrom: string,
+  importRuntimeFrom: string,
+) => {
+  let code = `/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createJSHandle } from "${importCreateJSHandleFrom}";
+import { _execJs } from "${importRuntimeFrom}";
+
+export const jsModules: Record<string, (props: any, appContext: any) => any> = {};
 `;
 
-  // 为每个 JS 计算组件生成代码
   jsModules.forEach((module) => {
-    const { id, title, transformCode, inputs, outputs } = module;
-    
-    // 如果 transformCode 已经是解码后的代码，直接使用；否则解码
+    const { id, title, transformCode } = module;
     let decodedCode = transformCode;
     try {
-      // 尝试解码，如果失败说明已经是原始代码
       decodedCode = decodeURIComponent(transformCode);
     } catch (e) {
-      // 如果解码失败，说明已经是原始代码，直接使用
       decodedCode = transformCode;
     }
-    
-    // 生成 JS 函数
-    code += `\n  // ${title}\n`;
-    code += `  const js_${id} = ${decodedCode};\n`;
-    code += `  const _execJs_${id} = _execJs(js_${id});\n`;
-    code += `  comModules["${id}"] = (props, appContext) => {\n`;
-    code += `    return createJSHandle(_execJs_${id}, { props, appContext });\n`;
-    code += `  };\n`;
+
+    code += `\n// ${title}\n`;
+    code += `const js_${id} = ${decodedCode};\n`;
+    code += `const _execJs_${id} = _execJs(js_${id});\n`;
+    code += `jsModules.${id} = (props, appContext) => createJSHandle(_execJs_${id}, { props, appContext });\n`;
   });
 
-  code += `\n  return comModules;\n}`;
-
+  code += `\n`;
   return code;
 };
 

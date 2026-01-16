@@ -5,7 +5,7 @@
 
 import { ImportManager } from "../common/ImportManager";
 import abstractEventTypeDef from "../../abstractEventTypeDef";
-import { genJSModules } from "../logic/genJSModules";
+import { genJSModulesRuntime } from "../logic/genJSModules";
 import type { ToTaroCodeConfig, GeneratedFile } from "../../toCodeTaro";
 import type { JSModulesMap } from "../context/collectJSModules";
 
@@ -48,29 +48,13 @@ export const buildFinalResults = (
     name: "abstractEventTypeDef",
   });
 
-  // 生成 JSModules.ts 文件
-  files.push({
-    type: "jsModules",
-    content: genJSModules(Array.from(jsModulesMap.values())),
-    importManager: new ImportManager(config),
-    name: "JSModules",
-  });
-
-  // 生成 common/index.ts 文件（初始化并导出 jsModules）
+  // 生成 JSModules 运行时工具（公共）
   if (jsModulesMap.size > 0) {
-    const commonIndexContent = `import jsModulesGenerator from "./jsModules";
-import { createJSHandle } from "../core/mybricks/index";
-
-const jsModules: Record<string, (props: any, appContext: any) => any> = jsModulesGenerator({ createJSHandle });
-
-export { jsModules };
-`;
-
     files.push({
-      type: "commonIndex",
-      content: commonIndexContent,
+      type: "jsModulesRuntime",
+      content: genJSModulesRuntime(),
       importManager: new ImportManager(config),
-      name: "commonIndex",
+      name: "jsModulesRuntime",
     });
   }
 

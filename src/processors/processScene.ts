@@ -14,7 +14,7 @@ import {
   type Provider,
 } from "../utils/context/createProvider";
 import { createEventQueries } from "../utils/context/createEventQueries";
-import { collectJSModulesFromScene } from "../utils/context/collectJSModules";
+import { collectJSModulesFromScene, extractJSModuleFromCom } from "../utils/context/collectJSModules";
 import type { JSModulesMap } from "../utils/context/collectJSModules";
 
 type ToCodeResult = ReturnType<typeof toCode>;
@@ -51,8 +51,13 @@ export const processScene = (params: ProcessSceneParams): void => {
     pageConfigHandler,
   } = params;
 
-  // 收集 JS 计算组件
+  // 收集 JS 计算组件（全局）
   collectJSModulesFromScene(scene, jsModulesMap);
+
+  // 收集当前页面/弹窗内的 JS 计算组件（用于生成 index.jsModules.ts）
+  const localJsModules = Object.entries(scene.coms || {})
+    .map(([comId, comInfo]: [string, any]) => extractJSModuleFromCom(comId, comInfo))
+    .filter(Boolean) as any[];
 
   // 创建 Provider
   const fileName = config.getFileName?.(ui.meta.slotId);
@@ -150,6 +155,7 @@ export const processScene = (params: ProcessSceneParams): void => {
         type: isPopup ? "popup" : (originalScene?.type ? originalScene.type : "normal"),
         meta: scene,
         pageConfigContent,
+        jsModules: localJsModules,
       });
     },
     addJSModule: (module) => {

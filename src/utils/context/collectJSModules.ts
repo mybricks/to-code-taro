@@ -26,7 +26,7 @@ const isJsCalculationComponent = (namespace: string): boolean => {
 /**
  * 从组件信息中提取 JS 模块数据
  */
-const extractJSModuleFromCom = (comId: string, comInfo: any): JSModule | null => {
+export const extractJSModuleFromCom = (comId: string, comInfo: any): JSModule | null => {
   const { def, model } = comInfo;
 
   if (!isJsCalculationComponent(def?.namespace)) {
