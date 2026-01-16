@@ -39,9 +39,11 @@ export class HandlePageConfig {
           pageIdToPath,
           this.tabBarImageFiles,
         );
-        this.globalTabBarConfig = formatTabBarConfigForAppConfig(globalTabBarConfigJson);
-        if (this.globalTabBarConfig) {
-          this.customTabbarFileContent = generateCustomTabBarFileContent(systemPageData.tabBar, globalTabBarConfigJson);
+        if (globalTabBarConfigJson) {
+          this.globalTabBarConfig = formatTabBarConfigForAppConfig(globalTabBarConfigJson);
+          if (this.globalTabBarConfig) {
+            this.customTabbarFileContent = generateCustomTabBarFileContent(systemPageData.tabBar, globalTabBarConfigJson);
+          }
         }
       }
     }
