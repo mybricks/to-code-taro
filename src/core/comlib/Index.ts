@@ -66,8 +66,8 @@ export { default as mybricks_taro_connectorGlobalHeaders } from './_ConnectorGlo
 export type { DataType as mybricks_taro_connectorGlobalHeaders_DataType } from './_ConnectorGlobalHeaders';
 
 // 导航和路由
-export { default as mybricks_taro_backTo } from './_BackTo';
-export type { DataType as mybricks_taro_backTo_DataType } from './_BackTo';
+export { default as mybricks_taro_navigateBack } from './_BackTo';
+export type { DataType as mybricks_taro_navigateBack_DataType } from './_BackTo';
 
 export { default as mybricks_taro_router } from './_Router';
 export type { DataType as mybricks_taro_router_DataType } from './_Router';
