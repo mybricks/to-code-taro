@@ -41,7 +41,7 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
       const utilsPkg = config.getUtilsPackageName({ isRoot, isPopup: config.isPopup });
       addDependencyImport({
         packageName: utilsPkg,
-        dependencyNames: ["useAppContext", "ScopedComContextProvider"],
+        dependencyNames: ["useAppContext"],
         importType: "named",
       });
       // 补全 useEffect 导入（用于插槽逻辑驱动）
@@ -103,10 +103,16 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
   const utilsPkg = config.getUtilsPackageName(importParams);
   const comPkg = config.getComponentPackageName(importParams);
 
-  addImport({ packageName: "react", dependencyNames: ["useRef", "useEffect", "useState"], importType: "named" });
+  addImport({
+    packageName: "react",
+    dependencyNames: ["useRef", "useEffect", "useState", "createContext", "useContext"],
+    importType: "named",
+  });
   addImport({ packageName: "@tarojs/components", dependencyNames: ["View"], importType: "named" });
   
-  const dependencyNames = ["WithCom", "WithWrapper", "SlotProvider"];
+  // SlotProvider/ScopedComContextProvider 属于 runtime 内部实现（core/utils/slots.tsx）使用，
+  // 页面/插槽产物通常不直接使用，避免生成未使用的 import。
+  const dependencyNames = ["WithCom", "WithWrapper"];
   if (isRoot && config.hasPopups) {
     dependencyNames.push("PopupRenderer");
   }

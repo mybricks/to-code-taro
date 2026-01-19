@@ -51,15 +51,28 @@ export const genComponentTemplate = ({
   isPopup?: boolean;
   hasPopups?: boolean;
 }) => {
+  // 页面级 scope：用于让插槽读取页面 hooks/state（通过 usePageScope）
+  // - value 默认传 ref（稳定引用，不触发额外重渲染）
+  // - slot 内可直接 usePageScope() 访问
+  const pageScopeCode =
+    `const PageScopeContext = createContext<any>(null);\n` +
+    `function usePageScope<T = any>() {\n` +
+    `  return useContext(PageScopeContext) as T;\n` +
+    `}\n\n`;
+
   // 渲染定义放在组件外部，保持引用稳定
-  let code = `${renderDefinitions}\n` +
+  let code = `${pageScopeCode}${renderDefinitions}\n` +
          `function ${componentName}() {\n` +
+         `  // 页面级 scope：你可以把 useState/useMemo 的结果放到这个 ref 上，让插槽读取\n` +
+         `  const pageScopeRef = useRef<any>({});\n` +
          `${combinedJsCode}\n` +
          `  return (\n` +
+         `    <PageScopeContext.Provider value={pageScopeRef}>\n` +
          `    <>\n` +
          `${uiResult.split('\n').map(line => `      ${line}`).join('\n')}\n` +
          (hasPopups ? `      <PopupRenderer popupMap={POPUP_MAP} />\n` : "") +
          `    </>\n` +
+         `    </PageScopeContext.Provider>\n` +
          `  );\n` +
          `}\n\n`;
   
