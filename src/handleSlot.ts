@@ -76,7 +76,7 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
   const combinedJsCode = `${envDefineCode}${childResults.js}${initCode}${wrapInEffect(indent2, effectCode)}`;
 
   // 5. 生成 UI 结构
-  const uiResult = generateSlotUi(ui, props, childResults.ui, config);
+  const uiResult = generateSlotUi(ui, props, childResults.ui, childResults.childrenResults, config);
 
   // 6. 如果是根场景，生成完整文件
   if (isRoot) {
@@ -130,12 +130,13 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
 /**
  * 生成 Slot 的 UI 代码
  */
-const generateSlotUi = (ui: any, props: any, childrenUi: string, config: any) => {
+const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults: any[], config: any) => {
   const indent = indentation(config.codeStyle!.indent * config.depth);
   const mergedStyle = { width: "100%", height: "100%", ...(ui.style || {}), ...(props.style || {}) };
   // 鸿蒙化：优先使用 config 中传递的 layout（来自父容器 data.layout），否则使用 slot 自身的 layout
   const layout = config.layout || ui.layout || mergedStyle.layout;
-  const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout }));
+  const hasFixedChildStyle = hasFixedChildren(childrenResults) ? { transform: "translateX(0)" } : {};
+  const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout, ...hasFixedChildStyle }));
   
   const rootClassName = getRootComponentClassName(config.getCurrentScene(), config.checkIsRoot());
   const classNameAttr = rootClassName ? ` className='${rootClassName}'` : "";
@@ -163,5 +164,12 @@ const finalizeRootComponent = (ui: any, config: any, importManager: any, combine
   
   config.add({ importManager, content: componentCode, cssContent, name: fileName });
 };
+
+/**
+ * 检查子元素是否有固定定位的元素
+ */
+const hasFixedChildren = (childrenResults: any[]) => {
+  return childrenResults.some((item) => item?.rootStyle?.position === "fixed");
+}
 
 export default handleSlot;
