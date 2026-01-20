@@ -22,6 +22,8 @@ interface HandleSlotConfig extends BaseConfig {
   hasPopups?: boolean;
   /** handleCom 处理 slots 时的 slot key（如 item/content），用于识别 scope 入参 */
   slotKey?: string;
+  /** 父组件 id（用于给插槽根容器打标 className） */
+  parentComId?: string;
 }
 
 const handleSlot = (ui: UI, config: HandleSlotConfig) => {
@@ -138,7 +140,12 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, config: any) =>
   const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout }));
   
   const rootClassName = getRootComponentClassName(config.getCurrentScene(), config.checkIsRoot());
-  const classNameAttr = rootClassName ? ` className='${rootClassName}'` : "";
+  // 插槽根容器增强：加上可读的标识，便于用户定位/调试
+  // - className: slot-<parentComId>
+  const parentComId = (config as any)?.parentComId;
+  const slotMarkClass = parentComId ? `slot-${parentComId}` : "";
+  const classNameStr = [rootClassName, slotMarkClass].filter(Boolean).join(" ");
+  const classNameAttr = classNameStr ? ` className='${classNameStr}'` : "";
 
   return `${indent}<View${classNameAttr} style={${styleCode}}>\n${childrenUi}\n${indent}</View>`;
 };
