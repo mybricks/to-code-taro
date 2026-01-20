@@ -48,12 +48,6 @@ export const handleCom = (com: Com, config: HandleComConfig): HandleComResult =>
   const { slotsCode, accumulatedCssContent: slotCss, eventCode, childrenResults } = processComSlots(com, config, accumulatedCssContent);
   accumulatedCssContent = slotCss;
 
-  // 如果插槽里的组件上有 position: fixed，则在父组件上写入 transform: translateX(0)
-  const hasFixedChild = childrenResults?.some((child: any) => child.rootStyle?.position === "fixed");
-  if (hasFixedChild) {
-    rootStyle.transform = "translateX(0)";
-  }
-
   // 5. 生成 UI 代码
   const ui = generateUiCode(com, config, componentName, rootStyle, comEventCode, slotsCode, eventHandlers);
 
