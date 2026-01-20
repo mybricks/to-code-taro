@@ -65,7 +65,7 @@ export const convertRootStyle = (style: Style) => {
         Object.entries(layoutObj).forEach(([lKey, lValue]) => {
           if (lKey === "position") {
             if (lValue === "smart") {
-              rootStyle["position"] = "absolute";
+              rootStyle["position"] = "relative";
             } else if (lValue !== "inherit") {
               rootStyle["position"] = lValue as string;
             }
@@ -115,7 +115,7 @@ export const convertComponentStyle = (style: Style) => {
               Object.entries(layoutObj).forEach(([lKey, lValue]) => {
                 if (lKey === "position") {
                   if (lValue === "smart") {
-                    transformedCss["position"] = "absolute";
+                    transformedCss["position"] = "relative";
                   } else if (lValue !== "inherit") {
                     transformedCss["position"] = lValue as string;
                   }
@@ -185,7 +185,7 @@ export const convertStyleAryToCss = (
             Object.entries(layoutObj).forEach(([lKey, lValue]) => {
               if (lKey === "position") {
                 if (lValue === "smart") {
-                  transformedCss["position"] = "absolute";
+                  transformedCss["position"] = "relative";
                 } else if (lValue !== "inherit") {
                   transformedCss["position"] = lValue as string;
                 }
