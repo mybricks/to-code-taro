@@ -8,58 +8,7 @@
         "consReg": {},
         "pinRels": {},
         "pinProxies": {},
-        "fxFrames": [
-            {
-                "-v": "1.1.1",
-                "id": "u_RVKqs",
-                "name": "pageOnLoad",
-                "title": "当页面加载时",
-                "type": "extension",
-                "deps": [],
-                "coms": {},
-                "comsAutoRun": {},
-                "_inputs": [],
-                "_outputs": [],
-                "inputs": [
-                    {
-                        "id": "onLoad",
-                        "title": "页面加载",
-                        "type": "normal",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "description": "当前页面 ID"
-                                },
-                                "path": {
-                                    "type": "string",
-                                    "description": "当前页面路径"
-                                },
-                                "query": {
-                                    "type": "object",
-                                    "description": "当前页面参数"
-                                }
-                            }
-                        }
-                    }
-                ],
-                "outputs": [
-                    {
-                        "id": "next",
-                        "title": "继续",
-                        "type": "normal",
-                        "schema": {
-                            "type": "any"
-                        }
-                    }
-                ],
-                "cons": {},
-                "pinRels": {},
-                "pinProxies": {},
-                "pinValueProxies": {}
-            }
-        ]
+        "fxFrames": []
     },
     "scenes": [
         {
@@ -2664,7 +2613,7 @@
                     "model": {
                         "data": {
                             "useDynamic": false,
-                            "text": "“",
+                            "text": "\"",
                             "ellipsis": false,
                             "maxLines": 1,
                             "displayState": "static",
@@ -2786,7 +2735,7 @@
                     "model": {
                         "data": {
                             "useDynamic": false,
-                            "text": "”",
+                            "text": "\"",
                             "ellipsis": false,
                             "maxLines": 1,
                             "displayState": "static",
@@ -8166,8 +8115,8 @@
                     "version": "1.0.0"
                 },
                 {
-                    "namespace": "mybricks.taro.table",
-                    "version": "1.0.1"
+                    "namespace": "mybricks.taro.chart.line",
+                    "version": "1.0.0"
                 },
                 {
                     "namespace": "mybricks.taro._showToast",
@@ -10721,569 +10670,6 @@
                         "_dataChanged_"
                     ]
                 },
-                "u_xFzk7": {
-                    "id": "u_xFzk7",
-                    "def": {
-                        "namespace": "mybricks.taro.text",
-                        "version": "1.0.0"
-                    },
-                    "title": "文本14",
-                    "model": {
-                        "data": {
-                            "useDynamic": false,
-                            "text": "图表组件",
-                            "ellipsis": false,
-                            "maxLines": 1,
-                            "displayState": "static",
-                            "useLongPress": "none"
-                        },
-                        "outputEvents": {
-                            "onClick": [
-                                {
-                                    "type": "defined",
-                                    "options": {},
-                                    "active": true
-                                }
-                            ]
-                        },
-                        "style": {
-                            "width": "100%",
-                            "height": "fit-content",
-                            "styleAry": [
-                                {
-                                    "selector": ".mybricks-text",
-                                    "css": {
-                                        "color": "rgba(153,153,153,1.00)",
-                                        "paddingTop": "60px",
-                                        "paddingBottom": "60px",
-                                        "textAlign": "center",
-                                        "backgroundColor": "rgba(249,249,249,1)"
-                                    }
-                                }
-                            ],
-                            "themesId": "_defined",
-                            "marginTop": 10,
-                            "zIndex": 2,
-                            "_new": true
-                        }
-                    },
-                    "configs": [],
-                    "_inputs": [],
-                    "inputs": [
-                        "value",
-                        "getValue",
-                        "_setStyle",
-                        "show",
-                        "hide",
-                        "showOrHide",
-                        "_config_"
-                    ],
-                    "outputs": [
-                        "onClick",
-                        "onGetValue",
-                        "_dataChanged_"
-                    ]
-                },
-                "u_ASpO2": {
-                    "id": "u_ASpO2",
-                    "def": {
-                        "namespace": "mybricks.taro.table",
-                        "version": "1.0.1"
-                    },
-                    "title": "数据表格",
-                    "model": {
-                        "data": {
-                            "useTHead": true,
-                            "pagenation": {
-                                "page": 1,
-                                "pageSize": 10
-                            },
-                            "columns": [
-                                {
-                                    "_id": "wMUgQR",
-                                    "id": "column_eftiy",
-                                    "title": "日期",
-                                    "dataIndex": "date",
-                                    "type": "text",
-                                    "autoWidth": true,
-                                    "minWidth": "90",
-                                    "width": "100"
-                                },
-                                {
-                                    "_id": "CA7NLW",
-                                    "id": "column_fam5b",
-                                    "title": "单位净值",
-                                    "dataIndex": "val1",
-                                    "type": "text",
-                                    "autoWidth": true,
-                                    "minWidth": "90",
-                                    "width": "100"
-                                },
-                                {
-                                    "_id": "D28zwv",
-                                    "id": "column_804y4",
-                                    "title": "累计净值",
-                                    "dataIndex": "val2",
-                                    "type": "text",
-                                    "autoWidth": true,
-                                    "minWidth": "90",
-                                    "width": "100"
-                                },
-                                {
-                                    "_id": "3utBmC",
-                                    "id": "column_j50pb",
-                                    "title": "日涨跌幅",
-                                    "dataIndex": "val3",
-                                    "type": "slot",
-                                    "autoWidth": true,
-                                    "minWidth": "90",
-                                    "width": "100"
-                                }
-                            ],
-                            "useLeftSticky": false,
-                            "useRightSticky": false,
-                            "bordered": false,
-                            "hiddenTableHeader": false
-                        },
-                        "outputEvents": {
-                            "onClickRow": [
-                                {
-                                    "type": "defined",
-                                    "options": {},
-                                    "active": true
-                                }
-                            ]
-                        },
-                        "style": {
-                            "width": "100%",
-                            "height": "fit-content",
-                            "styleAry": [
-                                {
-                                    "selector": ".mybricks-thead .mybricks-col",
-                                    "css": {
-                                        "backgroundColor": "rgba(255,255,255,0.00)",
-                                        "fontWeight": "400",
-                                        "fontSize": "14px",
-                                        "lineHeight": "22px"
-                                    }
-                                },
-                                {
-                                    "selector": ".mybricks-row .mybricks-col",
-                                    "css": {
-                                        "color": "rgba(153,153,153,1)"
-                                    }
-                                },
-                                {
-                                    "selector": ".mybricks-row-double .mybricks-col",
-                                    "css": {
-                                        "color": "rgba(153,153,153,0.85)"
-                                    }
-                                }
-                            ],
-                            "themesId": "_defined",
-                            "zIndex": 1,
-                            "_new": true
-                        }
-                    },
-                    "configs": [],
-                    "_inputs": [],
-                    "inputs": [
-                        "getDataSource",
-                        "setTableHeader",
-                        "setDataSource",
-                        "addDataSource",
-                        "noMore",
-                        "_setStyle",
-                        "show",
-                        "hide",
-                        "showOrHide",
-                        "_config_"
-                    ],
-                    "outputs": [
-                        "onClickRow",
-                        "onScrollLoad",
-                        "afterGetDataSource",
-                        "afterSetDataSource",
-                        "afterAddDataSource",
-                        "afterSetTableHeader",
-                        "_dataChanged_"
-                    ],
-                    "frames": [
-                        {
-                            "id": "column_j50pb",
-                            "title": "表格列 日涨跌幅 | val3",
-                            "_inputs": [],
-                            "_outputs": [],
-                            "inputs": [
-                                {
-                                    "id": "text",
-                                    "title": "当前列数据",
-                                    "type": "normal",
-                                    "schema": {
-                                        "type": "any"
-                                    }
-                                },
-                                {
-                                    "id": "record",
-                                    "title": "当前行数据",
-                                    "type": "normal",
-                                    "schema": {
-                                        "type": "object"
-                                    }
-                                },
-                                {
-                                    "id": "index",
-                                    "title": "当前行序号",
-                                    "type": "normal",
-                                    "schema": {
-                                        "type": "number"
-                                    }
-                                }
-                            ],
-                            "outputs": []
-                        }
-                    ]
-                },
-                "u_Et76s": {
-                    "id": "u_Et76s",
-                    "def": {
-                        "namespace": "mybricks.taro.containerCondition2",
-                        "version": "1.0.0"
-                    },
-                    "frameId": "column_j50pb",
-                    "parentComId": "u_ASpO2",
-                    "title": "条件容器",
-                    "model": {
-                        "data": {
-                            "gutter": 0,
-                            "direction": "row",
-                            "wrap": "wrap",
-                            "justify": "start",
-                            "align": "stretch",
-                            "_editSelectId_": "condition_1",
-                            "_editSelectOutputId_": "changeCondition_1",
-                            "new_index": 3,
-                            "items": [
-                                {
-                                    "_id": "condition_1",
-                                    "id": "condition_1",
-                                    "outputId": "changeCondition_1",
-                                    "title": "条件1",
-                                    "type": "scope",
-                                    "inputs": [
-                                        {
-                                            "id": "itemData",
-                                            "title": "传入的数据",
-                                            "schema": {
-                                                "type": "any"
-                                            }
-                                        }
-                                    ],
-                                    "rels": [
-                                        "changeSuccess"
-                                    ]
-                                },
-                                {
-                                    "_id": "condition_2",
-                                    "id": "condition_2",
-                                    "outputId": "changeCondition_2",
-                                    "title": "条件2",
-                                    "type": "scope",
-                                    "inputs": [
-                                        {
-                                            "id": "itemData",
-                                            "title": "传入的数据",
-                                            "schema": {
-                                                "type": "any"
-                                            }
-                                        }
-                                    ],
-                                    "rels": [
-                                        "changeSuccess"
-                                    ]
-                                }
-                            ]
-                        },
-                        "outputEvents": {
-                            "changeCondition": [
-                                {
-                                    "type": "defined",
-                                    "options": {},
-                                    "active": true
-                                }
-                            ],
-                            "changeCondition_1": [
-                                {
-                                    "type": "defined",
-                                    "options": {},
-                                    "active": true
-                                }
-                            ],
-                            "changeCondition_2": [
-                                {
-                                    "type": "defined",
-                                    "options": {},
-                                    "active": true
-                                }
-                            ]
-                        },
-                        "style": {
-                            "width": "100%",
-                            "zIndex": 1,
-                            "_new": true
-                        }
-                    },
-                    "configs": [],
-                    "_inputs": [],
-                    "inputs": [
-                        "setValue",
-                        "condition_1",
-                        "condition_2",
-                        "_setStyle",
-                        "show",
-                        "hide",
-                        "showOrHide",
-                        "_config_"
-                    ],
-                    "outputs": [
-                        "changeDone",
-                        "setValueDone",
-                        "changeCondition",
-                        "changeCondition_1",
-                        "changeCondition_2",
-                        "_dataChanged_"
-                    ]
-                },
-                "u_gom3R": {
-                    "id": "u_gom3R",
-                    "def": {
-                        "namespace": "mybricks.taro.text",
-                        "version": "1.0.0"
-                    },
-                    "frameId": "column_j50pb",
-                    "parentComId": "u_ASpO2",
-                    "title": "文本",
-                    "model": {
-                        "data": {
-                            "useDynamic": false,
-                            "text": "0.77%",
-                            "ellipsis": false,
-                            "maxLines": 1,
-                            "displayState": "static",
-                            "useLongPress": "none"
-                        },
-                        "outputEvents": {
-                            "onClick": [
-                                {
-                                    "type": "defined",
-                                    "options": {},
-                                    "active": true
-                                }
-                            ]
-                        },
-                        "style": {
-                            "width": "100%",
-                            "height": "fit-content",
-                            "styleAry": [
-                                {
-                                    "selector": ".mybricks-text",
-                                    "css": {
-                                        "fontSize": "12px",
-                                        "lineHeight": "20px",
-                                        "color": "rgba(245,34,45,1)",
-                                        "textAlign": "center"
-                                    }
-                                }
-                            ],
-                            "themesId": "_defined",
-                            "zIndex": 1,
-                            "_new": true
-                        }
-                    },
-                    "configs": [],
-                    "_inputs": [],
-                    "inputs": [
-                        "value",
-                        "getValue",
-                        "_setStyle",
-                        "show",
-                        "hide",
-                        "showOrHide",
-                        "_config_"
-                    ],
-                    "outputs": [
-                        "onClick",
-                        "onGetValue",
-                        "_dataChanged_"
-                    ]
-                },
-                "u_j1kgQ": {
-                    "id": "u_j1kgQ",
-                    "def": {
-                        "namespace": "mybricks.taro.text",
-                        "version": "1.0.0"
-                    },
-                    "frameId": "column_j50pb",
-                    "parentComId": "u_ASpO2",
-                    "title": "复制的 文本",
-                    "model": {
-                        "data": {
-                            "useDynamic": false,
-                            "text": "-0.77%",
-                            "ellipsis": false,
-                            "maxLines": 1,
-                            "displayState": "static",
-                            "useLongPress": "none"
-                        },
-                        "outputEvents": {
-                            "onClick": [
-                                {
-                                    "type": "defined",
-                                    "options": {},
-                                    "active": true
-                                }
-                            ]
-                        },
-                        "style": {
-                            "width": "100%",
-                            "height": "fit-content",
-                            "styleAry": [
-                                {
-                                    "selector": ".mybricks-text",
-                                    "css": {
-                                        "fontSize": "12px",
-                                        "lineHeight": "20px",
-                                        "color": "rgba(82,196,26,1)",
-                                        "textAlign": "center"
-                                    }
-                                }
-                            ],
-                            "themesId": "_defined",
-                            "zIndex": 1,
-                            "_new": true
-                        }
-                    },
-                    "configs": [],
-                    "_inputs": [],
-                    "inputs": [
-                        "value",
-                        "getValue",
-                        "_setStyle",
-                        "show",
-                        "hide",
-                        "showOrHide",
-                        "_config_"
-                    ],
-                    "outputs": [
-                        "onClick",
-                        "onGetValue",
-                        "_dataChanged_"
-                    ]
-                },
-                "u_U0PS1": {
-                    "id": "u_U0PS1",
-                    "def": {
-                        "namespace": "mybricks.taro._muilt-inputJs",
-                        "version": "1.0.0",
-                        "rtType": "js-autorun"
-                    },
-                    "frameId": "column_j50pb",
-                    "parentComId": "u_ASpO2",
-                    "title": "JS计算",
-                    "model": {
-                        "data": {
-                            "fns": {
-                                "code": "(%7B%20outputs%2C%20inputs%2C%20logger%20%7D)%20%3D%3E%20%7B%0A%20%20const%20%5B%20inputValue0%20%5D%20%3D%20inputs%3B%0A%20%20const%20%5B%20output0%2C%20output1%2C%20output2%20%5D%20%3D%20outputs%3B%0A%20%20output0(%60%24%7BinputValue0%7D%25%60)%3B%0A%20%20if%20(inputValue0%20%3E%3D%200)%20%7B%0A%20%20%20%20output1()%0A%20%20%7D%20else%20%7B%0A%20%20%20%20output2()%0A%20%20%7D%0A%7D",
-                                "transformCode": "(function()%20%7B%20var%20_RTFN_%3B%20%0A%22use%20strict%22%3B%0A%0Afunction%20_slicedToArray(r%2C%20e)%20%7B%20return%20_arrayWithHoles(r)%20%7C%7C%20_iterableToArrayLimit(r%2C%20e)%20%7C%7C%20_unsupportedIterableToArray(r%2C%20e)%20%7C%7C%20_nonIterableRest()%3B%20%7D%0Afunction%20_nonIterableRest()%20%7B%20throw%20new%20TypeError(%22Invalid%20attempt%20to%20destructure%20non-iterable%20instance.%5CnIn%20order%20to%20be%20iterable%2C%20non-array%20objects%20must%20have%20a%20%5BSymbol.iterator%5D()%20method.%22)%3B%20%7D%0Afunction%20_unsupportedIterableToArray(r%2C%20a)%20%7B%20if%20(r)%20%7B%20if%20(%22string%22%20%3D%3D%20typeof%20r)%20return%20_arrayLikeToArray(r%2C%20a)%3B%20var%20t%20%3D%20%7B%7D.toString.call(r).slice(8%2C%20-1)%3B%20return%20%22Object%22%20%3D%3D%3D%20t%20%26%26%20r.constructor%20%26%26%20(t%20%3D%20r.constructor.name)%2C%20%22Map%22%20%3D%3D%3D%20t%20%7C%7C%20%22Set%22%20%3D%3D%3D%20t%20%3F%20Array.from(r)%20%3A%20%22Arguments%22%20%3D%3D%3D%20t%20%7C%7C%20%2F%5E(%3F%3AUi%7CI)nt(%3F%3A8%7C16%7C32)(%3F%3AClamped)%3FArray%24%2F.test(t)%20%3F%20_arrayLikeToArray(r%2C%20a)%20%3A%20void%200%3B%20%7D%20%7D%0Afunction%20_arrayLikeToArray(r%2C%20a)%20%7B%20(null%20%3D%3D%20a%20%7C%7C%20a%20%3E%20r.length)%20%26%26%20(a%20%3D%20r.length)%3B%20for%20(var%20e%20%3D%200%2C%20n%20%3D%20Array(a)%3B%20e%20%3C%20a%3B%20e%2B%2B)%20n%5Be%5D%20%3D%20r%5Be%5D%3B%20return%20n%3B%20%7D%0Afunction%20_iterableToArrayLimit(r%2C%20l)%20%7B%20var%20t%20%3D%20null%20%3D%3D%20r%20%3F%20null%20%3A%20%22undefined%22%20!%3D%20typeof%20Symbol%20%26%26%20r%5BSymbol.iterator%5D%20%7C%7C%20r%5B%22%40%40iterator%22%5D%3B%20if%20(null%20!%3D%20t)%20%7B%20var%20e%2C%20n%2C%20i%2C%20u%2C%20a%20%3D%20%5B%5D%2C%20f%20%3D%20!0%2C%20o%20%3D%20!1%3B%20try%20%7B%20if%20(i%20%3D%20(t%20%3D%20t.call(r)).next%2C%200%20%3D%3D%3D%20l)%20%7B%20if%20(Object(t)%20!%3D%3D%20t)%20return%3B%20f%20%3D%20!1%3B%20%7D%20else%20for%20(%3B%20!(f%20%3D%20(e%20%3D%20i.call(t)).done)%20%26%26%20(a.push(e.value)%2C%20a.length%20!%3D%3D%20l)%3B%20f%20%3D%20!0)%3B%20%7D%20catch%20(r)%20%7B%20o%20%3D%20!0%2C%20n%20%3D%20r%3B%20%7D%20finally%20%7B%20try%20%7B%20if%20(!f%20%26%26%20null%20!%3D%20t%5B%22return%22%5D%20%26%26%20(u%20%3D%20t%5B%22return%22%5D()%2C%20Object(u)%20!%3D%3D%20u))%20return%3B%20%7D%20finally%20%7B%20if%20(o)%20throw%20n%3B%20%7D%20%7D%20return%20a%3B%20%7D%20%7D%0Afunction%20_arrayWithHoles(r)%20%7B%20if%20(Array.isArray(r))%20return%20r%3B%20%7D%0A_RTFN_%20%3D%20function%20_RTFN_(_ref)%20%7B%0A%20%20var%20outputs%20%3D%20_ref.outputs%2C%0A%20%20%20%20inputs%20%3D%20_ref.inputs%2C%0A%20%20%20%20logger%20%3D%20_ref.logger%3B%0A%20%20var%20_inputs%20%3D%20_slicedToArray(inputs%2C%201)%2C%0A%20%20%20%20inputValue0%20%3D%20_inputs%5B0%5D%3B%0A%20%20var%20_outputs%20%3D%20_slicedToArray(outputs%2C%203)%2C%0A%20%20%20%20output0%20%3D%20_outputs%5B0%5D%2C%0A%20%20%20%20output1%20%3D%20_outputs%5B1%5D%2C%0A%20%20%20%20output2%20%3D%20_outputs%5B2%5D%3B%0A%20%20output0(%22%22.concat(inputValue0%2C%20%22%25%22))%3B%0A%20%20if%20(inputValue0%20%3E%3D%200)%20%7B%0A%20%20%20%20output1()%3B%0A%20%20%7D%20else%20%7B%0A%20%20%20%20output2()%3B%0A%20%20%7D%0A%7D%3B%0A%3B%20return%20_RTFN_%3B%20%7D)()"
-                            },
-                            "inputSchema": {
-                                "inputValue0": {
-                                    "type": "any",
-                                    "title": "inputValue0"
-                                }
-                            },
-                            "extraLib": "declare interface IO {\n  inputs: any,\n  outputs: Array<Function>\n}"
-                        },
-                        "outputEvents": {},
-                        "style": {
-                            "display": "block"
-                        }
-                    },
-                    "style": {},
-                    "configs": [],
-                    "_inputs": [],
-                    "inputs": [
-                        "input.inputValue0"
-                    ],
-                    "outputs": [
-                        "output0",
-                        "output1",
-                        "output2"
-                    ]
-                },
-                "u_BfozX": {
-                    "id": "u_BfozX",
-                    "def": {
-                        "namespace": "mybricks.taro.containerBasic",
-                        "version": "1.0.0"
-                    },
-                    "title": "普通容器15",
-                    "model": {
-                        "data": {
-                            "layout": {
-                                "display": "flex",
-                                "position": "inherit",
-                                "flexDirection": "column",
-                                "alignItems": "flex-start",
-                                "justifyContent": "flex-start",
-                                "flexWrap": "nowrap",
-                                "rowGap": 0,
-                                "columnGap": 0
-                            }
-                        },
-                        "outputEvents": {
-                            "onClick": [
-                                {
-                                    "type": "defined",
-                                    "options": {},
-                                    "active": true
-                                }
-                            ]
-                        },
-                        "style": {
-                            "width": "100%",
-                            "height": "fit-content",
-                            "marginTop": 10,
-                            "styleAry": [
-                                {
-                                    "selector": "> .mybricks-container",
-                                    "css": {
-                                        "paddingRight": "10px",
-                                        "paddingLeft": "10px",
-                                        "backgroundColor": "rgba(255,255,255,1)",
-                                        "overflow": "visible"
-                                    }
-                                }
-                            ],
-                            "themesId": "_defined",
-                            "zIndex": 5,
-                            "_new": true
-                        }
-                    },
-                    "configs": [],
-                    "_inputs": [],
-                    "inputs": [
-                        "_setStyle",
-                        "show",
-                        "hide",
-                        "showOrHide",
-                        "_config_"
-                    ],
-                    "outputs": [
-                        "onClick",
-                        "_dataChanged_"
-                    ]
-                },
                 "u__Z9ZH": {
                     "id": "u__Z9ZH",
                     "def": {
@@ -11624,6 +11010,68 @@
                         "_dataChanged_"
                     ]
                 },
+                "u_NGbpp": {
+                    "id": "u_NGbpp",
+                    "def": {
+                        "namespace": "mybricks.taro.chart.line",
+                        "version": "1.0.0"
+                    },
+                    "title": "折线图",
+                    "model": {
+                        "data": {
+                            "type": "line",
+                            "config": {
+                                "xField": "date",
+                                "yField": "val1",
+                                "xAxis": {},
+                                "yAxis": {},
+                                "legend": false,
+                                "seriesField": "",
+                                "padding": "auto",
+                                "label": false,
+                                "xFieldScrollable": false
+                            },
+                            "geo": {
+                                "line": {
+                                    "show": true,
+                                    "smooth": true
+                                },
+                                "dot": {
+                                    "show": false
+                                },
+                                "area": {
+                                    "show": false
+                                }
+                            },
+                            "useCustomTooltip": false
+                        },
+                        "outputEvents": {},
+                        "style": {
+                            "height": 150,
+                            "width": "100%",
+                            "heightReverse": false,
+                            "zIndex": 2,
+                            "_new": true
+                        }
+                    },
+                    "configs": [],
+                    "_inputs": [],
+                    "inputs": [
+                        "data",
+                        "loading",
+                        "noMore",
+                        "error",
+                        "_setStyle",
+                        "show",
+                        "hide",
+                        "showOrHide",
+                        "_config_"
+                    ],
+                    "outputs": [
+                        "afterrender",
+                        "_dataChanged_"
+                    ]
+                },
                 "u_lwl0d": {
                     "id": "u_lwl0d",
                     "def": {
@@ -11707,8 +11155,8 @@
                     "model": {
                         "data": {
                             "fns": {
-                                "code": "(%7B%20outputs%2C%20inputs%2C%20logger%20%7D)%20%3D%3E%20%7B%0A%20%20const%20%5B%20_dayNum%20%5D%20%3D%20inputs%3B%0A%20%20const%20%5B%20output0%20%5D%20%3D%20outputs%3B%0A%0A%20%20const%20dayNum%20%3D%20parseInt(_dayNum)%0A%20%20const%20list%20%3D%20new%20Array(dayNum).fill(null).map((i%2C%20index)%20%3D%3E%20%7B%0A%20%20%20%20const%20date%20%3D%20new%20Date()%0A%20%20%20%20date.setDate(date.getDate()%20-%20index%20-%201)%0A%20%20%20%20const%20year%20%3D%20date.getFullYear()%0A%20%20%20%20const%20month%20%3D%20date.getMonth()%20%2B%201%0A%20%20%20%20const%20day%20%3D%20date.getDate()%0A%0A%20%20%20%20const%20jingzhi%20%3D%20getRandomInt(0.8001%2C%202.0001).toFixed(4)%0A%0A%20%20%20%20const%20zhangfu%20%3D%20getRandomInt(-2.01%2C%204.01).toFixed(2)%0A%0A%20%20%20%20return%20%7B%0A%20%20%20%20%20%20date%3A%20%60%24%7Byear%7D-%24%7Bmonth%7D-%24%7Bday%7D%60%2C%0A%20%20%20%20%20%20val1%3A%20jingzhi%2C%0A%20%20%20%20%20%20val2%3A%20jingzhi%2C%0A%20%20%20%20%20%20val3%3A%20zhangfu%2C%0A%20%20%20%20%7D%0A%20%20%7D)%0A%0A%20%20output0(list)%3B%0A%0A%20%20function%20getRandomInt(min%2C%20max)%20%7B%0A%20%20%20%20return%20Math.random()%20*%20(max%20-%20min)%20%2B%20min%3B%0A%20%20%7D%0A%7D",
-                                "transformCode": "(function()%20%7B%20var%20_RTFN_%3B%20%0A%22use%20strict%22%3B%0A%0Afunction%20_slicedToArray(r%2C%20e)%20%7B%20return%20_arrayWithHoles(r)%20%7C%7C%20_iterableToArrayLimit(r%2C%20e)%20%7C%7C%20_unsupportedIterableToArray(r%2C%20e)%20%7C%7C%20_nonIterableRest()%3B%20%7D%0Afunction%20_nonIterableRest()%20%7B%20throw%20new%20TypeError(%22Invalid%20attempt%20to%20destructure%20non-iterable%20instance.%5CnIn%20order%20to%20be%20iterable%2C%20non-array%20objects%20must%20have%20a%20%5BSymbol.iterator%5D()%20method.%22)%3B%20%7D%0Afunction%20_unsupportedIterableToArray(r%2C%20a)%20%7B%20if%20(r)%20%7B%20if%20(%22string%22%20%3D%3D%20typeof%20r)%20return%20_arrayLikeToArray(r%2C%20a)%3B%20var%20t%20%3D%20%7B%7D.toString.call(r).slice(8%2C%20-1)%3B%20return%20%22Object%22%20%3D%3D%3D%20t%20%26%26%20r.constructor%20%26%26%20(t%20%3D%20r.constructor.name)%2C%20%22Map%22%20%3D%3D%3D%20t%20%7C%7C%20%22Set%22%20%3D%3D%3D%20t%20%3F%20Array.from(r)%20%3A%20%22Arguments%22%20%3D%3D%3D%20t%20%7C%7C%20%2F%5E(%3F%3AUi%7CI)nt(%3F%3A8%7C16%7C32)(%3F%3AClamped)%3FArray%24%2F.test(t)%20%3F%20_arrayLikeToArray(r%2C%20a)%20%3A%20void%200%3B%20%7D%20%7D%0Afunction%20_arrayLikeToArray(r%2C%20a)%20%7B%20(null%20%3D%3D%20a%20%7C%7C%20a%20%3E%20r.length)%20%26%26%20(a%20%3D%20r.length)%3B%20for%20(var%20e%20%3D%200%2C%20n%20%3D%20Array(a)%3B%20e%20%3C%20a%3B%20e%2B%2B)%20n%5Be%5D%20%3D%20r%5Be%5D%3B%20return%20n%3B%20%7D%0Afunction%20_iterableToArrayLimit(r%2C%20l)%20%7B%20var%20t%20%3D%20null%20%3D%3D%20r%20%3F%20null%20%3A%20%22undefined%22%20!%3D%20typeof%20Symbol%20%26%26%20r%5BSymbol.iterator%5D%20%7C%7C%20r%5B%22%40%40iterator%22%5D%3B%20if%20(null%20!%3D%20t)%20%7B%20var%20e%2C%20n%2C%20i%2C%20u%2C%20a%20%3D%20%5B%5D%2C%20f%20%3D%20!0%2C%20o%20%3D%20!1%3B%20try%20%7B%20if%20(i%20%3D%20(t%20%3D%20t.call(r)).next%2C%200%20%3D%3D%3D%20l)%20%7B%20if%20(Object(t)%20!%3D%3D%20t)%20return%3B%20f%20%3D%20!1%3B%20%7D%20else%20for%20(%3B%20!(f%20%3D%20(e%20%3D%20i.call(t)).done)%20%26%26%20(a.push(e.value)%2C%20a.length%20!%3D%3D%20l)%3B%20f%20%3D%20!0)%3B%20%7D%20catch%20(r)%20%7B%20o%20%3D%20!0%2C%20n%20%3D%20r%3B%20%7D%20finally%20%7B%20try%20%7B%20if%20(!f%20%26%26%20null%20!%3D%20t%5B%22return%22%5D%20%26%26%20(u%20%3D%20t%5B%22return%22%5D()%2C%20Object(u)%20!%3D%3D%20u))%20return%3B%20%7D%20finally%20%7B%20if%20(o)%20throw%20n%3B%20%7D%20%7D%20return%20a%3B%20%7D%20%7D%0Afunction%20_arrayWithHoles(r)%20%7B%20if%20(Array.isArray(r))%20return%20r%3B%20%7D%0A_RTFN_%20%3D%20function%20_RTFN_(_ref)%20%7B%0A%20%20var%20outputs%20%3D%20_ref.outputs%2C%0A%20%20%20%20inputs%20%3D%20_ref.inputs%2C%0A%20%20%20%20logger%20%3D%20_ref.logger%3B%0A%20%20var%20_inputs%20%3D%20_slicedToArray(inputs%2C%201)%2C%0A%20%20%20%20_dayNum%20%3D%20_inputs%5B0%5D%3B%0A%20%20var%20_outputs%20%3D%20_slicedToArray(outputs%2C%201)%2C%0A%20%20%20%20output0%20%3D%20_outputs%5B0%5D%3B%0A%20%20var%20dayNum%20%3D%20parseInt(_dayNum)%3B%0A%20%20var%20list%20%3D%20new%20Array(dayNum).fill(null).map(function%20(i%2C%20index)%20%7B%0A%20%20%20%20var%20date%20%3D%20new%20Date()%3B%0A%20%20%20%20date.setDate(date.getDate()%20-%20index%20-%201)%3B%0A%20%20%20%20var%20year%20%3D%20date.getFullYear()%3B%0A%20%20%20%20var%20month%20%3D%20date.getMonth()%20%2B%201%3B%0A%20%20%20%20var%20day%20%3D%20date.getDate()%3B%0A%20%20%20%20var%20jingzhi%20%3D%20getRandomInt(0.8001%2C%202.0001).toFixed(4)%3B%0A%20%20%20%20var%20zhangfu%20%3D%20getRandomInt(-2.01%2C%204.01).toFixed(2)%3B%0A%20%20%20%20return%20%7B%0A%20%20%20%20%20%20date%3A%20%22%22.concat(year%2C%20%22-%22).concat(month%2C%20%22-%22).concat(day)%2C%0A%20%20%20%20%20%20val1%3A%20jingzhi%2C%0A%20%20%20%20%20%20val2%3A%20jingzhi%2C%0A%20%20%20%20%20%20val3%3A%20zhangfu%0A%20%20%20%20%7D%3B%0A%20%20%7D)%3B%0A%20%20output0(list)%3B%0A%20%20function%20getRandomInt(min%2C%20max)%20%7B%0A%20%20%20%20return%20Math.random()%20*%20(max%20-%20min)%20%2B%20min%3B%0A%20%20%7D%0A%7D%3B%0A%3B%20return%20_RTFN_%3B%20%7D)()"
+                                "code": "(%7B%20outputs%2C%20inputs%2C%20logger%20%7D)%20%3D%3E%20%7B%0A%20%20const%20%5B%20_dayNum%20%5D%20%3D%20inputs%3B%0A%20%20const%20%5B%20output0%20%5D%20%3D%20outputs%3B%0A%0A%20%20const%20dayNum%20%3D%20parseInt(_dayNum)%0A%20%20const%20list%20%3D%20new%20Array(dayNum).fill(null).map((i%2C%20index)%20%3D%3E%20%7B%0A%20%20%20%20const%20date%20%3D%20new%20Date()%0A%20%20%20%20date.setDate(date.getDate()%20-%20index%20-%201)%0A%20%20%20%20const%20year%20%3D%20date.getFullYear()%0A%20%20%20%20const%20month%20%3D%20date.getMonth()%20%2B%201%0A%20%20%20%20const%20day%20%3D%20date.getDate()%0A%0A%20%20%20%20const%20jingzhi%20%3D%20getRandomInt(0.8001%2C%202.0001).toFixed(4)%0A%0A%20%20%20%20const%20zhangfu%20%3D%20getRandomInt(-2.01%2C%204.01).toFixed(2)%0A%0A%20%20%20%20return%20%7B%0A%20%20%20%20%20%20date%3A%20%60%24%7Byear%7D-%24%7Bmonth%7D-%24%7Bday%7D%60%2C%0A%20%20%20%20%20%20val1%3A%20parseFloat(jingzhi)%2C%0A%20%20%20%20%20%20val2%3A%20jingzhi%2C%0A%20%20%20%20%20%20val3%3A%20zhangfu%2C%0A%20%20%20%20%7D%0A%20%20%7D)%0A%0A%20%20output0(list)%3B%0A%0A%20%20function%20getRandomInt(min%2C%20max)%20%7B%0A%20%20%20%20return%20Math.random()%20*%20(max%20-%20min)%20%2B%20min%3B%0A%20%20%7D%0A%7D",
+                                "transformCode": "(function()%20%7B%20var%20_RTFN_%3B%20%0A%22use%20strict%22%3B%0A%0Afunction%20_slicedToArray(r%2C%20e)%20%7B%20return%20_arrayWithHoles(r)%20%7C%7C%20_iterableToArrayLimit(r%2C%20e)%20%7C%7C%20_unsupportedIterableToArray(r%2C%20e)%20%7C%7C%20_nonIterableRest()%3B%20%7D%0Afunction%20_nonIterableRest()%20%7B%20throw%20new%20TypeError(%22Invalid%20attempt%20to%20destructure%20non-iterable%20instance.%5CnIn%20order%20to%20be%20iterable%2C%20non-array%20objects%20must%20have%20a%20%5BSymbol.iterator%5D()%20method.%22)%3B%20%7D%0Afunction%20_unsupportedIterableToArray(r%2C%20a)%20%7B%20if%20(r)%20%7B%20if%20(%22string%22%20%3D%3D%20typeof%20r)%20return%20_arrayLikeToArray(r%2C%20a)%3B%20var%20t%20%3D%20%7B%7D.toString.call(r).slice(8%2C%20-1)%3B%20return%20%22Object%22%20%3D%3D%3D%20t%20%26%26%20r.constructor%20%26%26%20(t%20%3D%20r.constructor.name)%2C%20%22Map%22%20%3D%3D%3D%20t%20%7C%7C%20%22Set%22%20%3D%3D%3D%20t%20%3F%20Array.from(r)%20%3A%20%22Arguments%22%20%3D%3D%3D%20t%20%7C%7C%20%2F%5E(%3F%3AUi%7CI)nt(%3F%3A8%7C16%7C32)(%3F%3AClamped)%3FArray%24%2F.test(t)%20%3F%20_arrayLikeToArray(r%2C%20a)%20%3A%20void%200%3B%20%7D%20%7D%0Afunction%20_arrayLikeToArray(r%2C%20a)%20%7B%20(null%20%3D%3D%20a%20%7C%7C%20a%20%3E%20r.length)%20%26%26%20(a%20%3D%20r.length)%3B%20for%20(var%20e%20%3D%200%2C%20n%20%3D%20Array(a)%3B%20e%20%3C%20a%3B%20e%2B%2B)%20n%5Be%5D%20%3D%20r%5Be%5D%3B%20return%20n%3B%20%7D%0Afunction%20_iterableToArrayLimit(r%2C%20l)%20%7B%20var%20t%20%3D%20null%20%3D%3D%20r%20%3F%20null%20%3A%20%22undefined%22%20!%3D%20typeof%20Symbol%20%26%26%20r%5BSymbol.iterator%5D%20%7C%7C%20r%5B%22%40%40iterator%22%5D%3B%20if%20(null%20!%3D%20t)%20%7B%20var%20e%2C%20n%2C%20i%2C%20u%2C%20a%20%3D%20%5B%5D%2C%20f%20%3D%20!0%2C%20o%20%3D%20!1%3B%20try%20%7B%20if%20(i%20%3D%20(t%20%3D%20t.call(r)).next%2C%200%20%3D%3D%3D%20l)%20%7B%20if%20(Object(t)%20!%3D%3D%20t)%20return%3B%20f%20%3D%20!1%3B%20%7D%20else%20for%20(%3B%20!(f%20%3D%20(e%20%3D%20i.call(t)).done)%20%26%26%20(a.push(e.value)%2C%20a.length%20!%3D%3D%20l)%3B%20f%20%3D%20!0)%3B%20%7D%20catch%20(r)%20%7B%20o%20%3D%20!0%2C%20n%20%3D%20r%3B%20%7D%20finally%20%7B%20try%20%7B%20if%20(!f%20%26%26%20null%20!%3D%20t%5B%22return%22%5D%20%26%26%20(u%20%3D%20t%5B%22return%22%5D()%2C%20Object(u)%20!%3D%3D%20u))%20return%3B%20%7D%20finally%20%7B%20if%20(o)%20throw%20n%3B%20%7D%20%7D%20return%20a%3B%20%7D%20%7D%0Afunction%20_arrayWithHoles(r)%20%7B%20if%20(Array.isArray(r))%20return%20r%3B%20%7D%0A_RTFN_%20%3D%20function%20_RTFN_(_ref)%20%7B%0A%20%20var%20outputs%20%3D%20_ref.outputs%2C%0A%20%20%20%20inputs%20%3D%20_ref.inputs%2C%0A%20%20%20%20logger%20%3D%20_ref.logger%3B%0A%20%20var%20_inputs%20%3D%20_slicedToArray(inputs%2C%201)%2C%0A%20%20%20%20_dayNum%20%3D%20_inputs%5B0%5D%3B%0A%20%20var%20_outputs%20%3D%20_slicedToArray(outputs%2C%201)%2C%0A%20%20%20%20output0%20%3D%20_outputs%5B0%5D%3B%0A%20%20var%20dayNum%20%3D%20parseInt(_dayNum)%3B%0A%20%20var%20list%20%3D%20new%20Array(dayNum).fill(null).map(function%20(i%2C%20index)%20%7B%0A%20%20%20%20var%20date%20%3D%20new%20Date()%3B%0A%20%20%20%20date.setDate(date.getDate()%20-%20index%20-%201)%3B%0A%20%20%20%20var%20year%20%3D%20date.getFullYear()%3B%0A%20%20%20%20var%20month%20%3D%20date.getMonth()%20%2B%201%3B%0A%20%20%20%20var%20day%20%3D%20date.getDate()%3B%0A%20%20%20%20var%20jingzhi%20%3D%20getRandomInt(0.8001%2C%202.0001).toFixed(4)%3B%0A%20%20%20%20var%20zhangfu%20%3D%20getRandomInt(-2.01%2C%204.01).toFixed(2)%3B%0A%20%20%20%20return%20%7B%0A%20%20%20%20%20%20date%3A%20%22%22.concat(year%2C%20%22-%22).concat(month%2C%20%22-%22).concat(day)%2C%0A%20%20%20%20%20%20val1%3A%20parseFloat(jingzhi)%2C%0A%20%20%20%20%20%20val2%3A%20jingzhi%2C%0A%20%20%20%20%20%20val3%3A%20zhangfu%0A%20%20%20%20%7D%3B%0A%20%20%7D)%3B%0A%20%20output0(list)%3B%0A%20%20function%20getRandomInt(min%2C%20max)%20%7B%0A%20%20%20%20return%20Math.random()%20*%20(max%20-%20min)%20%2B%20min%3B%0A%20%20%7D%0A%7D%3B%0A%3B%20return%20_RTFN_%3B%20%7D)()"
                             },
                             "inputSchema": {
                                 "inputValue0": {
@@ -11963,89 +11411,6 @@
                         "direction": "input"
                     }
                 ],
-                "u_ASpO2-column_j50pb-text": [
-                    {
-                        "id": "u_WuFpk",
-                        "type": "com",
-                        "frameKey": "u_ASpO2-column_j50pb",
-                        "targetFrameKey": "u_ASpO2-column_j50pb",
-                        "comId": "u_U0PS1",
-                        "def": {
-                            "namespace": "mybricks.taro._muilt-inputJs",
-                            "version": "1.0.0",
-                            "rtType": "js-autorun"
-                        },
-                        "pinId": "input.inputValue0",
-                        "pinType": "param",
-                        "direction": "input"
-                    }
-                ],
-                "u_U0PS1-output0": [
-                    {
-                        "id": "u_f9zmh",
-                        "type": "com",
-                        "frameKey": "u_ASpO2-column_j50pb",
-                        "targetFrameKey": "u_ASpO2-column_j50pb",
-                        "finishPinParentKey": "u_lb_SN",
-                        "comId": "u_gom3R",
-                        "def": {
-                            "namespace": "mybricks.taro.text",
-                            "version": "1.0.0"
-                        },
-                        "pinId": "value",
-                        "pinType": "normal",
-                        "direction": "input"
-                    },
-                    {
-                        "id": "u_rB9gT",
-                        "type": "com",
-                        "frameKey": "u_ASpO2-column_j50pb",
-                        "targetFrameKey": "u_ASpO2-column_j50pb",
-                        "finishPinParentKey": "u_iq6JE",
-                        "comId": "u_j1kgQ",
-                        "def": {
-                            "namespace": "mybricks.taro.text",
-                            "version": "1.0.0"
-                        },
-                        "pinId": "value",
-                        "pinType": "normal",
-                        "direction": "input"
-                    }
-                ],
-                "u_U0PS1-output1": [
-                    {
-                        "id": "u_ZJCjp",
-                        "type": "com",
-                        "frameKey": "u_ASpO2-column_j50pb",
-                        "targetFrameKey": "u_ASpO2-column_j50pb",
-                        "finishPinParentKey": "u_4tQag",
-                        "comId": "u_Et76s",
-                        "def": {
-                            "namespace": "mybricks.taro.containerCondition2",
-                            "version": "1.0.0"
-                        },
-                        "pinId": "condition_1",
-                        "pinType": "normal",
-                        "direction": "input"
-                    }
-                ],
-                "u_U0PS1-output2": [
-                    {
-                        "id": "u_8H8Py",
-                        "type": "com",
-                        "frameKey": "u_ASpO2-column_j50pb",
-                        "targetFrameKey": "u_ASpO2-column_j50pb",
-                        "finishPinParentKey": "u_PcCUS",
-                        "comId": "u_Et76s",
-                        "def": {
-                            "namespace": "mybricks.taro.containerCondition2",
-                            "version": "1.0.0"
-                        },
-                        "pinId": "condition_2",
-                        "pinType": "normal",
-                        "direction": "input"
-                    }
-                ],
                 "u__Z9ZH-return": [
                     {
                         "id": "u_cu220",
@@ -12150,17 +11515,17 @@
                 ],
                 "u_ucdyG-output0": [
                     {
-                        "id": "u_MLD5l",
+                        "id": "u_GeYTN",
                         "type": "com",
                         "frameKey": "u_jPrnv",
                         "targetFrameKey": "u_jPrnv",
-                        "finishPinParentKey": "u_gLP31",
-                        "comId": "u_ASpO2",
+                        "finishPinParentKey": "u_qUPSE",
+                        "comId": "u_NGbpp",
                         "def": {
-                            "namespace": "mybricks.taro.table",
-                            "version": "1.0.1"
+                            "namespace": "mybricks.taro.chart.line",
+                            "version": "1.0.0"
                         },
-                        "pinId": "setDataSource",
+                        "pinId": "data",
                         "pinType": "normal",
                         "direction": "input"
                     }
@@ -12251,36 +11616,6 @@
                 "u_px6Ln-setOptions": [
                     "setOptionsComplete"
                 ],
-                "u_xFzk7-getValue": [
-                    "onGetValue"
-                ],
-                "u_ASpO2-getDataSource": [
-                    "afterGetDataSource"
-                ],
-                "u_ASpO2-setTableHeader": [
-                    "afterSetTableHeader"
-                ],
-                "u_ASpO2-setDataSource": [
-                    "afterSetDataSource"
-                ],
-                "u_ASpO2-addDataSource": [
-                    "afterAddDataSource"
-                ],
-                "u_Et76s-setValue": [
-                    "setValueDone"
-                ],
-                "u_Et76s-condition_1": [
-                    "changeDone"
-                ],
-                "u_Et76s-condition_2": [
-                    "changeDone"
-                ],
-                "u_gom3R-getValue": [
-                    "onGetValue"
-                ],
-                "u_j1kgQ-getValue": [
-                    "onGetValue"
-                ],
                 "u__Z9ZH-get": [
                     "return"
                 ],
@@ -12307,6 +11642,9 @@
                 ],
                 "u_BWx86-setEnabled": [
                     "setEnabledSuccess"
+                ],
+                "u_NGbpp-data": [
+                    "afterrender"
                 ]
             },
             "pinProxies": {
@@ -12756,90 +12094,11 @@
                                                                         }
                                                                     },
                                                                     {
-                                                                        "id": "u_xFzk7",
-                                                                        "name": "u_zldPB",
+                                                                        "id": "u_NGbpp",
+                                                                        "name": "u_zObfH",
                                                                         "def": {
-                                                                            "namespace": "mybricks.taro.text",
+                                                                            "namespace": "mybricks.taro.chart.line",
                                                                             "version": "1.0.0"
-                                                                        }
-                                                                    }
-                                                                ],
-                                                                "style": {
-                                                                    "justifyContent": "flex-start",
-                                                                    "alignItems": "flex-start",
-                                                                    "layout": "flex-column"
-                                                                }
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        "id": "u_BfozX",
-                                                        "name": "u_mpBJP",
-                                                        "def": {
-                                                            "namespace": "mybricks.taro.containerBasic",
-                                                            "version": "1.0.0"
-                                                        },
-                                                        "slots": {
-                                                            "content": {
-                                                                "id": "content",
-                                                                "title": "插槽",
-                                                                "comAry": [
-                                                                    {
-                                                                        "id": "u_ASpO2",
-                                                                        "name": "u_a_0A9",
-                                                                        "def": {
-                                                                            "namespace": "mybricks.taro.table",
-                                                                            "version": "1.0.1"
-                                                                        },
-                                                                        "slots": {
-                                                                            "column_j50pb": {
-                                                                                "id": "column_j50pb",
-                                                                                "title": "表格列 日涨跌幅 | val3",
-                                                                                "type": "scope",
-                                                                                "comAry": [
-                                                                                    {
-                                                                                        "id": "u_Et76s",
-                                                                                        "name": "u_TJtpK",
-                                                                                        "def": {
-                                                                                            "namespace": "mybricks.taro.containerCondition2",
-                                                                                            "version": "1.0.0"
-                                                                                        },
-                                                                                        "slots": {
-                                                                                            "condition_1": {
-                                                                                                "id": "condition_1",
-                                                                                                "title": "条件1",
-                                                                                                "comAry": [
-                                                                                                    {
-                                                                                                        "id": "u_gom3R",
-                                                                                                        "name": "u_14RDd",
-                                                                                                        "def": {
-                                                                                                            "namespace": "mybricks.taro.text",
-                                                                                                            "version": "1.0.0"
-                                                                                                        }
-                                                                                                    }
-                                                                                                ],
-                                                                                                "style": {}
-                                                                                            },
-                                                                                            "condition_2": {
-                                                                                                "id": "condition_2",
-                                                                                                "title": "条件2",
-                                                                                                "comAry": [
-                                                                                                    {
-                                                                                                        "id": "u_j1kgQ",
-                                                                                                        "name": "u_IBrvr",
-                                                                                                        "def": {
-                                                                                                            "namespace": "mybricks.taro.text",
-                                                                                                            "version": "1.0.0"
-                                                                                                        }
-                                                                                                    }
-                                                                                                ],
-                                                                                                "style": {}
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                ],
-                                                                                "style": {}
-                                                                            }
                                                                         }
                                                                     }
                                                                 ],
@@ -12983,14 +12242,7 @@
         }
     ],
     "plugins": {
-        "@mybricks/plugins/service": {
-            "connectors": [],
-            "config": {
-                "paramsFn": "function _RT_({ params, data, headers, url, method }) {\n\n  return { params, data, headers, url, method };\n }",
-                "resultFn": "function _RT_({ response, config }, { throwError }) {\n\n\n\n\n  return response\n}",
-                "errorResultFn": "function _RT_({ error, response, config }, { throwError }) {\n\n\n  throwError(response.data.message || error.message || error);\n}"
-            }
-        }
+        "@mybricks/plugins/service": []
     },
     "type": "mpa",
     "frames": [
@@ -13872,8 +13124,7 @@
                             "id": "u_KDhfr",
                             "title": "工作室",
                             "createTime": 1768815253027,
-                            "updateTime": 1768881545193,
-                            "updated": true,
+                            "updateTime": 1769007935449,
                             "starter": {
                                 "type": "frame",
                                 "frameId": "u_YSO_1",
@@ -14027,193 +13278,7 @@
                     "id": "u_Z5tmj",
                     "title": "基金详情",
                     "type": "frame",
-                    "coms": {
-                        "u_ASpO2": {
-                            "id": "u_ASpO2",
-                            "title": "数据表格",
-                            "namespace": "mybricks.taro.table",
-                            "version": "1.0.1",
-                            "frames": [
-                                {
-                                    "id": "column_j50pb",
-                                    "title": "数据表格 | 表格列 日涨跌幅 | column_j50pb",
-                                    "type": "com",
-                                    "coms": {},
-                                    "autoRunComs": {},
-                                    "inputs": [
-                                        {
-                                            "pinId": "text",
-                                            "title": "当前列数据",
-                                            "type": "normal",
-                                            "schema": {
-                                                "type": "any"
-                                            }
-                                        },
-                                        {
-                                            "pinId": "record",
-                                            "title": "当前行数据",
-                                            "type": "normal",
-                                            "schema": {
-                                                "type": "object"
-                                            }
-                                        },
-                                        {
-                                            "pinId": "index",
-                                            "title": "当前行序号",
-                                            "type": "normal",
-                                            "schema": {
-                                                "type": "number"
-                                            }
-                                        }
-                                    ],
-                                    "outputs": [],
-                                    "frames": [],
-                                    "diagrams": [
-                                        {
-                                            "id": "u_lu9D9",
-                                            "title": "数据表格 | 表格列 日涨跌幅 | column_j50pb",
-                                            "createTime": 1768832845173,
-                                            "updateTime": 1768834228809,
-                                            "starter": {
-                                                "type": "frame",
-                                                "frameId": "column_j50pb",
-                                                "pinAry": [
-                                                    {
-                                                        "id": "text",
-                                                        "title": "当前列数据",
-                                                        "type": "normal"
-                                                    },
-                                                    {
-                                                        "id": "record",
-                                                        "title": "当前行数据",
-                                                        "type": "normal"
-                                                    },
-                                                    {
-                                                        "id": "index",
-                                                        "title": "当前行序号",
-                                                        "type": "normal"
-                                                    }
-                                                ]
-                                            },
-                                            "conAry": [
-                                                {
-                                                    "id": "u_WuFpk",
-                                                    "title": "从 当前列数据 到 参数0 的连接",
-                                                    "from": {
-                                                        "id": "text",
-                                                        "title": "当前列数据",
-                                                        "parent": {
-                                                            "type": "frame",
-                                                            "id": "column_j50pb"
-                                                        }
-                                                    },
-                                                    "to": {
-                                                        "id": "input.inputValue0",
-                                                        "title": "参数0",
-                                                        "type": "param",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_U0PS1"
-                                                        }
-                                                    }
-                                                },
-                                                {
-                                                    "id": "u_f9zmh",
-                                                    "title": "从 输出项0 到 修改内容 的连接",
-                                                    "finishPinParentKey": "u_lb_SN",
-                                                    "from": {
-                                                        "id": "output0",
-                                                        "title": "输出项0",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_U0PS1"
-                                                        }
-                                                    },
-                                                    "to": {
-                                                        "id": "value",
-                                                        "title": "修改内容",
-                                                        "type": "normal",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_gom3R"
-                                                        }
-                                                    }
-                                                },
-                                                {
-                                                    "id": "u_rB9gT",
-                                                    "title": "从 输出项0 到 修改内容 的连接",
-                                                    "finishPinParentKey": "u_iq6JE",
-                                                    "from": {
-                                                        "id": "output0",
-                                                        "title": "输出项0",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_U0PS1"
-                                                        }
-                                                    },
-                                                    "to": {
-                                                        "id": "value",
-                                                        "title": "修改内容",
-                                                        "type": "normal",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_j1kgQ"
-                                                        }
-                                                    }
-                                                },
-                                                {
-                                                    "id": "u_ZJCjp",
-                                                    "title": "从 输出项1 到 切换到 条件1 的连接",
-                                                    "finishPinParentKey": "u_4tQag",
-                                                    "from": {
-                                                        "id": "output1",
-                                                        "title": "输出项1",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_U0PS1"
-                                                        }
-                                                    },
-                                                    "to": {
-                                                        "id": "condition_1",
-                                                        "title": "切换到 条件1",
-                                                        "type": "normal",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_Et76s"
-                                                        }
-                                                    }
-                                                },
-                                                {
-                                                    "id": "u_8H8Py",
-                                                    "title": "从 输出项2 到 切换到 条件2 的连接",
-                                                    "finishPinParentKey": "u_PcCUS",
-                                                    "from": {
-                                                        "id": "output2",
-                                                        "title": "输出项2",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_U0PS1"
-                                                        }
-                                                    },
-                                                    "to": {
-                                                        "id": "condition_2",
-                                                        "title": "切换到 条件2",
-                                                        "type": "normal",
-                                                        "parent": {
-                                                            "type": "com",
-                                                            "id": "u_Et76s"
-                                                        }
-                                                    }
-                                                }
-                                            ],
-                                            "runtimeBefore": [],
-                                            "runtimeAfter": []
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    },
+                    "coms": {},
                     "autoRunComs": {},
                     "inputs": [
                         {
@@ -14397,7 +13462,8 @@
                                     "id": "u_l99xL",
                                     "title": "获取数据",
                                     "createTime": 1768833219402,
-                                    "updateTime": 1768835094635,
+                                    "updateTime": 1769008895565,
+                                    "updated": true,
                                     "starter": {
                                         "type": "frame",
                                         "frameId": "u_jPrnv",
@@ -14455,9 +13521,9 @@
                                             }
                                         },
                                         {
-                                            "id": "u_MLD5l",
-                                            "title": "从 输出项0 到 设置数据 的连接",
-                                            "finishPinParentKey": "u_gLP31",
+                                            "id": "u_GeYTN",
+                                            "title": "从 输出项0 到 输入数据 的连接",
+                                            "finishPinParentKey": "u_qUPSE",
                                             "from": {
                                                 "id": "output0",
                                                 "title": "输出项0",
@@ -14467,12 +13533,12 @@
                                                 }
                                             },
                                             "to": {
-                                                "id": "setDataSource",
-                                                "title": "设置数据",
+                                                "id": "data",
+                                                "title": "输入数据",
                                                 "type": "normal",
                                                 "parent": {
                                                     "type": "com",
-                                                    "id": "u_ASpO2"
+                                                    "id": "u_NGbpp"
                                                 }
                                             }
                                         }
@@ -14488,7 +13554,7 @@
                             "id": "u_gvrz8",
                             "title": "基金详情",
                             "createTime": 1768829371514,
-                            "updateTime": 1768872870671,
+                            "updateTime": 1769008900740,
                             "updated": true,
                             "starter": {
                                 "type": "frame",
@@ -14858,71 +13924,6 @@
                         "type": "frame",
                         "frameId": "u_dWsMk",
                         "pinAry": []
-                    },
-                    "conAry": [],
-                    "runtimeBefore": [],
-                    "runtimeAfter": []
-                }
-            ]
-        },
-        {
-            "id": "u_RVKqs",
-            "title": "当页面加载时",
-            "type": "extension",
-            "coms": {},
-            "autoRunComs": {},
-            "inputs": [
-                {
-                    "pinId": "onLoad",
-                    "title": "页面加载",
-                    "type": "normal",
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "description": "当前页面 ID"
-                            },
-                            "path": {
-                                "type": "string",
-                                "description": "当前页面路径"
-                            },
-                            "query": {
-                                "type": "object",
-                                "description": "当前页面参数"
-                            }
-                        }
-                    }
-                }
-            ],
-            "outputs": [
-                {
-                    "id": "next",
-                    "title": "继续",
-                    "type": "normal",
-                    "schema": {
-                        "type": "any"
-                    }
-                }
-            ],
-            "frames": [],
-            "diagrams": [
-                {
-                    "id": "u_WBs0r",
-                    "title": "当页面加载时",
-                    "createTime": 1768872533215,
-                    "updateTime": 1768872533215,
-                    "updated": true,
-                    "starter": {
-                        "type": "frame",
-                        "frameId": "u_RVKqs",
-                        "pinAry": [
-                            {
-                                "id": "onLoad",
-                                "title": "页面加载",
-                                "type": "normal"
-                            }
-                        ]
                     },
                     "conAry": [],
                     "runtimeBefore": [],

@@ -1,0 +1,16 @@
+{
+  "type": "pie",
+  "config": {
+    "xField": "label",
+    "yField": "value",
+    "xAxis": {},
+    "yAxis": {},
+    "legend": {
+      "position": "right"
+    },
+    "seriesField": "",
+    "padding": "auto",
+    "label": false,
+    "smooth": false
+  }
+}

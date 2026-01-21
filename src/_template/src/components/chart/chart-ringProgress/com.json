@@ -1,0 +1,43 @@
+{
+  "title": "环形进度图",
+  "namespace": "mybricks.taro.chart.ringProgress",
+  "author": "mybricks-team",
+  "author_name": "板砖团队",
+  "icon": "./icon.svg",
+  "version": "1.0.0",
+  "description": "环形进度图",
+  "runtime": "./runtime.tsx",
+  "runtime.edit": "./runtime.edit.tsx",
+  "data": "./data.json",
+  "editors": "./editors.tsx",
+  "inputs": [
+    {
+      "id": "data",
+      "title": "输入数据",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "title": "数值",
+            "type": "number"
+          },
+          "label": {
+            "title": "标签",
+            "type": "string"
+          },
+          "config": {
+            "title": "颜色字体等配置",
+            "type": "object"
+          }
+        }
+      }
+    } 
+  ],
+  "outputs": [
+    
+    {
+      "id": "afterrender",
+      "title": "渲染完成"
+    }
+  ]
+}

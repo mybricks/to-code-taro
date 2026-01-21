@@ -1,0 +1,21 @@
+{
+  "type": "ringProgress",
+  "config": {
+    "color": "#1E90FF",
+    "backgroundColor": "#eee",
+    "size": 100,
+    "strokeWidth": 10,
+    "isShowLabel" : true,
+    "isShowSubLabel" :true,
+    "labelDistance" : 10,
+    "labelSize" : 14, 
+    "labelColor" :"#eee",
+    "subLabelSize" :30,
+    "subLabelColor":"#000",
+    "label":"",
+    "subLabel":""
+  },
+  "value": 0,
+  "label": "进度"
+}
+ 
