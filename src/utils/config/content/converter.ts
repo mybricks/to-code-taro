@@ -32,13 +32,13 @@ function convertTabBarItem(
   if (item.normalIconPath) {
     taroItem.iconPath = processIcon
       ? processIcon(item.normalIconPath, index, 'normal')
-      : item.normalIconPath;
+      : item.normalIconPath.replace(/^\/?@\//, "");
   }
 
   if (item.selectedIconPath) {
     taroItem.selectedIconPath = processIcon
       ? processIcon(item.selectedIconPath, index, 'selected')
-      : item.selectedIconPath;
+      : item.selectedIconPath.replace(/^\/?@\//, "");
   }
 
   return taroItem;

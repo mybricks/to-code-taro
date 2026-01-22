@@ -83,7 +83,7 @@ export function processTabBarIcon(
   if (!iconPath) return undefined;
 
   const parsed = parseBase64Image(iconPath);
-  if (!parsed) return iconPath;
+  if (!parsed) return iconPath.replace(/^\/?@\//, "");
 
   const extension = getFileExtension(parsed.mimeType);
   const fileName = generateFileName(tabBarIndex, type, extension);
