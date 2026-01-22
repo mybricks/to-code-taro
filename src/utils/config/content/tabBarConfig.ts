@@ -83,11 +83,17 @@ export function generateCustomTabBarFileContent(
 ): string {
   const customTabbarConfig = tabBar.map((item, index) => {
     const {iconPath, selectedIconPath} = config.list[index]
+    const cleanPath = (p: string | undefined) => {
+      if (!p) return undefined;
+      const cleaned = p.replace(/^\/?@\//, "").replace(/^\//, "");
+      return `/${cleaned}`;
+    };
+
     return {
       ...item,
       pagePath: config.list[index].pagePath,
-      normalIconPath: iconPath ? `/${iconPath}` : undefined,
-      selectedIconPath: selectedIconPath ? `/${selectedIconPath}` : undefined,
+      normalIconPath: cleanPath(iconPath),
+      selectedIconPath: cleanPath(selectedIconPath),
     }
   })
   const tabBarJson = JSON.stringify(customTabbarConfig, null, 2);
