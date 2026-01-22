@@ -12,7 +12,9 @@
     "padding": "auto",
     "label": false,
     "xFieldScrollable": false,
-    "smooth": false
+    "smooth": false,
+    "xFieldTickCount": 0
   },
-  "useCustomTooltip": false
+  "useCustomTooltip": false,
+  "showTooltipTitle": false
 }

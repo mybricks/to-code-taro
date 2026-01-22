@@ -11029,7 +11029,8 @@
                                 "seriesField": "",
                                 "padding": "auto",
                                 "label": false,
-                                "xFieldScrollable": false
+                                "xFieldScrollable": false,
+                                "xFieldTickCount": 2
                             },
                             "geo": {
                                 "line": {
@@ -11043,13 +11044,15 @@
                                     "show": false
                                 }
                             },
-                            "useCustomTooltip": false
+                            "useCustomTooltip": false,
+                            "showTooltipTitle": true
                         },
                         "outputEvents": {},
                         "style": {
-                            "height": 150,
+                            "height": 292,
                             "width": "100%",
                             "heightReverse": false,
+                            "marginTop": 10,
                             "zIndex": 2,
                             "_new": true
                         }
@@ -13463,7 +13466,6 @@
                                     "title": "获取数据",
                                     "createTime": 1768833219402,
                                     "updateTime": 1769008895565,
-                                    "updated": true,
                                     "starter": {
                                         "type": "frame",
                                         "frameId": "u_jPrnv",
@@ -13554,7 +13556,7 @@
                             "id": "u_gvrz8",
                             "title": "基金详情",
                             "createTime": 1768829371514,
-                            "updateTime": 1769008900740,
+                            "updateTime": 1769066963636,
                             "updated": true,
                             "starter": {
                                 "type": "frame",

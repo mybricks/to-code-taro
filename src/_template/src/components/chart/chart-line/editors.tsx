@@ -36,7 +36,18 @@ export default {
         yFieldDisplay: true,
       }),
       getLegendEditors({}),
-      {},
+      {
+        title: "Tooltip显示标题",
+        type: "switch",
+        value: {
+          get({ data }) {
+            return data.showTooltipTitle;
+          },
+          set({ data, outputs }, value) {
+            data.showTooltipTitle = value;
+          },
+        },
+      },
       {
         title: "自定义 Tooltip",
         type: "switch",

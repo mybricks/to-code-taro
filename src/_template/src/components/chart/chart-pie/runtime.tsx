@@ -26,6 +26,16 @@ export default function ({
 
   const tickit = useRef(null);
 
+  const changeSize = useCallback(
+    (width, height) => {
+      if (!chart) {
+        return;
+      }
+      chart.changeSize(width, height);
+    },
+    [chart]
+  );
+
   useMemo(() => {
     inputs["loading"]?.((bool) => {
       setStatus(LoadStatus.LOADING);
@@ -180,7 +190,7 @@ export default function ({
   ]);
 
   return (
-    <ChartStatus status={status} {...events}>
+    <ChartStatus env={env} status={status} {...events} onResize={changeSize}>
       <Canvas className={css.chart_line} {...props} />
     </ChartStatus>
   );
