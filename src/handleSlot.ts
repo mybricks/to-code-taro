@@ -6,7 +6,7 @@ import {
   wrapInEffect
 } from "./utils/templates/scene";
 import { RenderManager } from "./utils/templates/renderManager";
-import { processChildren } from "./utils/logic/processChildren";
+import { processChildren, normalizeChildren } from "./utils/logic/processChildren";
 import { processSceneLogic } from "./processors/processSceneLogic";
 
 import type { UI, BaseConfig } from "./toCodeTaro";
@@ -29,8 +29,8 @@ interface HandleSlotConfig extends BaseConfig {
 const handleSlot = (ui: UI, config: HandleSlotConfig) => {
   const importManager = new ImportManager(config);
   const { props = {} as any } = ui;
-  // 支持 children 或 comAry (DSL 常用名)
-  const children = ui.children || (ui as any).comAry || [];
+  // 使用归一化处理器
+  const children = normalizeChildren(ui);
   const isRoot = config.checkIsRoot();
   const slotId = (ui as any).meta?.id || (ui as any).id;
 
@@ -93,6 +93,7 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
     cssContent,
     slots: [],
     scopeSlots: [],
+    directChildren: childResults.directChildren,
     childrenResults: childResults.childrenResults,
   };
 };
@@ -134,7 +135,10 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
  */
 const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults: any, config: any) => {
   const indent = indentation(config.codeStyle!.indent * config.depth);
-  const mergedStyle = { width: "100%", height: "100%", ...(ui.style || {}), ...(props.style || {}) };
+  const slotStyle = ui.style || {};
+  const propsStyle = props.style || {};
+  const mergedStyle = { width: "100%", height: "100%", ...slotStyle, ...propsStyle };
+  
   // 鸿蒙化：优先使用 config 中传递的 layout（来自父容器 data.layout），否则使用 slot 自身的 layout
   const layout = config.layout || ui.layout || mergedStyle.layout;
   const hasFixedChildStyle = hasFixedChildren(childrenResults) ? { transform: "translateX(0)" } : {};

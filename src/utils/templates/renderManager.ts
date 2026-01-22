@@ -52,15 +52,16 @@ export class RenderManager {
         children.forEach((child) => {
           if (child.type === "com") {
             const varName = `${child.id}_JSX`;
-            const comJsx = child.ui.trim();
+            const comJsx = child.ui; // 保持原始字符串（包含可能的 Fragment 或 View 包裹）
             comVars[child.id] = varName;
             
             code += `${indent}${indent2}const ${varName} = (\n`;
-            code += `${indent}${indent3}${comJsx}\n`;
+            // 内部定义时 trim 掉外层缩进，保持变量内容整洁
+            code += `${indent}${indent3}${comJsx.trim()}\n`;
             code += `${indent}${indent2});\n`;
 
-            // 替换渲染结构中的组件调用为变量引用
-            const pattern = new RegExp(`<WithCom\\s+[^>]*id=['"]${child.id}['"][\\s\\S]*?/>|<WithCom\\s+[^>]*id=['"]${child.id}['"][\\s\\S]*?>[\\s\\S]*?</WithCom>`, 'g');
+            // 优化：使用宽容空白匹配正则
+            const pattern = this.createFlexibleRegex(comJsx.trim());
             modifiedRenderCode = modifiedRenderCode.replace(pattern, `{${varName}}`);
           }
         });
@@ -103,6 +104,15 @@ export class RenderManager {
     });
 
     return code;
+  }
+
+  /**
+   * 转义字符串并创建能够匹配任意空白符的正则
+   */
+  private createFlexibleRegex(str: string): RegExp {
+    const escaped = str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // 转义正则元字符
+                       .replace(/\s+/g, '\\s+');               // 将所有空白符替换为 \s+
+    return new RegExp(escaped, 'g');
   }
 
   genRenderRef(slotId: string, renderId: string, indent: string): string {

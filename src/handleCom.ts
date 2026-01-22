@@ -4,6 +4,7 @@ import { indentation, firstCharToUpperCase, formatSlotContent, getUiComponentCod
 import { genSlotRenderRef } from "./utils/templates/component";
 import { RenderManager } from "./utils/templates/renderManager";
 import handleSlot from "./handleSlot";
+import handleDom from "./handleDom";
 import { processComEvents } from "./processors/processComEvents";
 import { handleProcess } from "./utils/logic/handleProcess";
 
@@ -44,12 +45,32 @@ export const handleCom = (com: Com, config: HandleComConfig): HandleComResult =>
   const { cssContent, rootStyle } = prepareStyles(com);
   let accumulatedCssContent = cssContent;
 
+  // 鸿蒙化：如果存在内置子节点（child），确保容器为 relative，以便内部绝对定位生效
+  if (com.child) {
+    rootStyle.position = "relative";
+  }
+
   // 4. 处理插槽
   const { slotsCode, accumulatedCssContent: slotCss, eventCode, childrenResults } = processComSlots(com, config, accumulatedCssContent);
   accumulatedCssContent = slotCss;
 
-  // 5. 生成 UI 代码
-  const ui = generateUiCode(com, config, componentName, rootStyle, comEventCode, slotsCode, eventHandlers);
+  // 5. 处理组件内置子节点 (child 属性，常用于自由布局中的绝对定位包装层)
+  let childrenUi = "";
+  if (com.child) {
+    const childResult = handleDom(com.child, {
+      ...config,
+      depth: config.depth + 1,
+    });
+    childrenUi = childResult.ui;
+    if (childResult.cssContent) {
+      accumulatedCssContent += (accumulatedCssContent ? "\n" : "") + childResult.cssContent;
+    }
+  }
+
+  // 6. 生成 UI 代码 (支持嵌套子节点)
+  const ui = generateUiCode(com, config, componentName, rootStyle, comEventCode, slotsCode, eventHandlers, childrenUi);
+
+  const hasEvents = Object.keys(eventHandlers).length > 0;
 
   return {
     slots: [],
@@ -57,7 +78,7 @@ export const handleCom = (com: Com, config: HandleComConfig): HandleComResult =>
     ui,
     js: eventCode,
     cssContent: accumulatedCssContent,
-    outputsConfig: Object.keys(eventHandlers).length > 0 ? { [meta.id]: eventHandlers } : undefined,
+    outputsConfig: hasEvents ? { [meta.id]: eventHandlers } : undefined,
     childrenResults,
     name: (meta as any).name, // 返回解析后的稳定名称
     rootStyle, // 返回转换后的根样式
@@ -149,15 +170,15 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
     }
 
     const renderId = `${meta.id}_${slotId}`;
-    const baseIndentSize = config.codeStyle!.indent;
-    const renderBodyIndent = indentation(config.codeStyle!.indent * 2);
-
-    const formattedContent = formatSlotContent(result.ui, baseIndentSize, renderBodyIndent);
+    
+    // 关键：不再预先 formatSlotContent，而是将原始 ui 传给 renderManager
+    // 这样 RenderManager 在内部进行精确字符串替换时才能匹配成功
+    const rawContent = result.ui;
     
     // 鸿蒙化处理：针对表单容器进行别名对齐
-    if (meta.def.namespace === "mybricks.taro.formContainer" && Array.isArray((props.data as any)?.items) && result.childrenResults) {
+    if (meta.def.namespace === "mybricks.taro.formContainer" && Array.isArray((props.data as any)?.items) && result.directChildren) {
       const items = (props.data as any)?.items;
-      result.childrenResults.forEach((childRes: any) => {
+      result.directChildren.forEach((childRes: any) => {
         const itemConfig = items.find((it: any) => it.id === childRes.id);
         if (itemConfig?.comName) {
           childRes.name = itemConfig.comName;
@@ -171,7 +192,7 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
     const logicCode = buildSlotLogicCode({
       parentComId: meta.id,
       slotKey: slotId,
-      children: result.childrenResults,
+      children: result.directChildren,
       config,
     });
 
@@ -180,8 +201,8 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
 
     renderManager.register(
       renderId, 
-      formattedContent, 
-      result.childrenResults, 
+      rawContent, 
+      result.directChildren, // 仅传入直接子组件，避免递归替换导致的结构破坏
       logicCode,
       slot.type,
       slot.wrap || slot.itemWrap || COM_PROTOCOL[meta.def.namespace]?.useWrap,
@@ -262,6 +283,7 @@ const generateUiCode = (
   comEventCode: string,
   slotsCode: string,
   eventHandlers: any,
+  childrenUi?: string,
 ) => {
   const { meta, props } = com;
   const scene = config.getCurrentScene();
@@ -278,6 +300,7 @@ const generateUiCode = (
       comEventCode,
       slotsCode,
       eventHandlers,
+      childrenUi,
     },
     {
       codeStyle: config.codeStyle!,

@@ -109,6 +109,7 @@ export const WithCom: React.FC<WithComProps> = (props) => {
     show || isPopup ? (
       <View className={className} style={{ ...style, ...dynamicStyle }} >
         {jsx}
+        {props.children}
       </View>
     ) : null
   );
