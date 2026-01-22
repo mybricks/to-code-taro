@@ -145,9 +145,13 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
   const slotEntries = Object.entries(slots);
   
   slotEntries.forEach(([slotId, slot]: [string, any], index) => {
-    // 鸿蒙规范：如果插槽内没有组件，跳过渲染
+    // 鸿蒙规范：如果插槽内没有组件，直接渲染空
     const children = slot.comAry || slot.children || [];
+    const isLast = index === slotEntries.length - 1;
+    const slotIndent = indentation(config.codeStyle!.indent * (config.depth + 2));
+
     if (children.length === 0) {
+      slotsCode += `${slotIndent}${slotId}: {\n${slotIndent}  render: () => null\n${slotIndent}}${isLast ? '' : ','}\n`;
       return;
     }
 
@@ -213,12 +217,11 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
       allChildrenResults = allChildrenResults.concat(result.childrenResults);
     }
 
-    const slotIndent = indentation(config.codeStyle!.indent * (config.depth + 2));
     slotsCode += genSlotRenderRef({
       slotId,
       renderId,
       indent: slotIndent,
-      isLast: index === slotEntries.length - 1,
+      isLast,
     });
   });
 
