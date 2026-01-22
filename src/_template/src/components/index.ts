@@ -63,3 +63,10 @@ export { default as ChannelVideo } from "./channelVideo/runtime";
 export { default as Line } from "./line/runtime";
 export { default as Anchor } from "./anchor/runtime";
 export { default as Support } from "./support/runtime";
+
+// 图表组件
+export { default as ChartColumn } from "./chart/chart-column/runtime";
+export { default as ChartLine } from "./chart/chart-line/runtime";
+export { default as ChartPie } from "./chart/chart-pie/runtime";
+export { default as ChartRadar } from "./chart/chart-radar/runtime";
+export { default as ChartRingProgress } from "./chart/chart-ringProgress/runtime";

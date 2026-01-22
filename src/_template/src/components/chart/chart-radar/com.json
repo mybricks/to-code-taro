@@ -1,0 +1,62 @@
+{
+  "title": "雷达图",
+  "namespace": "mybricks.taro.chart.radar",
+  "author": "mybricks-team",
+  "author_name": "板砖团队",
+  "icon": "./icon.svg",
+  "version": "1.0.0",
+  "description": "雷达图",
+  "runtime": "./runtime.tsx",
+  "runtime.edit": "./runtime.edit.tsx",
+  "data": "./data.json",
+  "editors": "./editors.tsx",
+  "inputs": [
+    {
+      "id": "data",
+      "title": "输入数据",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "xField": {
+              "title": "x轴字段名",
+              "type": "string"
+            },
+            "yField": {
+              "title": "y轴字段名",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "loading",
+      "title": "切换到加载中",
+      "desc": "提示用户正在加载中",
+      "schema": {
+        "type": "boolean"
+      }
+    },
+    {
+      "id": "noMore",
+      "title": "切换到没有数据",
+      "desc": "提示用户当前没有数据",
+      "schema": {
+        "type": "boolean"
+      }
+    },
+    {
+      "id": "error",
+      "title": "切换到加载报错",
+      "desc": "提示用户报错信息",
+      "schema": {
+        "type": "boolean"
+      }
+    }
+  ],
+  "outputs": [
+    
+  ]
+}

@@ -15,6 +15,9 @@ import testData from './test-data.json';
 
 // 示例测试代码
 async function runCode() {
+  // 组件namespace前缀
+  const compNamespace = 'mybricks.taro'
+
   try {
     // 配置 toCodeTaro 的参数
     const config = {
@@ -22,7 +25,7 @@ async function runCode() {
         const { namespace = "" } = com.def || {};
 
         // JS API 组件（以 _ 开头，如 _showToast）
-        if (namespace.startsWith("mybricks.taro._")) {
+        if (namespace.startsWith(`${compNamespace}._`)) {
           const importName = convertNamespaceToImportName(namespace);
           return {
             importInfo: {
@@ -36,7 +39,7 @@ async function runCode() {
         }
 
         // 普通组件：从 namespace 中提取组件名
-        const componentName = namespace.split(".").pop()?.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase()) || "Component";
+        const componentName = namespace.replace(`${compNamespace}.`, "").replace(/[_\-\.]([a-zA-Z])/g, (_: any, letter: string) => letter.toUpperCase()) || "Component";
         return {
           importInfo: {
             name: componentName,

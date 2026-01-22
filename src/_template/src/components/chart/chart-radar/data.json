@@ -1,0 +1,27 @@
+{
+  "type": "radar",
+  "config": {
+    "xField": "label",
+    "yField": "value",
+    "xAxis": {},
+    "yAxis": {},
+    "legend": {
+      "position": "right"
+    },
+    "seriesField": "",
+    "padding": "auto",
+    "label": false
+  },
+  "geo": {
+    "line": {
+      "show": true,
+      "smooth": false
+    },
+    "dot": {
+      "show": true
+    },
+    "area": {
+      "show": false
+    }
+  }
+}
