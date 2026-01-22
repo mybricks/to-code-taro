@@ -4,6 +4,7 @@ import type { ImageFileInfo } from "../utils/config/content";
 import { findDir, ensureDir } from "./utils/fileNode";
 import { handleCommonDir } from "./utils/commonDir";
 import { handleTabBarImages } from "./utils/tabBarImages";
+import { handlePageImages } from "./utils/pageImages";
 import { updateAppConfig } from "./utils/appConfig";
 import type { GenerationResult, GeneratedFile } from "../toCodeTaro";
 import { genScopedJSModules } from "../utils/logic/genJSModules";
@@ -52,6 +53,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
 
   // 从 assets 中获取 TabBar 图片文件信息
   const imageFiles: ImageFileInfo[] = assets.tabBarImages || [];
+  const pageImages: ImageFileInfo[] = (assets as any).pageImages || [];
 
   // 过滤出类型为 normal 的项
   const normalItems = files.filter((item) => item.type === "normal");
@@ -160,6 +162,9 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
 
   // 处理 TabBar 图片文件
   handleTabBarImages(tabbarDir, imageFiles);
+
+  // 处理页面 base64 图片文件（与 tabbar 同级别）
+  handlePageImages(assetsDir, pageImages);
 
   // 替换自定义 Tabbar 配置文件
   const CUSTOM_TAB_BAR_CONFIG_PATH = "src/custom-tab-bar/mybricks/tabbar-config.ts"

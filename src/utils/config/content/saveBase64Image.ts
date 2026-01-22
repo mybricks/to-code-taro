@@ -50,6 +50,9 @@ function parseBase64Image(base64Str: string): ParsedBase64Image | null {
 const getFileExtension = (mimeType: string): string =>
   MIME_TO_EXT[mimeType.toLowerCase()] ?? "png";
 
+const sanitizeName = (name: string): string =>
+  name.replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 64) || "img";
+
 /**
  * 生成唯一的文件名
  * @param index TabBar 项的索引
@@ -100,4 +103,63 @@ export function processTabBarIcon(
   }
 
   return configPath;
+}
+
+/**
+ * 处理页面/组件 data 中的 base64 图片
+ * - 图片文件保存到 src/assets/<pageId>/ 目录（与 tabbar 同级）
+ * - data 中替换为 "@/assets/<pageId>/<fileName>"
+ */
+export function processPageBase64Image(
+  value: string,
+  pageId: string,
+  imageFiles: ImageFileInfo[],
+  nameHint: string,
+  index: number,
+): string {
+  const parsed = parseBase64Image(value);
+  if (!parsed) return value;
+
+  const extension = getFileExtension(parsed.mimeType);
+  const safeName = sanitizeName(nameHint);
+  const finalName = index > 1 ? `${safeName}_${index}` : safeName;
+  const fileName = `${finalName}.${extension}`;
+  const fileSystemPath = `src/assets/${pageId}/${fileName}`;
+  const aliasPath = `@/assets/${pageId}/${fileName}`;
+
+  imageFiles.push({
+    filePath: fileSystemPath,
+    fileContent: Buffer.from(parsed.base64Data, "base64"),
+  });
+
+  return aliasPath;
+}
+
+/**
+ * 替换字符串中的 base64 图片（支持 url(data:image/...) 形式）
+ */
+export function replaceBase64InText(
+  value: string,
+  pageId: string,
+  imageFiles: ImageFileInfo[],
+  nameHint: string,
+  getIndex: () => number,
+): string {
+  if (typeof value !== "string") return value as any;
+  let result = value;
+  // 支持一个字符串中多处 base64
+  while (true) {
+    const match = result.match(/data:image\/[^;]+;base64,[a-zA-Z0-9+/=]+/);
+    if (!match) break;
+    const currentIndex = getIndex();
+    const replaced = processPageBase64Image(
+      match[0],
+      pageId,
+      imageFiles,
+      nameHint,
+      currentIndex,
+    );
+    result = result.replace(match[0], replaced);
+  }
+  return result;
 }

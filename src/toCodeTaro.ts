@@ -9,6 +9,7 @@ import { ImportManager } from "./utils/common/ImportManager";
 import handleGlobal from "./handleGlobal";
 import handleExtension from "./handleExtension";
 import { HandlePageConfig } from "./utils/config/handlePageConfig";
+import { processPageBase64Image, replaceBase64InText, type ImageFileInfo } from "./utils/config/content";
 
 // 工具函数
 import { buildFrameMap } from "./utils/context/buildFrameMap";
@@ -109,6 +110,7 @@ export interface GenerationResult {
   files: GeneratedFile[];
   assets?: {
     tabBarImages?: any[];
+    pageImages?: any[];
   };
 }
 
@@ -195,6 +197,41 @@ const getCode = (
   const abstractEventTypeDefMap: Record<string, any> = {};
   const jsModulesCollector = createJSModulesCollector();
   const pageConfigHandler = new HandlePageConfig();
+  const pageBase64Images: ImageFileInfo[] = [];
+  const pageImageIndex = new Map<string, number>();
+
+  const nextImageIndex = (pageId: string, nameHint: string) => {
+    const key = `${pageId}::${nameHint}`;
+    const next = (pageImageIndex.get(key) || 0) + 1;
+    pageImageIndex.set(key, next);
+    return next;
+  };
+
+  const replaceBase64InObject = (
+    value: any,
+    pageId: string,
+    nameHint: string,
+  ): any => {
+    if (typeof value === "string") {
+      return replaceBase64InText(
+        value,
+        pageId,
+        pageBase64Images,
+        nameHint,
+        () => nextImageIndex(pageId, nameHint),
+      );
+    }
+    if (Array.isArray(value)) {
+      return value.map((item) => replaceBase64InObject(item, pageId, nameHint));
+    }
+    if (value && typeof value === "object") {
+      Object.keys(value).forEach((key) => {
+        value[key] = replaceBase64InObject(value[key], pageId, nameHint);
+      });
+      return value;
+    }
+    return value;
+  };
   
   // 提前识别所有弹窗场景
   const popupIds = new Set<string>();
@@ -204,7 +241,24 @@ const getCode = (
     }
   });
 
-  // ========== 第六步：处理场景 ==========
+  // ========== 第六步：预处理 base64 图片（替换 data 中的 base64 为本地资源路径） ==========
+  scenes.forEach(({ scene }: any) => {
+    const pageId = scene?.id;
+    if (!pageId) return;
+    Object.entries(scene.coms || {}).forEach(([comId, com]: any) => {
+      if (com?.model?.data) {
+        com.model.data = replaceBase64InObject(com.model.data, pageId, `${comId}`);
+      }
+      if (com?.props?.data) {
+        com.props.data = replaceBase64InObject(com.props.data, pageId, `${comId}`);
+      }
+      if (com?.props?.style) {
+        com.props.style = replaceBase64InObject(com.props.style, pageId, `${comId}`);
+      }
+    });
+  });
+
+  // ========== 第七步：处理场景 ==========
   processScenes(scenes, {
     config: {
       ...config,
@@ -224,7 +278,7 @@ const getCode = (
     },
   });
 
-  // ========== 第七步：处理模块 ==========
+  // ========== 第八步：处理模块 ==========
   processModules(modules, {
     config,
     globalVarTypeDef,
@@ -239,7 +293,42 @@ const getCode = (
     },
   });
 
-  // ========== 第八步：构建最终结果 ==========
+  // ========== 第九步：构建最终结果 ==========
+  // 为页面产物中的图片路径补充 import，并用变量名替换字符串
+  files.forEach((file) => {
+    if (!file.content || !file.importManager || !file.meta?.id) return;
+    const pageId = file.meta.id;
+    const regex = new RegExp(`@/assets/${pageId}/([a-zA-Z0-9_\\-\\.]+\\.(?:png|jpg|jpeg|gif|webp|svg))`, "g");
+    const seen = new Map<string, string>();
+    let updated = file.content;
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(file.content)) !== null) {
+      const fileName = match[1];
+      if (!seen.has(fileName)) {
+        const base = fileName.replace(/\.[^.]+$/, "");
+        let varName = `${base}Img`.replace(/[^a-zA-Z0-9_]/g, "_");
+        if (/^[0-9]/.test(varName)) {
+          varName = `img_${varName}`;
+        }
+        seen.set(fileName, varName);
+        file.importManager.addImport({
+          packageName: `@/assets/${pageId}/${fileName}`,
+          dependencyNames: [varName],
+          importType: "default",
+        });
+      }
+    }
+    seen.forEach((varName, fileName) => {
+      const literal = `@/assets/${pageId}/${fileName}`;
+      // 替换字符串字面量为变量（去掉引号）
+      updated = updated
+        .split(`"${literal}"`).join(varName)
+        .split(`'${literal}'`).join(varName)
+        .split(literal).join(varName);
+    });
+    file.content = updated;
+  });
+
   const finalResultData = buildFinalResults({
     abstractEventTypeDefMap,
     jsModulesMap: jsModulesCollector.getMap(),
@@ -256,6 +345,7 @@ const getCode = (
     files,
     assets: {
       tabBarImages: finalResultData.tabBarImageFiles,
+      pageImages: pageBase64Images,
     },
   };
 };

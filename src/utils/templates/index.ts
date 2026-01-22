@@ -46,6 +46,7 @@ export const getUiComponentCode = (
     componentOutputs?: string[];
     comEventCode?: string;
     slotsCode?: string;
+    childrenUi?: string; // 新增：子节点 UI
     eventHandlers?: Record<string, string>; // 事件处理函数代码
   },
   config: {
@@ -62,6 +63,7 @@ export const getUiComponentCode = (
     resultStyle,
     dataCode,
     slotsCode,
+    childrenUi,
     eventHandlers = {},
   } = params;
 
@@ -97,10 +99,15 @@ export const getUiComponentCode = (
   // 添加插槽
   if (slotsCode) {
     ui += `\n${indent2}slots={{\n${slotsCode}${indent2}}}`;
-  } else {
   }
   
-  ui += `\n${indent}/>`;
+  if (childrenUi) {
+    ui += `\n${indent}>`;
+    ui += `\n${childrenUi}`;
+    ui += `\n${indent}</WithCom>`;
+  } else {
+    ui += `\n${indent}/>`;
+  }
 
   return ui;
 };

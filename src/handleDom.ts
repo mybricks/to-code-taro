@@ -1,6 +1,6 @@
 import type { UI, BaseConfig } from "./toCodeTaro";
 import { ImportManager, indentation, convertStyleAryToCss, convertRootStyle } from "./utils";
-import { processChildren } from "./utils/logic/processChildren";
+import { normalizeChildren, processChildren } from "./utils/logic/processChildren";
 
 type Dom = Extract<UI["children"][0], { type: "dom" }>;
 
@@ -16,11 +16,14 @@ type HandleDomResult = {
   slots: string[];
   scopeSlots: string[];
   cssContent: string;
+  directChildren?: any[];
+  childrenResults?: any[];
 };
 
 const handleDom = (dom: Dom, config: HandleDomConfig): HandleDomResult => {
-  const { props, children } = dom;
+  const { props } = dom;
   const domProps = props as any;
+  const children = normalizeChildren(dom);
   
   const childResults = processChildren(children, {
     ...config,
@@ -41,6 +44,8 @@ const handleDom = (dom: Dom, config: HandleDomConfig): HandleDomResult => {
     slots: childResults.slots,
     scopeSlots: childResults.scopeSlots,
     cssContent,
+    directChildren: childResults.directChildren,
+    childrenResults: childResults.childrenResults,
   };
 };
 
