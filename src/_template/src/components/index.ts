@@ -52,7 +52,7 @@ export { default as FilterSwitch } from "./filter-coms/switch/runtime";
 export { default as FilterCustom } from "./filter-coms/custom/runtime";
 export { default as Calendar } from "./calendar/runtime";
 export { default as Cascader } from "./cascader/runtime";
-// export { default as Qrcode } from "./qrcode/runtime";
+export { default as Qrcode } from "./qrcode/runtime";
 
 // 微信
 export { default as Map } from "./map/runtime";
