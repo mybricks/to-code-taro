@@ -115,9 +115,9 @@ export const WithCom: React.FC<WithComProps> = (props) => {
   );
 };
 
-export const WithWrapper = (Component: React.ComponentType<any>) => {
+export const WithWrapper = (id: string, Component: React.ComponentType<any>) => {
   return function WrappedComponent(props: any) {
-    const contextStore = useAppCreateContext();
+    const contextStore = useAppCreateContext(id);
     const { setPopupState } = contextStore;
     const isPopup = (Component as any).isPopup;
 

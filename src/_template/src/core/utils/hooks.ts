@@ -1,133 +1,187 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { createReactiveInputHandler } from '../mybricks/createReactiveInputHandler';
+import { useAppContext, useParentSlot } from './ComContext';
 
-/**
- * 深度代理，支持自动路径初始化和响应式更新（鸿蒙化处理方案）
- */
+/** 深度代理：支持响应式更新 */
 export function deepProxy(target: any, onSet?: () => void): any {
-  if (target === null || typeof target !== 'object' || target.__isProxy) {
-    return target;
-  }
+  if (target === null || typeof target !== 'object' || target.__isProxy) return target;
 
   return new Proxy(target, {
     get(obj, prop) {
       if (prop === '__isProxy') return true;
       if (prop === 'toJSON') return () => obj;
 
-      let value = (obj as any)[prop];
-
-      // 只代理已存在的对象属性，不自动创建空对象
-      // 避免访问不存在的属性（如 disabled）时污染原始数据
+      const value = obj[prop];
       if (typeof value === 'object' && value !== null && !value.__isProxy) {
-        (obj as any)[prop] = deepProxy(value, onSet);
+        obj[prop] = deepProxy(value, onSet);
       }
-
-      return (obj as any)[prop];
+      return obj[prop];
     },
     set(obj, prop, value) {
       const result = Reflect.set(obj, prop, value);
-      if (onSet) onSet();
+      onSet?.();
       return result;
     }
   });
 }
 
+/** 状态 Hook：提供响应式数据能力 */
 export function useModel(rawData: any) {
   const [, forceUpdate] = useState({});
   const dataRef = useRef(rawData || {});
 
-  return useMemo(() => {
-    return deepProxy(dataRef.current, () => forceUpdate({}));
-  }, []);
+  return useMemo(() => deepProxy(dataRef.current, () => forceUpdate({})), []);
 }
 
+/** 
+ * 组件引用代理：
+ * 1. 自动缓冲：访问未渲染组件时返回影子对象，缓冲后续指令
+ * 2. 引用渗透：子作用域注册的真实引用自动同步至父级
+ * 3. 自动同步清理：卸载时从作用域链中彻底移除，防止僵尸引用
+ */
+export function proxyRefs(target: any, parentComRefs?: any, globalTodoPool?: Map<string, any[]>): any {
+  return new Proxy(target, {
+    get(obj, prop) {
+      if (prop === '__isProxy') return true;
+      if (prop === 'toJSON') return () => obj;
+
+      if (typeof prop === 'string' && prop.startsWith('u_') && obj[prop] === undefined) {
+        // 懒加载影子对象
+        return (obj[prop] = new Proxy({ __isShadow: true }, {
+          get(_, method: string) {
+            if (method === '__isShadow') return true;
+            return (...args: any[]) => {
+              if (!(globalTodoPool instanceof Map)) return;
+
+              const instances = globalTodoPool.get(prop) || [];
+              if (!globalTodoPool.has(prop)) globalTodoPool.set(prop, instances);
+
+              const index = obj.$index ?? 0;
+              const todo = instances[index] || (instances[index] = {});
+              todo[method] = args;
+            };
+          }
+        }));
+      }
+      return obj[prop];
+    },
+    set(obj, prop, value) {
+      const result = Reflect.set(obj, prop, value);
+      const isRealRef = typeof prop === 'string' && !prop.startsWith('$') && value?.__isShadow !== true;
+
+      if (isRealRef && parentComRefs?.current) {
+        try { parentComRefs.current[prop] = value; } catch {}
+      }
+      return result;
+    },
+    deleteProperty(obj, prop) {
+      const result = Reflect.deleteProperty(obj, prop);
+      const isRealRef = typeof prop === 'string' && !prop.startsWith('$');
+
+      if (isRealRef && parentComRefs?.current) {
+        try { delete parentComRefs.current[prop]; } catch {}
+      }
+      return result;
+    }
+  });
+}
+
+/** 
+ * 组件输入绑定 Hook：
+ * 1. 注册输入执行器
+ * 2. 自动重放缓冲指令（精准索引匹配）
+ * 3. 生命周期自动化：卸载时自动注销引用渗透路径
+ */
 export function useBindInputs(scope: any, id: string, initialHandlers?: Record<string, any>) {
   const handlersRef = useRef<Record<string, any>>({ ...initialHandlers });
+  const { globalTodoInputs } = useAppContext();
+  const parentSlot = useParentSlot();
+  const index = parentSlot?.params?.inputValues?.index ?? 0;
 
-  // 同步最新的 initialHandlers
-  if (initialHandlers) {
-    Object.assign(handlersRef.current, initialHandlers);
-  }
+  useEffect(() => {
+    return () => {
+      if (scope?.current) {
+        delete scope.current[id];
+      }
+    };
+  }, [scope, id]);
 
   return useMemo(() => {
     const proxy = new Proxy({}, {
-      get: (_target, pin: string) => {
+      get: (target, pin: string) => {
+        if (pin === '__isShadow') return false;
+        if (pin === 'toJSON') return () => target;
+
         return (arg: any, ...args: any[]) => {
           if (typeof arg === 'function') {
-            // 组件注册回调
             handlersRef.current[pin] = arg;
-          } else {
-            // 逻辑流触发输入
-            const handler = handlersRef.current[pin];
 
-            if (typeof handler === 'function') {
+            // 处理指令重放
+            const instances = globalTodoInputs?.get(id);
+            const todo = instances?.[index] || instances?.[0];
+            if (todo?.[pin]) {
+              const pendingArgs = todo[pin];
               if (pin === '_setData') {
-                return handler(arg, ...args);
+                arg(...pendingArgs);
+              } else {
+                createReactiveInputHandler({ input: arg, value: pendingArgs[0], rels: {}, title: id });
               }
-              // 构造 createReactiveInputHandler 需要的参数
-              return createReactiveInputHandler({
-                input: handler,
-                value: arg,
-                rels: {}, // 这里可以扩展 output 关联
-                title: id
-              });
+              delete todo[pin];
+
+              // 检查全局清理
+              const hasTasks = instances?.some((inst: any) => inst && Object.keys(inst).length > 0);
+              if (!hasTasks) globalTodoInputs.delete(id);
+            }
+          } else {
+            const handler = handlersRef.current[pin];
+            if (typeof handler === 'function') {
+              return pin === '_setData' 
+                ? handler(arg, ...args) 
+                : createReactiveInputHandler({ input: handler, value: arg, rels: {}, title: id });
             }
           }
         };
       }
     });
 
-    // 将代理对象挂载到作用域，供外部 comRefs.current.id.pin() 调用
-    if (scope && scope.current) {
-      scope.current[id] = proxy;
+    if (scope?.current) scope.current[id] = proxy;
+    if (initialHandlers) {
+      Object.keys(initialHandlers).forEach(pin => (proxy as any)[pin](initialHandlers[pin]));
     }
+
     return proxy;
-  }, [scope, id]);
+  }, [scope, id, globalTodoInputs, index]);
 }
 
+/** 组件事件绑定 Hook */
 export function useBindEvents(props: any, context?: { id: string, name: string, parentSlot?: any }) {
   return useMemo(() => {
-    const _events: Record<string, any> = {};
+    const events: Record<string, any> = {};
 
-    // 预处理已存在的事件
     Object.keys(props).forEach(key => {
-      // 兼容：MyBricks 输出 pin 既可能是 onChange，也可能是 changeTab 这种非 on 前缀
       if (typeof props[key] === 'function') {
         const handler = props[key];
-        const wrapped = (originalValue: any) => {
-          // 鸿蒙/render-web 规范：如果是在插槽中触发事件，且存在父级协议，则自动封装元数据
-          // 这解决了 FormContainer 等组件识别子项的需求
-          // 注意：不要仅凭 parentSlot 存在就封装，否则会影响 Tabs2/changeTab 这类事件直接给 JS 计算组件传参
-          // 仅在父级 slot 使用 itemWrap 协议时才需要这层元数据
-          const value = context?.parentSlot?.params?.itemWrap ? {
-            id: context.id,
-            name: context.name,
-            value: originalValue
-          } : originalValue;
-          
+        const wrapped = (original: any) => {
+          const value = context?.parentSlot?.params?.itemWrap 
+            ? { id: context.id, name: context.name, value: original } 
+            : original;
           return handler(value);
         };
         wrapped.getConnections = () => [{ id: 'default' }];
-        _events[key] = wrapped;
+        events[key] = wrapped;
       }
     });
 
-    return new Proxy(_events, {
+    return new Proxy(events, {
       get(target, key: string) {
-        // 对 onXXX 事件（不少组件 runtime 直接 outputs["onChange"](...)）提供兜底函数，避免未连线时报错
         if (typeof key === 'string' && key.startsWith('on')) {
-          if ((target as any)[key]) {
-            return (target as any)[key];
-          }
-          // 对未连接的事件返回兜底函数
-          const emptyFn: any = () => { };
-          emptyFn.getConnections = () => [];
-          return emptyFn;
+          if (target[key]) return target[key];
+          const fn: any = () => {};
+          fn.getConnections = () => [];
+          return fn;
         }
-        return (target as any)[key];
+        return target[key];
       }
     });
   }, [props, context]);
 }
-
-

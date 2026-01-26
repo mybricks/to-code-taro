@@ -31,7 +31,7 @@ export default (context: IOContext) => {
   const inputs: Inputs = context.inputs;
   const outputs: Outputs = context.outputs;
 
-  let timeoutId: NodeJS.Timeout | null = null;
+  let timeoutId: any = null;
   const inputPins = new Set(Object.keys(inputs as any));
   const outputPins = new Set(Object.keys(outputs as any));
   const hasIn = (pin: string) => inputPins.has(pin);

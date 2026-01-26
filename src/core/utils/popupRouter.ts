@@ -1,7 +1,8 @@
 import { Page } from '../mybricks';
 
 /**
- * 弹窗在 Taro 中被视为组件 兼容APP TODO
+ * 弹窗状态管理（解耦版）
+ * 弹窗在 Taro 中被视为组件，不走路由栈
  */
 class PopupStore {
   private activePopup: any = null;

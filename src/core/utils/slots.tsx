@@ -1,6 +1,7 @@
 import React, { useMemo, useRef } from "react";
 import ComContext, { SlotProvider, useAppContext, useParentSlot } from "./ComContext";
 import { createReactiveInputHandler } from "../mybricks/createReactiveInputHandler";
+import { proxyRefs } from "./hooks";
 
 type AnyRecord = Record<string, any>;
 
@@ -13,6 +14,14 @@ type SlotState = {
   _render?: any;
   render: (params?: any) => any;
 };
+
+/**
+ * 创建一个具有“向上渗透”和“隔离 Todo 池”能力的 comRefs 对象
+ */
+function createPenetratingComRefs(parentComRefs: any, globalTodoPool?: Map<string, any>, index: number = 0) {
+  const localTarget = { $inputs: {}, $outputs: {}, $index: index };
+  return { current: proxyRefs(localTarget, parentComRefs, globalTodoPool) };
+}
 
 function SlotParamsBridge(props: {
   state: SlotState;
@@ -38,7 +47,7 @@ function createChannelProxy(title: string) {
     {},
     {
       get: (_t, pin: string) => {
-          return (arg: any) => {
+        return (arg: any) => {
           if (typeof arg === "function") {
             handlersMap[pin] = arg;
             return;
@@ -58,12 +67,8 @@ function createChannelProxy(title: string) {
   );
 }
 
-/**
- * 参考鸿蒙的 createSlotsIO：
- * - 确保每个 slot 都具备 inputs / outputs / _inputs 三套通道，避免 runtime 访问时报 undefined
- * - render 时通过 SlotProvider 注入 parentSlot（slot 内子组件可 useParentSlot 获取）
- */
 export function useEnhancedSlots(rawSlots: any, id: string) {
+  const { comRefs: parentComRefs, globalTodoInputs } = useAppContext();
   const slotStoreRef = useRef<Record<string, SlotState>>({});
 
   return useMemo(() => {
@@ -91,14 +96,14 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
             }
 
             const scopeId = `${id}.${slotKey}::${String(rawScope)}`;
+            const index = params?.inputValues?.index ?? 0;
             const scopedComRefs =
-              (state._scopedComRefs![scopeId] ||= { current: { $inputs: {}, $outputs: {} } });
+              (state._scopedComRefs![scopeId] ||= createPenetratingComRefs(parentComRefs, globalTodoInputs, index));
+
             return (
-              <SlotProvider value={{ ...state, params }}>
-                <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
-                  <SlotParamsBridge state={state} params={params} render={r} />
-                </ScopedComContextProvider>
-              </SlotProvider>
+              <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
+                <SlotParamsBridge state={state} params={params} render={r} />
+              </ScopedComContextProvider>
             );
           },
         });
@@ -114,7 +119,7 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
     });
 
     return nextSlots;
-  }, [rawSlots, id]);
+  }, [rawSlots, id, parentComRefs, globalTodoInputs]);
 }
 
 export function ScopedComContextProvider(props: {
@@ -124,8 +129,6 @@ export function ScopedComContextProvider(props: {
 }) {
   const parent = useAppContext();
   const value = useMemo(() => {
-    // $outputs 与 $inputs 一样：在 scoped 下应当隔离（由 scopedComRefs.current.$outputs 提供）
-    // 如果没有显式传 comRefs，则沿用父级的，但依然带上新的 scopeId
     return {
       ...parent,
       comRefs: props.comRefs || parent.comRefs,
@@ -141,5 +144,3 @@ export function useResolvedParentSlot(parentSlotProp: any) {
   const parentSlotFromCtx = useParentSlot();
   return parentSlotProp ?? parentSlotFromCtx;
 }
-
-

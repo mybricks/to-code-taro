@@ -1,5 +1,7 @@
 import { useRef, useState, useMemo } from 'react'
-import { deepProxy } from './hooks'
+import { proxyRefs } from './hooks'
+
+const GLOBAL_TODO_POOL = new Map<string, any[]>();
 
 export interface ComContextStore {
   comRefs: any;
@@ -13,17 +15,15 @@ export interface ComContextStore {
     controller: any;
   };
   setPopupState: (state: any) => void;
+  globalTodoInputs: Map<string, any[]>;
 }
 
 export function useAppCreateContext(id: string): ComContextStore {
-  // 约定：场景级 inputs 统一挂载到 $inputs，避免与组件 runtime 的 inputs 命名冲突
-  // 同时可避免 `Cannot set property 'open' of undefined`
-  // 注册表拆分：
-  // - comRefs: 组件实例/inputs/outputs 注册表（可 scoped）
-  // - $vars/$fxs: 逻辑能力注册表（仅页面级，全作用域共享）
-  const comRefs = useRef<any>(deepProxy({ $inputs: {}, $outputs: {} }));
+  const globalTodoInputs = useRef<Map<string, any[]>>(GLOBAL_TODO_POOL);
+  const comRefs = useRef<any>(proxyRefs({ $inputs: {}, $outputs: {} }, undefined, globalTodoInputs.current));
   const $vars = useRef<any>({});
   const $fxs = useRef<any>({});
+
   const [popupState, setPopupState] = useState({
     visible: false,
     name: '',
@@ -33,7 +33,7 @@ export function useAppCreateContext(id: string): ComContextStore {
 
   const appContext = useRef({
     canvas: {
-      id, // 使用 data 中的 id
+      id,
     },
     runtime: {
       debug: false,
@@ -54,6 +54,7 @@ export function useAppCreateContext(id: string): ComContextStore {
     comRefs,
     $vars,
     $fxs,
+    globalTodoInputs: globalTodoInputs.current,
     appContext,
     popupState,
     setPopupState
