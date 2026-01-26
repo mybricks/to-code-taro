@@ -34,5 +34,17 @@ export function handleCommonDir(commonDir: FileNode, items: GenerateItem[]): voi
       content: fullContent,
     });
   }
+
+  // 处理 global
+  const globalItem = items.find((item) => item.type === 'global');
+  if (globalItem) {
+    const importCode = globalItem.importManager?.toCode() || '';
+    const fileContent = globalItem.content || '';
+    const fullContent = importCode ? `${importCode}\n${fileContent}` : fileContent;
+    commonDir.children.push({
+      path: 'src/common/global.ts',
+      content: fullContent,
+    });
+  }
 }
 

@@ -97,8 +97,8 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
         path: `src/pages/${pageName}/index.jsModules.ts`,
         content: genScopedJSModules(
           item.jsModules as any,
-          "../../core/mybricks/index",
-          "../../common/jsModulesRuntime",
+          "@/core/mybricks/index",
+          "@/common/jsModulesRuntime",
         ),
       });
     }
@@ -139,8 +139,8 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
         path: `src/popupComponents/${popupId}/index.jsModules.ts`,
         content: genScopedJSModules(
           item.jsModules as any,
-          "../../core/mybricks/index",
-          "../../common/jsModulesRuntime",
+          "@/core/mybricks/index",
+          "@/common/jsModulesRuntime",
         ),
       });
     }

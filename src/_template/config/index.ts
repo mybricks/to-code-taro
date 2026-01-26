@@ -1,5 +1,5 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
+import path from 'path'
 import devConfig from './dev'
 import prodConfig from './prod'
 
@@ -55,7 +55,8 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         }
       },
       webpackChain(chain) {
-        chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+        chain.resolve.alias
+        .set('@', path.resolve(__dirname, '../src'))
       }
     },
     h5: {
@@ -84,7 +85,8 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         }
       },
       webpackChain(chain) {
-        chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+        chain.resolve.alias
+          .set('@', path.resolve(__dirname, '../src'))
       }
     },
     rn: {

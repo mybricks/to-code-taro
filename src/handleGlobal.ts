@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ImportManager, indentation } from "./utils";
 import { handleProcess } from "./utils/logic/handleProcess";
+import { getSafeVarName } from "./utils/common/string";
 import type { ToTaroCodeConfig, GeneratedFile } from "./toCodeTaro";
 
 interface HandleGlobalParams {
@@ -65,12 +66,14 @@ const handleGlobal = (
       },
     } as any);
 
+    const varKey = getSafeVarName(com);
+
     globalVarsRegisterChangeCode +=
-      `\n${indent2}this.${com.title}.registerChange((value: any) => {` +
+      `\n${indent2}this.${varKey}.registerChange((value: any) => {` +
       `\n${res}` +
       `\n${indent2}})`;
 
-    globalVarsInitCode += `${indent}${com.title}: any = createVariable(${JSON.stringify(com.model.data.initValue || {})})\n`;
+    globalVarsInitCode += `${indent}${varKey}: any = createVariable(${JSON.stringify(com.model.data.initValue || {})})\n`;
   });
 
   let globalFxsInitCode = "";

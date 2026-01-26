@@ -188,7 +188,7 @@ export const handleProcess = (
         const varKey = getSafeVarName(props.meta);
         if (props.meta.global) {
           config.addParentDependencyImport({
-            packageName: config.getComponentPackageName(),
+            packageName: "../../common/global",
             dependencyNames: ["globalVars"],
             importType: "named",
           });
@@ -207,7 +207,7 @@ export const handleProcess = (
       } else if (category === "fx") {
         if (props.meta.global) {
           config.addParentDependencyImport({
-            packageName: config.getComponentPackageName(),
+            packageName: "../../common/global",
             dependencyNames: ["globalFxs"],
             importType: "named",
           });
@@ -497,7 +497,7 @@ const generateJsApiComponentCode = (params: {
 
   // 导入 createJSHandle
   config.addParentDependencyImport({
-    packageName: "../../core/mybricks/index",
+    packageName: "@/core/mybricks/index",
     dependencyNames: ["createJSHandle"],
     importType: "named",
   });

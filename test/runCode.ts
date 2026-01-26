@@ -30,7 +30,7 @@ async function runCode() {
           return {
             importInfo: {
               name: importName,
-              from: "../../core/comlib",
+              from: "@/core/comlib",
               type: "named" as const,
             },
             name: importName,
@@ -43,15 +43,15 @@ async function runCode() {
         return {
           importInfo: {
             name: componentName,
-            from: "../../components",
+            from: "@/components",
             type: "named" as const,
           },
           name: componentName,
           callName: componentName,
         };
       },
-      getComponentPackageName: () => "../../core/utils/index",
-      getUtilsPackageName: () => "../../core/utils/index",
+      getComponentPackageName: () => "@/core/utils/index",
+      getUtilsPackageName: () => "@/core/utils/index",
       getPageId: (id: string) => id,
       getModuleApi: () => ({
         dependencyImport: {
