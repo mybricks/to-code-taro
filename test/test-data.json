@@ -18527,8 +18527,78 @@
                         "_dataChanged_"
                     ]
                 },
+<<<<<<< HEAD
                 "u_w6hH3": {
                     "id": "u_w6hH3",
+=======
+                "u_NGbpp": {
+                    "id": "u_NGbpp",
+                    "def": {
+                        "namespace": "mybricks.taro.chart.line",
+                        "version": "1.0.0"
+                    },
+                    "title": "折线图",
+                    "model": {
+                        "data": {
+                            "type": "line",
+                            "config": {
+                                "xField": "date",
+                                "yField": "val1",
+                                "xAxis": {},
+                                "yAxis": {},
+                                "legend": false,
+                                "seriesField": "",
+                                "padding": "auto",
+                                "label": false,
+                                "xFieldScrollable": false,
+                                "xFieldTickCount": 2
+                            },
+                            "geo": {
+                                "line": {
+                                    "show": true,
+                                    "smooth": true
+                                },
+                                "dot": {
+                                    "show": false
+                                },
+                                "area": {
+                                    "show": false
+                                }
+                            },
+                            "useCustomTooltip": false,
+                            "showTooltipTitle": true
+                        },
+                        "outputEvents": {},
+                        "style": {
+                            "height": 292,
+                            "width": "100%",
+                            "heightReverse": false,
+                            "marginTop": 10,
+                            "zIndex": 2,
+                            "_new": true
+                        }
+                    },
+                    "configs": [],
+                    "_inputs": [],
+                    "inputs": [
+                        "data",
+                        "loading",
+                        "noMore",
+                        "error",
+                        "_setStyle",
+                        "show",
+                        "hide",
+                        "showOrHide",
+                        "_config_"
+                    ],
+                    "outputs": [
+                        "afterrender",
+                        "_dataChanged_"
+                    ]
+                },
+                "u_lwl0d": {
+                    "id": "u_lwl0d",
+>>>>>>> 2837e18b411d770fbfada608e0eda0768374bb3c
                     "def": {
                         "namespace": "mybricks.taro._muilt-inputJs",
                         "version": "1.0.0",
@@ -18988,6 +19058,7 @@
                             }
                         }
                     ],
+<<<<<<< HEAD
                     "frames": [],
                     "diagrams": [
                         {
@@ -18995,6 +19066,231 @@
                             "title": "工作",
                             "createTime": 1767861311494,
                             "updateTime": 1768355672886,
+=======
+                    "frames": [
+                        {
+                            "id": "u_viN36",
+                            "title": "加入对比",
+                            "type": "fx",
+                            "coms": {},
+                            "autoRunComs": {},
+                            "inputs": [
+                                {
+                                    "pinId": "param0",
+                                    "title": "输入端口",
+                                    "type": "normal",
+                                    "schema": {
+                                        "type": "unknown"
+                                    }
+                                }
+                            ],
+                            "outputs": [],
+                            "frames": [],
+                            "diagrams": [
+                                {
+                                    "id": "u_EZy_V",
+                                    "title": "加入对比",
+                                    "createTime": 1768832079816,
+                                    "updateTime": 1768832138936,
+                                    "starter": {
+                                        "type": "frame",
+                                        "frameId": "u_viN36",
+                                        "pinAry": [
+                                            {
+                                                "id": "param0",
+                                                "title": "输入端口",
+                                                "type": "normal"
+                                            }
+                                        ]
+                                    },
+                                    "conAry": [
+                                        {
+                                            "id": "u_5wrpe",
+                                            "title": "从 输入端口 到 赋值 的连接",
+                                            "finishPinParentKey": "u_c4dMe",
+                                            "from": {
+                                                "id": "param0",
+                                                "title": "输入端口",
+                                                "parent": {
+                                                    "type": "frame",
+                                                    "id": "u_viN36"
+                                                }
+                                            },
+                                            "to": {
+                                                "id": "set",
+                                                "title": "赋值",
+                                                "type": "normal",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u_O0lhh"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": "u_0EXbW",
+                                            "title": "从 输入端口 到 参数0 的连接",
+                                            "from": {
+                                                "id": "param0",
+                                                "title": "输入端口",
+                                                "parent": {
+                                                    "type": "frame",
+                                                    "id": "u_viN36"
+                                                }
+                                            },
+                                            "to": {
+                                                "id": "input.inputValue0",
+                                                "title": "参数0",
+                                                "type": "param",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u_lwl0d"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": "u_xJFHy",
+                                            "title": "从 输出项0 到 显示 的连接",
+                                            "from": {
+                                                "id": "output0",
+                                                "title": "输出项0",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u_lwl0d"
+                                                }
+                                            },
+                                            "to": {
+                                                "id": "showToast",
+                                                "title": "显示",
+                                                "type": "normal",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u_hzAuV"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "runtimeBefore": [],
+                                    "runtimeAfter": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "u_jPrnv",
+                            "title": "获取数据",
+                            "type": "fx",
+                            "coms": {},
+                            "autoRunComs": {},
+                            "inputs": [
+                                {
+                                    "pinId": "param0",
+                                    "title": "输入端口",
+                                    "type": "normal",
+                                    "schema": {
+                                        "type": "unknown"
+                                    }
+                                }
+                            ],
+                            "outputs": [],
+                            "frames": [],
+                            "diagrams": [
+                                {
+                                    "id": "u_l99xL",
+                                    "title": "获取数据",
+                                    "createTime": 1768833219402,
+                                    "updateTime": 1769008895565,
+                                    "starter": {
+                                        "type": "frame",
+                                        "frameId": "u_jPrnv",
+                                        "pinAry": [
+                                            {
+                                                "id": "param0",
+                                                "title": "输入端口",
+                                                "type": "normal"
+                                            }
+                                        ]
+                                    },
+                                    "conAry": [
+                                        {
+                                            "id": "u_tQFKP",
+                                            "title": "从 输入端口 到 读取 的连接",
+                                            "finishPinParentKey": "u_QFKs_",
+                                            "from": {
+                                                "id": "param0",
+                                                "title": "输入端口",
+                                                "parent": {
+                                                    "type": "frame",
+                                                    "id": "u_jPrnv"
+                                                }
+                                            },
+                                            "to": {
+                                                "id": "get",
+                                                "title": "读取",
+                                                "type": "normal",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u__Z9ZH"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": "u_fWQUP",
+                                            "title": "从 完成 到 参数0 的连接",
+                                            "startPinParentKey": "u_QFKs_",
+                                            "from": {
+                                                "id": "return",
+                                                "title": "完成",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u__Z9ZH"
+                                                }
+                                            },
+                                            "to": {
+                                                "id": "input.inputValue0",
+                                                "title": "参数0",
+                                                "type": "param",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u_ucdyG"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": "u_GeYTN",
+                                            "title": "从 输出项0 到 输入数据 的连接",
+                                            "finishPinParentKey": "u_qUPSE",
+                                            "from": {
+                                                "id": "output0",
+                                                "title": "输出项0",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u_ucdyG"
+                                                }
+                                            },
+                                            "to": {
+                                                "id": "data",
+                                                "title": "输入数据",
+                                                "type": "normal",
+                                                "parent": {
+                                                    "type": "com",
+                                                    "id": "u_NGbpp"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "runtimeBefore": [],
+                                    "runtimeAfter": []
+                                }
+                            ]
+                        }
+                    ],
+                    "diagrams": [
+                        {
+                            "id": "u_gvrz8",
+                            "title": "基金详情",
+                            "createTime": 1768829371514,
+                            "updateTime": 1769066963636,
+                            "updated": true,
+>>>>>>> 2837e18b411d770fbfada608e0eda0768374bb3c
                             "starter": {
                                 "type": "frame",
                                 "frameId": "u_Jot6e",

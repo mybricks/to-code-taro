@@ -11,7 +11,8 @@
     "seriesField": "",
     "padding": "auto",
     "label": false,
-    "xFieldScrollable": false
+    "xFieldScrollable": false,
+    "xFieldTickCount": 0
   },
   "geo": {
     "line": {
@@ -25,5 +26,6 @@
       "show": false
     }
   },
-  "useCustomTooltip": false
+  "useCustomTooltip": false,
+  "showTooltipTitle": false
 }
