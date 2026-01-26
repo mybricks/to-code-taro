@@ -65,7 +65,7 @@ export const convertRootStyle = (style: Style) => {
         Object.entries(layoutObj).forEach(([lKey, lValue]) => {
           if (lKey === "position") {
             if (lValue === "smart") {
-              rootStyle["position"] = "relative";
+              rootStyle["position"] = "fixed";
             } else if (lValue !== "inherit") {
               rootStyle["position"] = lValue as string;
             }
@@ -81,7 +81,7 @@ export const convertRootStyle = (style: Style) => {
         rootStyle["display"] = "flex";
         rootStyle["flexDirection"] = "column";
       } else if (value === "smart") {
-        rootStyle["position"] = "relative";
+        rootStyle["position"] = "fixed";
       }
       return;
     }
