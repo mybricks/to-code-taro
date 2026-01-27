@@ -22,6 +22,16 @@
     "content": null,
     "children": [
       {
+        "path": "src/common",
+        "content": null,
+        "children": [
+          {
+            "path": "src/common/pageLife.ts",
+            "content": "import Taro, { useDidShow, useDidHide, useRouter } from '@tarojs/taro';\n\n/**\n * 页面生命周期 Hook\n * 用于监听页面的 DidShow 和 DidHide 事件，并通过 Taro.eventCenter 触发全局事件\n */\nexport const usePageLife = () => {\n  const router = useRouter();\n\n  useDidShow(() => {\n    Taro.eventCenter.trigger('pageDidShow', {\n      path: router.path,\n      query: router.params\n    });\n  });\n\n  useDidHide(() => {\n    Taro.eventCenter.trigger('pageDidHide', {\n      path: router.path,\n      query: router.params\n    });\n  });\n};\n\n"
+          }
+        ]
+      },
+      {
         "path": "src/components",
         "content": null,
         "children": [

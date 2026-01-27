@@ -113,7 +113,6 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
   });
   addImport({ packageName: "@tarojs/components", dependencyNames: ["View"], importType: "named" });
   
-  // SlotProvider/ScopedComContextProvider 属于 runtime 内部实现（core/utils/slots.tsx）使用，
   // 页面/插槽产物通常不直接使用，避免生成未使用的 import。
   const dependencyNames = ["WithCom", "WithWrapper"];
   if (isRoot && config.hasPopups) {
@@ -123,6 +122,7 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
   addImport({ packageName: comPkg, dependencyNames: ["useAppContext"], importType: "named" });
 
   if (isRoot) {
+    addImport({ packageName: "@/common/pageLife", dependencyNames: ["usePageLife"], importType: "named" });
     if (config.hasPopups) {
       addImport({ packageName: "@/common/popup", dependencyNames: ["POPUP_MAP", "POPUP_IDS"], importType: "named" });
     }
