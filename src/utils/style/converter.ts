@@ -45,6 +45,39 @@ function transformStyleValue(key: string, value: any): any {
   return value;
 }
 
+/**
+ * 提取通用的 layout 属性转换逻辑
+ */
+function handleLayoutProp(value: any, target: Record<string, string | number>) {
+  if (typeof value === "object" && value !== null) {
+    const layoutObj = value as any;
+    Object.entries(layoutObj).forEach(([lKey, lValue]) => {
+      if (lKey === "position") {
+        if (lValue === "smart") {
+          if (target["position"] === undefined) {
+            target["position"] = "relative";
+          }
+        } else if (lValue !== "inherit") {
+          target["position"] = lValue as string;
+        }
+      } else {
+        const camelLKey = kebabToCamel(lKey);
+        target[camelLKey] = transformStyleValue(camelLKey, lValue);
+      }
+    });
+  } else if (value === "flex-row") {
+    target["display"] = "flex";
+    target["flexDirection"] = "row";
+  } else if (value === "flex-column") {
+    target["display"] = "flex";
+    target["flexDirection"] = "column";
+  } else if (value === "smart") {
+    if (target["position"] === undefined) {
+      target["position"] = "relative";
+    }
+  }
+}
+
 /** 转换根节点样式 */
 export const convertRootStyle = (style: Style) => {
   const rootStyle: Record<string, string | number> = {};
@@ -60,29 +93,7 @@ export const convertRootStyle = (style: Style) => {
     }
 
     if (key === "layout") {
-      if (typeof value === "object" && value !== null) {
-        const layoutObj = value as any;
-        Object.entries(layoutObj).forEach(([lKey, lValue]) => {
-          if (lKey === "position") {
-            if (lValue === "smart") {
-              rootStyle["position"] = "fixed";
-            } else if (lValue !== "inherit") {
-              rootStyle["position"] = lValue as string;
-            }
-          } else {
-            const camelLayoutKey = kebabToCamel(lKey);
-            rootStyle[camelLayoutKey] = transformStyleValue(camelLayoutKey, lValue);
-          }
-        });
-      } else if (value === "flex-row") {
-        rootStyle["display"] = "flex";
-        rootStyle["flexDirection"] = "row";
-      } else if (value === "flex-column") {
-        rootStyle["display"] = "flex";
-        rootStyle["flexDirection"] = "column";
-      } else if (value === "smart") {
-        rootStyle["position"] = "fixed";
-      }
+      handleLayoutProp(value, rootStyle);
       return;
     }
 
@@ -110,29 +121,7 @@ export const convertComponentStyle = (style: Style) => {
         const transformedCss: Record<string, string | number> = {};
         Object.entries(css).forEach(([cssKey, cssValue]) => {
           if (cssKey === "layout") {
-            if (typeof cssValue === "object" && cssValue !== null) {
-              const layoutObj = cssValue as any;
-              Object.entries(layoutObj).forEach(([lKey, lValue]) => {
-                if (lKey === "position") {
-                  if (lValue === "smart") {
-                    transformedCss["position"] = "relative";
-                  } else if (lValue !== "inherit") {
-                    transformedCss["position"] = lValue as string;
-                  }
-                } else {
-                  const camelLKey = kebabToCamel(lKey);
-                  transformedCss[camelLKey] = transformStyleValue(camelLKey, lValue);
-                }
-              });
-            } else if (cssValue === "flex-row") {
-              transformedCss["display"] = "flex";
-              transformedCss["flexDirection"] = "row";
-            } else if (cssValue === "flex-column") {
-              transformedCss["display"] = "flex";
-              transformedCss["flexDirection"] = "column";
-            } else if (cssValue === "smart") {
-              transformedCss["position"] = "relative";
-            }
+            handleLayoutProp(cssValue, transformedCss);
           } else {
             const camelKey = cssKey.includes("-") ? kebabToCamel(cssKey) : cssKey;
             transformedCss[camelKey] = transformStyleValue(camelKey, cssValue);
@@ -155,7 +144,6 @@ export const convertStyleAryToCss = (
 ) => {
   if (!Array.isArray(styleAry)) return "";
 
-  const prefix = parentSelector ? `.${parentSelector} ` : "";
 
   return styleAry
     .map(({ selector, css }) => {
@@ -164,15 +152,6 @@ export const convertStyleAryToCss = (
       let finalSelector = selector.trim();
       if (parentSelector) {
         const prefix = `.${parentSelector}`;
-        // if (finalSelector.startsWith(">")) {
-        //   // 移除 >，改为后代选择器以提升兼容性（Taro 可能会插入组件层级）
-        //   const subSelector = finalSelector.substring(1).trim();
-        //   finalSelector = `${prefix} ${subSelector}, ${prefix}${subSelector}`;
-        // } else {
-        //   // 同时支持后代选择器和同级选择器（针对 itemWrap 场景）
-        //   finalSelector = `${prefix} ${finalSelector}, ${prefix}${finalSelector}`;
-        // }
-
         // 同时支持后代选择器和同级选择器（针对 itemWrap 场景）
         finalSelector = `${prefix} ${finalSelector}, ${prefix}${finalSelector}`;
       }
@@ -180,29 +159,7 @@ export const convertStyleAryToCss = (
       const transformedCss: Record<string, string | number> = {};
       Object.entries(css).forEach(([key, value]) => {
         if (key === "layout") {
-          if (typeof value === "object" && value !== null) {
-            const layoutObj = value as any;
-            Object.entries(layoutObj).forEach(([lKey, lValue]) => {
-              if (lKey === "position") {
-                if (lValue === "smart") {
-                  transformedCss["position"] = "relative";
-                } else if (lValue !== "inherit") {
-                  transformedCss["position"] = lValue as string;
-                }
-              } else {
-                const camelLKey = kebabToCamel(lKey);
-                transformedCss[camelLKey] = transformStyleValue(camelLKey, lValue);
-              }
-            });
-          } else if (value === "flex-row") {
-            transformedCss["display"] = "flex";
-            transformedCss["flexDirection"] = "row";
-          } else if (value === "flex-column") {
-            transformedCss["display"] = "flex";
-            transformedCss["flexDirection"] = "column";
-          } else if (value === "smart") {
-            transformedCss["position"] = "relative";
-          }
+          handleLayoutProp(value, transformedCss);
         } else {
           const camelKey = kebabToCamel(key);
           transformedCss[camelKey] = transformStyleValue(camelKey, value);

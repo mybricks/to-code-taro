@@ -113,7 +113,6 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
   });
   addImport({ packageName: "@tarojs/components", dependencyNames: ["View"], importType: "named" });
   
-  // SlotProvider/ScopedComContextProvider 属于 runtime 内部实现（core/utils/slots.tsx）使用，
   // 页面/插槽产物通常不直接使用，避免生成未使用的 import。
   const dependencyNames = ["WithCom", "WithWrapper"];
   if (isRoot && config.hasPopups) {
@@ -123,6 +122,7 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
   addImport({ packageName: comPkg, dependencyNames: ["useAppContext"], importType: "named" });
 
   if (isRoot) {
+    addImport({ packageName: "@/common/pageLife", dependencyNames: ["usePageLife"], importType: "named" });
     if (config.hasPopups) {
       addImport({ packageName: "@/common/popup", dependencyNames: ["POPUP_MAP", "POPUP_IDS"], importType: "named" });
     }
@@ -141,8 +141,12 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults
   
   // 鸿蒙化：优先使用 config 中传递的 layout（来自父容器 data.layout），否则使用 slot 自身的 layout
   const layout = config.layout || ui.layout || mergedStyle.layout;
-  const hasFixedChildStyle = hasFixedChildren(childrenResults) ? { transform: "translateX(0)" } : {};
-  const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout, ...hasFixedChildStyle }));
+  const smart = isSmartLayout(layout);
+  const layoutAdjustment = smart
+    ? { position: isHasInSmartLayout(childrenResults) ? "fixed" : "relative" }
+    : hasFixedChildren(childrenResults) ? { transform: "translateX(0)" } : {};
+
+  const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout, ...layoutAdjustment }));
   
   const rootClassName = getRootComponentClassName(config.getCurrentScene(), config.checkIsRoot());
   // 插槽根容器增强：加上可读的标识，便于用户定位/调试
@@ -181,6 +185,17 @@ const finalizeRootComponent = (ui: any, config: any, importManager: any, combine
  */
 const hasFixedChildren = (childrenResults: any[]) => {
   return childrenResults.some((item) => item?.rootStyle?.position === "fixed");
+}
+
+/**
+ * 检查是否是智能布局
+ */
+const isSmartLayout = (layout: any) => {
+  return layout === "smart" || layout?.position === "smart";
+}
+
+const isHasInSmartLayout = (childrenResults: any[]) => {
+  return childrenResults.some((item) => item?.rootStyle?.inSmartLayout === true );
 }
 
 export default handleSlot;

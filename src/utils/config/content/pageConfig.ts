@@ -39,7 +39,10 @@ const TARO_PAGE_CONFIG_TEMPLATE_PROPERTIES = [
  * @returns definePageConfig 配置字符串
  */
 export function generatePageConfigContent(systemPageData?: any): string {
-  const pageConfig: Record<string, any> = {};
+  const pageConfig: Record<string, any> = {
+    enableShareAppMessage: true,
+    enableShareTimeline: true,
+  };
 
   if (systemPageData) {
     // 1. 处理导航栏隐藏逻辑：如果是 none，强制设置 navigationStyle 为 custom 以隐藏默认导航栏

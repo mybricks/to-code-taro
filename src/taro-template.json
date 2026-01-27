@@ -22,6 +22,16 @@
     "content": null,
     "children": [
       {
+        "path": "src/common",
+        "content": null,
+        "children": [
+          {
+            "path": "src/common/pageLife.ts",
+            "content": "import Taro, { useDidShow, useDidHide, useRouter } from '@tarojs/taro';\n\n/**\n * 页面生命周期 Hook\n * 用于监听页面的 DidShow 和 DidHide 事件，并通过 Taro.eventCenter 触发全局事件\n */\nexport const usePageLife = () => {\n  const router = useRouter();\n\n  useDidShow(() => {\n    Taro.eventCenter.trigger('pageDidShow', {\n      path: router.path,\n      query: router.params\n    });\n  });\n\n  useDidHide(() => {\n    Taro.eventCenter.trigger('pageDidHide', {\n      path: router.path,\n      query: router.params\n    });\n  });\n};\n\n"
+          }
+        ]
+      },
+      {
         "path": "src/components",
         "content": null,
         "children": [
@@ -5763,7 +5773,7 @@
       },
       {
         "path": "src/app.global.less",
-        "content": "/* 隐藏 React Refresh 的全屏错误遮罩 */\n#react-refresh-overlay, \niframe[id=\"react-refresh-overlay\"] {\n  display: none !important;\n}\n\n.mybricks_taro_systemPage {\n  height: 100vh !important;\n}\n\nview {\n  box-sizing: border-box;\n}\n"
+        "content": "/* 隐藏 React Refresh 的全屏错误遮罩 */\n#react-refresh-overlay, \niframe[id=\"react-refresh-overlay\"] {\n  display: none !important;\n}\n\n.mybricks_taro_systemPage {\n  height: 100vh !important;\n}\n\n.mybricks_com{\n  flex-shrink: 0;\n  min-height: 0; /* 防止子元素撑开父元素 */\n}\n\nview {\n  box-sizing: border-box;\n}\n"
       },
       {
         "path": "src/app.ts",
