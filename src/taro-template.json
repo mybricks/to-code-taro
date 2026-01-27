@@ -5763,7 +5763,7 @@
       },
       {
         "path": "src/app.global.less",
-        "content": "/* 隐藏 React Refresh 的全屏错误遮罩 */\n#react-refresh-overlay, \niframe[id=\"react-refresh-overlay\"] {\n  display: none !important;\n}\n\n.mybricks_taro_systemPage {\n  height: 100vh !important;\n}\n\nview {\n  box-sizing: border-box;\n}\n"
+        "content": "/* 隐藏 React Refresh 的全屏错误遮罩 */\n#react-refresh-overlay, \niframe[id=\"react-refresh-overlay\"] {\n  display: none !important;\n}\n\n.mybricks_taro_systemPage {\n  height: 100vh !important;\n}\n\n.mybricks_com{\n  flex-shrink: 0;\n  min-height: 0; /* 防止子元素撑开父元素 */\n}\n\nview {\n  box-sizing: border-box;\n}\n"
       },
       {
         "path": "src/app.ts",
