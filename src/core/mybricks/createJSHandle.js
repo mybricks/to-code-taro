@@ -60,7 +60,8 @@ export const createJSHandle = (fn, options) => {
     inputs,
     outputs,
     logger,
-    env: appContext?.env
+    env: appContext?.env,
+    appContext
   })
 
   const isJsMultipleInputs = props.inputs[0]

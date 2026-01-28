@@ -12,6 +12,7 @@ import type { JSModulesMap } from "../context/collectJSModules";
 interface BuildResultParams {
   abstractEventTypeDefMap: Record<string, any>;
   jsModulesMap: JSModulesMap;
+  connectorMap: any;
   globalTabBarConfig: string | null;
   tabBarImageFiles: any[];
   popupIds: string[];
@@ -31,6 +32,7 @@ export const buildFinalResults = (
   const {
     abstractEventTypeDefMap,
     jsModulesMap,
+    connectorMap,
     globalTabBarConfig,
     tabBarImageFiles,
     popupIds,
@@ -55,6 +57,16 @@ export const buildFinalResults = (
       content: genJSModulesRuntime(),
       importManager: new ImportManager(config),
       name: "jsModulesRuntime",
+    });
+  }
+
+  // 生成 API 定义
+  if (connectorMap) {
+    files.push({
+      type: "connector-api",
+      content: generateApi(connectorMap),
+      importManager: new ImportManager(config),
+      name: "api",
     });
   }
 
@@ -103,4 +115,37 @@ export const buildFinalResults = (
     tabBarImageFiles,
   };
 };
+
+/**
+ * 生成 API 定义代码
+ */
+function generateApi(connectorMap: any) {
+  const { connectors, config } = connectorMap;
+
+  let code = `/* eslint-disable @typescript-eslint/no-explicit-any */\n\n`;
+  code += `export const api: Record<string, any> = {\n`;
+
+  connectors.forEach((conn: any) => {
+    code += `  '${conn.id}': {\n`;
+    code += `    type: '${conn.type}',\n`;
+    code += `    input: ${conn.input || 'function _RT_(params) { return params; }'},\n`;
+    code += `    output: ${conn.output || 'function _RT_(result) { return result; }'},\n`;
+    code += `    method: '${conn.method}',\n`;
+    code += `    path: '${conn.path}',\n`;
+    code += `    globalMock: ${conn.globalMock || false},\n`;
+    code += `    markList: ${JSON.stringify(conn.markList || [])}\n`;
+    code += `  },\n`;
+  });
+
+  code += `};\n\n`;
+
+  code += `export const baseConfig = {\n`;
+  code += `  globalParamsFn: ${config.paramsFn || 'function _RT_(params) { return params; }'},\n`;
+  code += `  globalResultFn: ${config.resultFn || 'function _RT_(response) { return response; }'},\n`;
+  code += `  globalErrorResultFn: ${config.errorResultFn || 'function _RT_(error) { throw error; }'},\n`;
+  code += `  globalMock: ${config.globalMock || false}\n`;
+  code += `};\n`;
+
+  return code;
+}
 

@@ -1,6 +1,8 @@
 import { useRef, useState, useMemo } from 'react'
 import { proxyRefs } from './hooks'
 import { TodoPool } from './pool'
+// @ts-ignore
+import { request } from '@/common/request'
 
 export interface ComContextStore {
   comRefs: any;
@@ -34,8 +36,9 @@ export function useAppCreateContext(id: string): ComContextStore {
     canvas: {
       id,
     },
-    runtime: {
-      debug: false,
+    env: {
+      runtime: true,
+      request: (connector: any, params: any, config: any) => request(connector, params, config, { $vars }),
     },
     edit: false,
     isH5: false,

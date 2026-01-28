@@ -1,88 +1,69 @@
-import Taro from '@tarojs/taro';
-
-export type DataType = {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
-  url?: string;
-  headers?: Record<string, string>;
-  data?: any;
-  timeout?: number;
-  dataType?: 'json' | 'text' | 'base64';
-  responseType?: 'text' | 'arraybuffer';
-};
-
-export interface Inputs {
-  request?: (fn: (config: DataType, relOutputs?: any) => void) => void;
-}
-
-export interface Outputs {
-  onSuccess: (value?: any) => void;
-  onFail: (value?: any) => void;
-}
-
-interface IOContext {
-  data: DataType;
-  inputs: Inputs;
-  outputs: Outputs;
-}
-
-export default (context: IOContext) => {
-  const data: DataType = context.data;
-  const inputs: Inputs = context.inputs;
-  const outputs: Outputs = context.outputs;
-
-  inputs.request?.((val: DataType) => {
+function callCon({ env, data, inputs, outputs, onError }, params = {}) {
+  if (data.connector || data.dynamicConfig) {
     try {
-      const config = {
-        method: val?.method || data.method || 'GET',
-        url: val?.url || data.url,
-        header: val?.headers || data.headers || {},
-        data: val?.data || data.data,
-        timeout: val?.timeout || data.timeout,
-        dataType: val?.dataType || data.dataType || 'json',
-        responseType: val?.responseType || data.responseType || 'text',
+      let finnalConnector = {
+        ...(data.connector || {}),
+        outputSchema: data.outputSchema,
       };
 
-      if (!config.url) {
-        outputs.onFail('请求URL不能为空');
-        return;
+      if (data.dynamicConfig) {
+        finnalConnector = data.dynamicConfig;
       }
 
-      // 检查URL格式
-      if (!/^https?:\/\//.test(config.url)) {
-        outputs.onFail('URL格式不正确，请以http://或https://开头');
-        return;
+      if (data.timeout) {
+        finnalConnector.timeout = data.timeout;
       }
 
-      Taro.request({
-        ...config,
-        success: (res) => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            outputs.onSuccess({
-              data: res.data,
-              statusCode: res.statusCode,
-              header: res.header,
-            });
-          } else {
-            outputs.onFail({
-              message: `请求失败: ${res.statusCode}`,
-              statusCode: res.statusCode,
-              data: res.data,
-            });
-          }
-        },
-        fail: (err) => {
-          outputs.onFail({
-            message: err.errMsg || '网络请求失败',
-            error: err,
-          });
-        },
-      });
-    } catch (error: any) {
-      console.error('网络请求失败:', error);
-      outputs.onFail({
-        message: error?.message || '网络请求失败',
-        error,
-      });
+      env
+        .request(finnalConnector, params, {
+          ...(data.connectorConfig || {}),
+          outputSchema: finnalConnector?.outputSchema,
+          isMultipleOutputs: true,
+        })
+        .then((val) => {
+          outputs[val?.__OUTPUT_ID__ ?? "then"](
+            val?.__ORIGIN_RESPONSE__ ?? val
+          );
+        })
+        .catch((err) => {
+          outputs["catch"](err);
+        });
+    } catch (ex) {
+      console.error(ex);
+
+      outputs["catch"](`执行错误 ${ex.message || ex}`);
+      //onError(ex.message)
     }
-  });
-};
+  } else {
+    outputs["catch"](`没有选择接口`);
+  }
+}
+
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) return false;
+
+  let proto = Object.getPrototypeOf(value);
+  if (proto === null) return true; // 没有原型的对象也视为普通对象
+
+  // 检查对象是否是由Object构造函数创建的
+  return proto === Object.prototype;
+}
+
+export default function ({ env, data, inputs, outputs, onError }) {
+  if (!env.runtime) {
+    return;
+  }
+
+  if (data.immediate) {
+    callCon({ env, data, outputs });
+  } else {
+    inputs["call"]((params) => {
+      // 如果 params 不是 对象，则转换为空对象
+      if (!isPlainObject(params)) {
+        params = {};
+      }
+
+      callCon({ env, data, outputs, onError }, params);
+    });
+  }
+}

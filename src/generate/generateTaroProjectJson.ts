@@ -188,6 +188,16 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
   // 处理 common 目录下的文件
   handleCommonDir(commonDir, files);
 
+  // 处理 common 目录下的 api.ts
+  const apiItem = files.find((item) => item.type === 'connector-api');
+  if (apiItem) {
+    commonDir.children = commonDir.children || [];
+    commonDir.children.push({
+      path: 'src/common/api.ts',
+      content: apiItem.content!,
+    });
+  }
+
   // 处理 popup 汇总文件 (type 为 popup 且无 meta)
   const popupFile = files.find((f) => f.type === "popup" && !f.meta);
   if (popupFile) {

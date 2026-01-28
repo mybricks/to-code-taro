@@ -26,6 +26,19 @@ export const buildEventsMap = (frames: any[]) => {
 };
 
 /**
+ * 构建连接器映射表
+ */
+export const buildConnectorMap = (plugins: any) => {
+  const servicePlugin = plugins?.["@mybricks/plugins/service"];
+  if (!servicePlugin) return null;
+
+  return {
+    connectors: servicePlugin.connectors || [],
+    config: servicePlugin.config || {}
+  };
+};
+
+/**
  * 创建场景查询函数
  */
 export const createGetSceneById = (sceneMap: Record<string, any>) => {
