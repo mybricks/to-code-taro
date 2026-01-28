@@ -1,7 +1,6 @@
 import { useRef, useState, useMemo } from 'react'
 import { proxyRefs } from './hooks'
-
-const GLOBAL_TODO_POOL = new Map<string, any[]>();
+import { TodoPool } from './pool'
 
 export interface ComContextStore {
   comRefs: any;
@@ -15,12 +14,12 @@ export interface ComContextStore {
     controller: any;
   };
   setPopupState: (state: any) => void;
-  globalTodoInputs: Map<string, any[]>;
+  todoPool: TodoPool;
 }
 
 export function useAppCreateContext(id: string): ComContextStore {
-  const globalTodoInputs = useRef<Map<string, any[]>>(GLOBAL_TODO_POOL);
-  const comRefs = useRef<any>(proxyRefs({ $inputs: {}, $outputs: {} }, undefined, globalTodoInputs.current));
+  const todoPool = useMemo(() => new TodoPool(), []);
+  const comRefs = useRef<any>(proxyRefs({ $inputs: {}, $outputs: {} }, undefined, todoPool));
   const $vars = useRef<any>({});
   const $fxs = useRef<any>({});
 
@@ -54,7 +53,7 @@ export function useAppCreateContext(id: string): ComContextStore {
     comRefs,
     $vars,
     $fxs,
-    globalTodoInputs: globalTodoInputs.current,
+    todoPool,
     appContext,
     popupState,
     setPopupState

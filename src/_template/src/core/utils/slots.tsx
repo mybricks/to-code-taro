@@ -2,6 +2,7 @@ import React, { useMemo, useRef } from "react";
 import ComContext, { SlotProvider, useAppContext, useParentSlot } from "./ComContext";
 import { createReactiveInputHandler } from "../mybricks/createReactiveInputHandler";
 import { proxyRefs } from "./hooks";
+import { TodoPool } from "./pool";
 
 type AnyRecord = Record<string, any>;
 
@@ -18,9 +19,9 @@ type SlotState = {
 /**
  * 创建一个具有“向上渗透”和“隔离 Todo 池”能力的 comRefs 对象
  */
-function createPenetratingComRefs(parentComRefs: any, globalTodoPool?: Map<string, any>, index: number = 0) {
+function createPenetratingComRefs(parentComRefs: any, todoPool?: TodoPool, index: number = 0) {
   const localTarget = { $inputs: {}, $outputs: {}, $index: index };
-  return { current: proxyRefs(localTarget, parentComRefs, globalTodoPool) };
+  return { current: proxyRefs(localTarget, parentComRefs, todoPool) };
 }
 
 function SlotParamsBridge(props: {
@@ -68,7 +69,7 @@ function createChannelProxy(title: string) {
 }
 
 export function useEnhancedSlots(rawSlots: any, id: string) {
-  const { comRefs: parentComRefs, globalTodoInputs } = useAppContext();
+  const { comRefs: parentComRefs, todoPool } = useAppContext();
   const slotStoreRef = useRef<Record<string, SlotState>>({});
 
   return useMemo(() => {
@@ -97,7 +98,7 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
             const scopeId = `${id}.${slotKey}::${String(rawScope)}`;
             const index = params?.inputValues?.index ?? 0;
             const scopedComRefs =
-              (state._scopedComRefs![scopeId] ||= createPenetratingComRefs(parentComRefs, globalTodoInputs, index));
+              (state._scopedComRefs![scopeId] ||= createPenetratingComRefs(parentComRefs, todoPool, index));
 
             return (
               <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
@@ -118,7 +119,7 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
     });
 
     return nextSlots;
-  }, [rawSlots, id, parentComRefs, globalTodoInputs]);
+  }, [rawSlots, id, parentComRefs, todoPool]);
 }
 
 export function ScopedComContextProvider(props: {

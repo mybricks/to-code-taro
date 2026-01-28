@@ -1,4 +1,5 @@
 export * from './hooks';
+export { TodoPool } from './pool';
 export { WithCom, WithWrapper } from './with';
 export { PopupRenderer } from './PopupRenderer';
 export { pageRouter, router } from './pageRouter';

@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { createReactiveInputHandler } from '../mybricks/createReactiveInputHandler';
 import { useAppContext, useParentSlot } from './ComContext';
+import { TodoPool } from './pool';
 
 /** 深度代理：支持响应式更新 */
 export function deepProxy(target: any, onSet?: () => void): any {
@@ -39,7 +40,7 @@ export function useModel(rawData: any) {
  * 2. 引用渗透：子作用域注册的真实引用自动同步至父级
  * 3. 自动同步清理：卸载时从作用域链中彻底移除，防止僵尸引用
  */
-export function proxyRefs(target: any, parentComRefs?: any, globalTodoPool?: Map<string, any[]>): any {
+export function proxyRefs(target: any, parentComRefs?: any, todoPool?: TodoPool): any {
   return new Proxy(target, {
     get(obj, prop) {
       if (prop === '__isProxy') return true;
@@ -55,14 +56,10 @@ export function proxyRefs(target: any, parentComRefs?: any, globalTodoPool?: Map
           get(_, method: string) {
             if (method === '__isShadow') return true;
             return (...args: any[]) => {
-              if (!(globalTodoPool instanceof Map)) return;
-
-              const instances = globalTodoPool.get(prop) || [];
-              if (!globalTodoPool.has(prop)) globalTodoPool.set(prop, instances);
+              if (!(todoPool instanceof TodoPool)) return;
 
               const index = obj.$index ?? 0;
-              const todo = instances[index] || (instances[index] = {});
-              todo[method] = args;
+              todoPool.push(prop, index, method, args);
             };
           }
         }));
@@ -98,7 +95,7 @@ export function proxyRefs(target: any, parentComRefs?: any, globalTodoPool?: Map
  */
 export function useBindInputs(scope: any, id: string, initialHandlers?: Record<string, any>) {
   const handlersRef = useRef<Record<string, any>>({ ...initialHandlers });
-  const { globalTodoInputs } = useAppContext();
+  const { todoPool } = useAppContext();
   const parentSlot = useParentSlot();
   const index = parentSlot?.params?.inputValues?.index ?? 0;
 
@@ -121,20 +118,13 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
             handlersRef.current[pin] = arg;
 
             // 处理指令重放
-            const instances = globalTodoInputs?.get(id);
-            const todo = instances?.[index] || instances?.[0];
-            if (todo?.[pin]) {
-              const pendingArgs = todo[pin];
+            const pendingArgs = todoPool?.pop(id, index, pin);
+            if (pendingArgs) {
               if (pin === '_setData') {
                 arg(...pendingArgs);
               } else {
                 createReactiveInputHandler({ input: arg, value: pendingArgs[0], rels: {}, title: id });
               }
-              delete todo[pin];
-
-              // 检查全局清理
-              const hasTasks = instances?.some((inst: any) => inst && Object.keys(inst).length > 0);
-              if (!hasTasks) globalTodoInputs.delete(id);
             }
           } else {
             const handler = handlersRef.current[pin];
@@ -154,7 +144,7 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
     }
 
     return proxy;
-  }, [scope, id, globalTodoInputs, index]);
+  }, [scope, id, todoPool, index]);
 }
 
 /** 组件事件绑定 Hook */
