@@ -87,7 +87,7 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
           render: (params?: any) => {
             const r = state._render;
             // 只有存在 key 或 index 时才认为是“多实例作用域插槽”，需要实例隔离
-            const rawScope = params?.key ?? params?.inputValues?.index ?? params?.inputValues?.itemData?.id;
+            const rawScope =  params?.inputValues?.index ?? params?.key;
             
             if (rawScope === undefined || rawScope === null) {
               return (
