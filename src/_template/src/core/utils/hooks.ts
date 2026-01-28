@@ -46,6 +46,10 @@ export function proxyRefs(target: any, parentComRefs?: any, globalTodoPool?: Map
       if (prop === 'toJSON') return () => obj;
 
       if (typeof prop === 'string' && prop.startsWith('u_') && obj[prop] === undefined) {
+        if (parentComRefs?.current) {
+          return parentComRefs.current[prop];
+        }
+
         // 懒加载影子对象
         return (obj[prop] = new Proxy({ __isShadow: true }, {
           get(_, method: string) {
