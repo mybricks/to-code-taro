@@ -45,7 +45,7 @@ export default function ({ env, data, inputs, outputs, title, style, extra }) {
   })
 
   const onLoad = useCallback(() => {
-    if (!env.runtim) {
+    if (!env.runtime) {
       return;
     }
     outputs["onLoad"](data.src);
