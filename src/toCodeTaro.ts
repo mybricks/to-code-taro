@@ -157,7 +157,7 @@ const getCode = (
   const eventsMap = buildEventsMap(tojson.frames);
   const getSceneById = createGetSceneById(sceneMap);
   const getExtensionEventById = createGetExtensionEventById(eventsMap);
-  const connectorMap = buildConnectorMap(tojson.plugins);
+  const connectorMap = buildConnectorMap((tojson as any).plugins);
 
   // ========== 第二步：处理扩展事件 ==========
   files.push(
