@@ -3,6 +3,7 @@ import { View } from "@tarojs/components";
 import cx from "classnames";
 import { isObject, isString, isNumber, isEmpty } from "./../utils/core/type";
 import { Rate, Field } from "brickd-mobile";
+import css from "./style.less";
 
 export default function (props) {
   const { env, data, inputs, outputs, slots, parentSlot } = props;
@@ -55,13 +56,15 @@ export default function (props) {
 
   return (
     // <Field label={data.label} name={data.name}>
-    <Rate
-      value={value}
-      onChange={onChange}
-      count={data.count}
-      allowHalf={data.allowHalf}
-      disabled={data.disabled}
-    />
+    <View className={css.rate}>
+      <Rate
+        value={value}
+        onChange={onChange}
+        count={data.count}
+        allowHalf={data.allowHalf}
+        disabled={data.disabled}
+      />
+    </View>
     // </Field>
   );
 }
