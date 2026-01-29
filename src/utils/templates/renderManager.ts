@@ -81,7 +81,7 @@ export class RenderManager {
         code += `${indent}${indent4}name: ${child.name !== undefined ? `'${child.name}'` : 'undefined'},\n`;
         code += `${indent}${indent4}style: ${childStyle},\n`;
         code += `${indent}${indent4}get inputs() { return comRefs.current['${child.id}'] },\n`;
-        code += `${indent}${indent4}get outputs() { return outputs['${child.id}'] },\n`;
+        code += `${indent}${indent4}get outputs() { return comRefs.current.$outputs['${child.id}'] },\n`;
         code += `${indent}${indent4}jsx: ${varName},\n`;
             code += `${indent}${indent3}},\n`;
           }
