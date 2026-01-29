@@ -35,6 +35,22 @@ interface ProcessSceneParams {
 }
 
 /**
+ * 获取需要调用的路由方法名
+ */
+const getCallMethodName = (com: any, pinId: string, isTargetPopup: boolean) => {
+  // 不是 open 方法，或者是弹窗，直接返回 pinId
+  if (pinId !== 'open' || isTargetPopup) return pinId;
+
+  // 页面跳转类型映射
+  const OPEN_TYPE_MAP = {
+    'blank': 'open',
+    'redirect': 'replace',
+  }
+  const openType = com?.model?.data?.openType
+  return OPEN_TYPE_MAP[openType] || openType || pinId;
+}
+
+/**
  * 处理单个场景
  */
 export const processScene = (params: ProcessSceneParams): void => {
@@ -131,9 +147,12 @@ export const processScene = (params: ProcessSceneParams): void => {
         const isInput = targetScene?.inputs?.some((pin: any) => pin.id === pinId);
         const isOutput = targetScene?.outputs?.some((pin: any) => pin.id === pinId);
 
+        // 调用的方法名
+        const callMethodName = getCallMethodName(com, pinId, isTargetPopup);
+
         if (isInput || isOutput) {
           return {
-            code: `${routerName}.${pinId}("${config.getPageId?.(sceneId) || sceneId}"${args ? `, ${args}` : ""})`,
+            code: `${routerName}.${callMethodName}("${config.getPageId?.(sceneId) || sceneId}"${args ? `, ${args}` : ""})`,
             import: {
               packageName: config.getComponentPackageName(),
               dependencyNames: [routerName],
@@ -205,4 +224,3 @@ export const processScenes = (
     });
   });
 };
-
