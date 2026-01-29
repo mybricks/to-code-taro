@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, useEffect } from 'react';
 import { createReactiveInputHandler } from '../mybricks/createReactiveInputHandler';
 import { useAppContext, useParentSlot } from './ComContext';
 import { TodoPool } from './pool';
+import { ComRefResolver } from './comRefResolver';
 
 /** 深度代理：支持响应式更新 */
 export function deepProxy(target: any, onSet?: () => void): any {
@@ -34,51 +35,59 @@ export function useModel(rawData: any) {
   return useMemo(() => deepProxy(dataRef.current, () => forceUpdate({})), []);
 }
 
-/** 
+/**
  * 组件引用代理：
  * 1. 自动缓冲：访问未渲染组件时返回影子对象，缓冲后续指令
  * 2. 引用渗透：子作用域注册的真实引用自动同步至父级
  * 3. 自动同步清理：卸载时从作用域链中彻底移除，防止僵尸引用
+ *
+ * 使用 ComRefResolver 统一处理引用解析逻辑
  */
 export function proxyRefs(target: any, parentComRefs?: any, todoPool?: TodoPool): any {
+  // 创建解析器，链接父级解析器
+  const parentResolver = parentComRefs?.current?.__resolver as ComRefResolver | undefined;
+  const scopeIndex = target.$index ?? 0;
+  const resolver = new ComRefResolver(target, parentResolver, todoPool, scopeIndex);
+
+  // 存储解析器引用，供子级使用
+  target.__resolver = resolver;
+
   return new Proxy(target, {
     get(obj, prop) {
       if (prop === '__isProxy') return true;
+      if (prop === '__resolver') return resolver;
       if (prop === 'toJSON') return () => obj;
 
-      if (typeof prop === 'string' && prop.startsWith('u_') && obj[prop] === undefined) {
-        // 先检查父级是否有真实引用（非影子对象）
-        if (parentComRefs?.current?.[prop] && !parentComRefs.current[prop].__isShadow) {
-          return parentComRefs.current[prop];
-        }
-        // 在当前作用域创建影子对象，使用当前作用域的 $index
-        const currentIndex = obj.$index ?? 0;
-        return (obj[prop] = new Proxy({ __isShadow: true }, {
-          get(_, method: string) {
-            if (method === '__isShadow') return true;
-            return (...args: any[]) => {
-              if (!(todoPool instanceof TodoPool)) return;
-              todoPool.push(prop, currentIndex, method, args);
-            };
-          }
-        }));
+      // u_ 开头的组件引用，统一由解析器处理
+      if (typeof prop === 'string' && prop.startsWith('u_')) {
+        return resolver.get(prop);
       }
       return obj[prop];
     },
+
     set(obj, prop, value) {
       const result = Reflect.set(obj, prop, value);
-      const isRealRef = typeof prop === 'string' && !prop.startsWith('$') && value?.__isShadow !== true;
 
-      if (isRealRef && parentComRefs?.current) {
+      // 真实引用注册时，同步到解析器
+      const isRealRef = typeof prop === 'string'
+        && !prop.startsWith('$')
+        && value?.__isShadow !== true;
+
+      if (isRealRef && typeof prop === 'string' && prop.startsWith('u_')) {
+        resolver.set(prop, value);
+      } else if (isRealRef && parentComRefs?.current) {
+        // 非 u_ 开头的属性，保持原有的父级渗透逻辑
         try { parentComRefs.current[prop] = value; } catch {}
       }
       return result;
     },
+
     deleteProperty(obj, prop) {
       const result = Reflect.deleteProperty(obj, prop);
-      const isRealRef = typeof prop === 'string' && !prop.startsWith('$');
 
-      if (isRealRef && parentComRefs?.current) {
+      if (typeof prop === 'string' && prop.startsWith('u_')) {
+        resolver.delete(prop);
+      } else if (typeof prop === 'string' && !prop.startsWith('$') && parentComRefs?.current) {
         try { delete parentComRefs.current[prop]; } catch {}
       }
       return result;
@@ -110,6 +119,7 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
     const proxy = new Proxy({}, {
       get: (target, pin: string) => {
         if (pin === '__isShadow') return false;
+        if (pin === '__isLazyProxy') return false;
         if (pin === 'toJSON') return () => target;
 
         return (arg: any, ...args: any[]) => {

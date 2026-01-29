@@ -1,5 +1,6 @@
 export * from './hooks';
 export { TodoPool } from './pool';
+export { ComRefResolver } from './comRefResolver';
 export { WithCom, WithWrapper } from './with';
 export { PopupRenderer } from './PopupRenderer';
 export { pageRouter, router } from './pageRouter';
