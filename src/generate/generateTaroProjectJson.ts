@@ -6,6 +6,7 @@ import { handleCommonDir } from "./utils/commonDir";
 import { handleTabBarImages } from "./utils/tabBarImages";
 import { handlePageImages } from "./utils/pageImages";
 import { updateAppConfig } from "./utils/appConfig";
+import { updateCustomTabBar } from "./utils/customTabBar";
 import type { GenerationResult, GeneratedFile } from "../toCodeTaro";
 import { genScopedJSModules } from "../utils/logic/genJSModules";
 
@@ -167,23 +168,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
   handlePageImages(assetsDir, pageImages);
 
   // 替换自定义 Tabbar 配置文件
-  const CUSTOM_TAB_BAR_CONFIG_PATH = "src/custom-tab-bar/mybricks/tabbar-config.ts"
-  const customTabBarItem = files.find((item) => item.type === 'customTabBar');
-  if (customTabBarItem?.content) {
-    const customTabBarDir = ensureDir(srcDir, "src/custom-tab-bar");
-    const mybricksDir = ensureDir(customTabBarDir, "src/custom-tab-bar/mybricks");
-    const tabbarConfigFileIndex = mybricksDir.children?.findIndex(
-      (node) => node.path === CUSTOM_TAB_BAR_CONFIG_PATH,
-    );
-    if (tabbarConfigFileIndex === -1) {
-      mybricksDir.children!.push({
-        path: CUSTOM_TAB_BAR_CONFIG_PATH,
-        content: customTabBarItem.content,
-      })
-    } else {
-      mybricksDir.children[tabbarConfigFileIndex].content = customTabBarItem.content;
-    }
-  }
+  updateCustomTabBar(srcDir, files);
 
   // 处理 common 目录下的文件
   handleCommonDir(commonDir, files);
