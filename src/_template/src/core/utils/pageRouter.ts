@@ -20,7 +20,16 @@ class TaroRouter {
       params = { data: this.paramsBackup[name] };
     }
 
-    return { value: params };
+    // 解析真实参数
+    const paramsDataStr = params.data ? decodeURIComponent(params.data) : undefined;
+    let paramsData;
+    try {
+      paramsData = paramsDataStr ? JSON.parse(paramsDataStr) : undefined;
+    } catch (error) {
+      paramsData = paramsDataStr;
+    }
+
+    return { value: paramsData };
   }
 
   push(name: string, { value }: any) {
