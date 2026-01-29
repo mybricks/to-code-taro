@@ -47,19 +47,18 @@ export function proxyRefs(target: any, parentComRefs?: any, todoPool?: TodoPool)
       if (prop === 'toJSON') return () => obj;
 
       if (typeof prop === 'string' && prop.startsWith('u_') && obj[prop] === undefined) {
-        if (parentComRefs?.current) {
+        // 先检查父级是否有真实引用（非影子对象）
+        if (parentComRefs?.current?.[prop] && !parentComRefs.current[prop].__isShadow) {
           return parentComRefs.current[prop];
         }
-
-        // 懒加载影子对象
+        // 在当前作用域创建影子对象，使用当前作用域的 $index
+        const currentIndex = obj.$index ?? 0;
         return (obj[prop] = new Proxy({ __isShadow: true }, {
           get(_, method: string) {
             if (method === '__isShadow') return true;
             return (...args: any[]) => {
               if (!(todoPool instanceof TodoPool)) return;
-
-              const index = obj.$index ?? 0;
-              todoPool.push(prop, index, method, args);
+              todoPool.push(prop, currentIndex, method, args);
             };
           }
         }));
