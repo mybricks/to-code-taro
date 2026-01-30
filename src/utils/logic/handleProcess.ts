@@ -27,7 +27,7 @@ const isJsCalculationComponent = (namespace: string): boolean => {
  */
 const isJsApiComponent = (namespace: string, rtType?: string): boolean => {
   return (
-    namespace.startsWith("mybricks.taro._") &&
+    namespace.startsWith("mybricks.taro.") &&
     rtType?.match(/^js/gi) !== null
   );
 };
