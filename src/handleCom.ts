@@ -119,12 +119,7 @@ const prepareComponent = (com: Com, config: HandleComConfig) => {
  */
 const prepareStyles = (com: Com) => {
   const { meta, props } = com;
-  // 鸿蒙化：合并 data.layout 到样式中，确保容器布局生效
-  const styleWithLayout = {
-    ...(props.style || {}),
-    layout: props.data?.layout || props.style?.layout
-  };
-  const resultStyle = convertComponentStyle(styleWithLayout);
+  const resultStyle = convertComponentStyle(props.style || {});
   const cssContent = convertStyleAryToCss((props.style as any)?.styleAry, meta.id);
   return { cssContent, rootStyle: resultStyle.root || {} };
 };

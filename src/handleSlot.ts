@@ -139,8 +139,7 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults
   const propsStyle = props.style || {};
   const mergedStyle = { width: "100%", height: "100%", ...slotStyle, ...propsStyle };
   
-  // 鸿蒙化：优先使用 config 中传递的 layout（来自父容器 data.layout），否则使用 slot 自身的 layout
-  const layout = config.layout || ui.layout || mergedStyle.layout;
+  const layout = ui.layout || mergedStyle.layout;
   const smart = isSmartLayout(layout);
   const layoutAdjustment = smart
     ? { position: isHasInSmartLayout(childrenResults) ? "fixed" : "relative" }
