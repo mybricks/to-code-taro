@@ -263,7 +263,7 @@ const processSceneInputs = (currentScene: any, config: any, addDependencyImport:
           importType: "named",
         });
         // 使用 SUBJECT_SUBSCRIBE 订阅，不修改 Subject.js
-        code += `\n${indent}  ${controllerName}.getParams("${currentScene.id}")[SUBJECT_SUBSCRIBE]((val: any) => {\n${indent}    if (val) inputs.open(val);\n${indent}  });`;
+        code += `\n${indent}  ${controllerName}.getParams("${currentScene.id}")[SUBJECT_SUBSCRIBE]((val: any) => {\n${indent}    inputs.open(val);\n${indent}  });`;
       }
     }
   });
