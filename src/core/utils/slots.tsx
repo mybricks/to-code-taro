@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useCallback } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import ComContext, { SlotProvider, useAppContext, useParentSlot } from "./ComContext";
 import { createReactiveInputHandler } from "../mybricks/createReactiveInputHandler";
 import { proxyRefs } from "./hooks";
@@ -6,19 +6,57 @@ import { TodoPool } from "./pool";
 
 type AnyRecord = Record<string, any>;
 
+/** Channel Proxy 类型 */
+type ChannelProxy = Record<string, (arg: any) => any>;
+
+/** Slot 渲染函数类型 */
+type SlotRenderFunction = React.ComponentType<{
+  inputValues?: Record<string, any>;
+  [key: string]: any;
+}>;
+
 type SlotState = {
-  inputs: any;
-  outputs: any;
-  _inputs: any;
+  inputs: ChannelProxy;
+  outputs: ChannelProxy;
+  _inputs: ChannelProxy;
   /** scopeId -> scoped comRefs（每个 scope 一套，避免列表多实例覆盖） */
-  _scopedComRefs?: Record<string, any>;
-  _render?: any;
+  _scopedComRefs: Record<string, any>;
+  _render?: SlotRenderFunction;
   /** 存储 inputValues，当 inputs 被调用时更新 */
-  _inputValues?: Record<string, any>;
-  /** 触发重渲染的回调 */
-  _triggerUpdate?: () => void;
-  render: (params?: any) => any;
+  _inputValues: Record<string, any>;
+  render: (params?: any) => React.ReactNode;
 };
+
+/**
+ * 合并 slot 参数
+ * 只有当有实际的 inputValues 时才合并，否则保持 undefined 以便从父级继承
+ */
+function mergeSlotParams(
+  stateInputValues: Record<string, any> | undefined,
+  params?: any
+): any {
+  const hasStateInputValues = stateInputValues && Object.keys(stateInputValues).length > 0;
+  const hasParamsInputValues = params?.inputValues && Object.keys(params.inputValues).length > 0;
+
+  if (!hasStateInputValues && !hasParamsInputValues) {
+    return params || {};
+  }
+
+  return {
+    ...(params || {}),
+    inputValues: {
+      ...(stateInputValues || {}),
+      ...(params?.inputValues || {}),
+    },
+  };
+}
+
+/**
+ * 生成作用域 ID
+ */
+function createScopeId(id: string, slotKey: string, rawScope: any): string {
+  return `${id}.${slotKey}::${String(rawScope)}`;
+}
 
 /**
  * 创建一个具有"向上渗透"和"隔离 Todo 池"能力的 comRefs 对象
@@ -107,19 +145,7 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
           _render: undefined,
           render: (params?: any) => {
             const r = state._render;
-            // 只有当有实际的 inputValues 时才合并，否则保持 undefined 以便从父级继承
-            const hasStateInputValues = state._inputValues && Object.keys(state._inputValues).length > 0;
-            const hasParamsInputValues = params?.inputValues && Object.keys(params.inputValues).length > 0;
-
-            const mergedParams = hasStateInputValues || hasParamsInputValues
-              ? {
-                  ...(params || {}),
-                  inputValues: {
-                    ...(state._inputValues || {}),
-                    ...(params?.inputValues || {}),
-                  },
-                }
-              : params || {};
+            const mergedParams = mergeSlotParams(state._inputValues, params);
 
             // 只有存在 key 或 index 时才认为是"多实例作用域插槽"，需要实例隔离
             const rawScope = mergedParams?.inputValues?.index ?? params?.key;
@@ -129,10 +155,10 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
               );
             }
 
-            const scopeId = `${id}.${slotKey}::${String(rawScope)}`;
+            const scopeId = createScopeId(id, slotKey, rawScope);
             const index = mergedParams?.inputValues?.index ?? 0;
             const scopedComRefs =
-              (state._scopedComRefs![scopeId] ||= createPenetratingComRefs(parentComRefs, todoPool, index));
+              (state._scopedComRefs[scopeId] ||= createPenetratingComRefs(parentComRefs, todoPool, index));
 
             return (
               <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
