@@ -13,7 +13,23 @@ class TaroRouter {
 
   getParams(name: string) {
     const instance = Taro.getCurrentInstance();
-    let params = instance.router?.params || {};
+    const inputParams: any = instance.router?.params || {};
+
+    // 直接页面"打开"，会有data包裹参数
+    // 使用“跳转到”逻辑组件，会直接传递参数
+    // TODO: 没有特殊字段和结构可以判断，现只能尽量加条件来判断
+    let params =
+      Object.keys(inputParams).length === 2 &&
+      inputParams.data &&
+      typeof inputParams.data === "string"
+        ? inputParams
+        : {
+            data:
+              Object.keys(inputParams).length > 1
+                ? JSON.stringify({ ...inputParams, $taroTimestamp: undefined })
+                : undefined,
+            $taroTimestamp: inputParams.$taroTimestamp,
+          };
 
     // 备份参数，解决某些生命周期下 Taro 获取不到 params 的问题
     if (!params.data && this.paramsBackup[name]) {
@@ -21,7 +37,9 @@ class TaroRouter {
     }
 
     // 解析真实参数
-    const paramsDataStr = params.data ? decodeURIComponent(params.data) : undefined;
+    const paramsDataStr = params.data
+      ? decodeURIComponent(params.data)
+      : undefined;
     let paramsData;
     try {
       paramsData = paramsDataStr ? JSON.parse(paramsDataStr) : undefined;

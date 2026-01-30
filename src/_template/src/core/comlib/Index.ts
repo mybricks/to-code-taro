@@ -31,8 +31,8 @@ export { default as mybricks_taro_openCamera } from './_OpenCamera';
 export type { DataType as mybricks_taro_openCamera_DataType } from './_OpenCamera';
 
 // 系统功能
-export { default as mybricks_taro_openUrl } from './_OpenUrl';
-export type { DataType as mybricks_taro_openUrl_DataType } from './_OpenUrl';
+export { default as mybricks_taro_open } from './_Open';
+export type { DataType as mybricks_taro_open_DataType } from './_Open';
 
 export { default as mybricks_taro_share } from './_Share';
 export type { DataType as mybricks_taro_share_DataType } from './_Share';
@@ -69,8 +69,8 @@ export type { DataType as mybricks_taro_connectorGlobalHeaders_DataType } from '
 export { default as mybricks_taro_navigateBack } from './_BackTo';
 export type { DataType as mybricks_taro_navigateBack_DataType } from './_BackTo';
 
-export { default as mybricks_taro_router } from './_Router';
-export type { DataType as mybricks_taro_router_DataType } from './_Router';
+export { default as mybricks_taro_goto } from './_Goto';
+export type { DataType as mybricks_taro_goto_DataType } from './_Goto';
 
 export { default as mybricks_taro_openPetalMap } from './_OpenPetalMap';
 export type { DataType as mybricks_taro_openPetalMap_DataType } from './_OpenPetalMap';
