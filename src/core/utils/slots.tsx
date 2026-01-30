@@ -107,14 +107,19 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
           _render: undefined,
           render: (params?: any) => {
             const r = state._render;
-            // 合并外部传入的 params 和通过 inputs 调用设置的 inputValues
-            const mergedParams = {
-              ...(params || {}),
-              inputValues: {
-                ...(state._inputValues || {}),
-                ...(params?.inputValues || {}),
-              },
-            };
+            // 只有当有实际的 inputValues 时才合并，否则保持 undefined 以便从父级继承
+            const hasStateInputValues = state._inputValues && Object.keys(state._inputValues).length > 0;
+            const hasParamsInputValues = params?.inputValues && Object.keys(params.inputValues).length > 0;
+
+            const mergedParams = hasStateInputValues || hasParamsInputValues
+              ? {
+                  ...(params || {}),
+                  inputValues: {
+                    ...(state._inputValues || {}),
+                    ...(params?.inputValues || {}),
+                  },
+                }
+              : params || {};
 
             // 只有存在 key 或 index 时才认为是"多实例作用域插槽"，需要实例隔离
             const rawScope = mergedParams?.inputValues?.index ?? params?.key;
