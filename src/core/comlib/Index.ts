@@ -69,8 +69,8 @@ export type { DataType as mybricks_taro_connectorGlobalHeaders_DataType } from '
 export { default as mybricks_taro_navigateBack } from './_BackTo';
 export type { DataType as mybricks_taro_navigateBack_DataType } from './_BackTo';
 
-export { default as mybricks_taro_router } from './_Router';
-export type { DataType as mybricks_taro_router_DataType } from './_Router';
+export { default as mybricks_taro_goto } from './_Goto';
+export type { DataType as mybricks_taro_goto_DataType } from './_Goto';
 
 export { default as mybricks_taro_openPetalMap } from './_OpenPetalMap';
 export type { DataType as mybricks_taro_openPetalMap_DataType } from './_OpenPetalMap';
