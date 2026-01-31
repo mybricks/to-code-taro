@@ -7,7 +7,6 @@ export type DataType = {
   mask?: boolean;
   asynchronous?: boolean;
   icon?: "success" | "error" | "loading" | "none";
-  image?: string;
 };
 
 export interface Inputs {
@@ -32,7 +31,6 @@ export default (context: IOContext) => {
   const outputs: Outputs = context.outputs;
 
   inputs.showToast?.((val: DataType | string) => {
-    console.log(111, context);
     try {
       /** 动态输入 */
       if (data?.dynamic) {
