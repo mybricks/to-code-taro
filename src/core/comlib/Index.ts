@@ -2,13 +2,16 @@
 export { default as mybricks_taro_connector } from './_Connector';
 export type { DataType as mybricks_taro_connector_DataType } from './_Connector';
 
+export { default as mybricks_taro_connectorGlobalHeaders } from './_ConnectorGlobalHeaders';
+export type { DataType as mybricks_taro_connectorGlobalHeaders_DataType } from './_ConnectorGlobalHeaders';
+
 // 字符格式化
 export { default as mybricks_taro_format } from './_Format';
 export type { DataType as mybricks_taro_format_DataType } from './_Format';
 
 // 延迟执行
-export { default as mybricks_taro_timerDebounce } from './_TimerDebounce';
-export type { DataType as mybricks_taro_timerDebounce_DataType } from './_TimerDebounce';
+export { default as mybricks_taro_timerDelay } from './_TimerDelay';
+export type { DataType as mybricks_taro_timerDelay_DataType } from './_TimerDelay';
 
 // 写入本地缓存
 export { default as mybricks_taro_setStorage } from './_SetStorage';
@@ -54,18 +57,40 @@ export type { DataType as mybricks_taro_hideLoading_DataType } from './_hideLoad
 export { default as mybricks_taro_modal } from './_Modal';
 export type { DataType as mybricks_taro_modal_DataType } from './_Modal';
 
+// 显示操作菜单
+export { default as mybricks_taro_showActionSheet } from './_showActionSheet';
+export type { DataType as mybricks_taro_showActionSheet_DataType } from './_showActionSheet';
 
+// 写入剪贴板
+export { default as mybricks_taro_setClipboardData } from './_setClipboardData';
+export type { DataType as mybricks_taro_setClipboardData_DataType } from './_setClipboardData';
 
+// 单文件上传
+export { default as mybricks_taro_uploadFile } from './_uploadFile';
+export type { DataType as mybricks_taro_uploadFile_DataType } from './_uploadFile';
 
+// 获取登录凭证
+export { default as mybricks_taro_login } from './_login';
+export type { DataType as mybricks_taro_login_DataType } from './_login';
 
+// 获取 scheme
+export { default as mybricks_taro_generateScheme } from './_generateScheme';
+export type { DataType as mybricks_taro_generateScheme_DataType } from './_generateScheme';
 
+// 设置当前页标题
+export { default as mybricks_taro_setNavigationBarTitle } from './_setNavigationBarTitle';
+export type { DataType as mybricks_taro_setNavigationBarTitle_DataType } from './_setNavigationBarTitle';
 
 // 扫码
 export { default as mybricks_taro_scanQrcode } from './_ScanQrcode';
 export type { DataType as mybricks_taro_scanQrcode_DataType } from './_ScanQrcode';
 
-export { default as mybricks_taro_removeStorage } from './_RemoveStorage';
-export type { DataType as mybricks_taro_removeStorage_DataType } from './_RemoveStorage';
+
+
+
+
+
+
 
 // 地理位置
 export { default as mybricks_taro_getLocation } from './_GetLocation';
@@ -98,9 +123,6 @@ export type { DataType as mybricks_taro_chooseFile_DataType } from './_ChooseFil
 export { default as mybricks_taro_chooseMedia } from './_ChooseMedia';
 export type { DataType as mybricks_taro_chooseMedia_DataType } from './_ChooseMedia';
 
-export { default as mybricks_taro_connectorGlobalHeaders } from './_ConnectorGlobalHeaders';
-export type { DataType as mybricks_taro_connectorGlobalHeaders_DataType } from './_ConnectorGlobalHeaders';
-
 
 export { default as mybricks_taro_openPetalMap } from './_OpenPetalMap';
 export type { DataType as mybricks_taro_openPetalMap_DataType } from './_OpenPetalMap';
@@ -109,9 +131,9 @@ export type { DataType as mybricks_taro_openPetalMap_DataType } from './_OpenPet
 export { default as mybricks_taro_textToSpeech } from './_TextToSpeech';
 export type { DataType as mybricks_taro_textToSpeech_DataType } from './_TextToSpeech';
 
-export { default as mybricks_taro_timerDelay } from './_TimerDelay';
-export type { DataType as mybricks_taro_timerDelay_DataType } from './_TimerDelay';
-
 export { default as mybricks_taro_timerThrottle } from './_TimerThrottle';
 export type { DataType as mybricks_taro_timerThrottle_DataType } from './_TimerThrottle';
+
+export { default as mybricks_taro_timerDebounce } from './_TimerDebounce';
+export type { DataType as mybricks_taro_timerDebounce_DataType } from './_TimerDebounce';
 

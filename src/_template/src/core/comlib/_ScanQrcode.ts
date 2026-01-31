@@ -1,12 +1,11 @@
-import Taro from '@tarojs/taro';
+import Taro from "@tarojs/taro";
 
 export type DataType = {
   onlyFromCamera?: boolean;
-  scanType?: ('barCode' | 'qrCode' | 'datamatrix' | 'pdf417')[];
 };
 
 export interface Inputs {
-  scan?: (fn: (val: DataType | any, relOutputs?: any) => void) => void;
+  scan?: (fn: () => void) => void;
 }
 
 export interface Outputs {
@@ -25,24 +24,24 @@ export default (context: IOContext) => {
   const inputs: Inputs = context.inputs;
   const outputs: Outputs = context.outputs;
 
-  inputs.scan?.((val: DataType | any) => {
+  inputs.scan?.(() => {
     try {
-      const scanConfig = {
-        onlyFromCamera: val?.onlyFromCamera ?? data.onlyFromCamera ?? false,
-        scanType: val?.scanType ?? data.scanType ?? ['barCode', 'qrCode'],
-        success: (res: any) => {
-          outputs.onSuccess(res.result || res);
+      Taro.scanCode({
+        onlyFromCamera: data.onlyFromCamera,
+        success: ({ result, scanType }) => {
+          if (result) {
+            outputs["onSuccess"]?.({ result, scanType });
+          } else {
+            outputs["onFail"]?.({});
+          }
         },
-        fail: (err: any) => {
-          outputs.onFail(err.errMsg || '扫码失败');
+        fail: ({ errMsg }) => {
+          outputs["onFail"]?.({ errMsg });
         },
-      };
-
-      Taro.scanCode(scanConfig);
+      });
     } catch (error: any) {
-      console.error('扫码失败:', error);
-      outputs.onFail(error?.message || '扫码失败');
+      console.error("扫码失败:", error);
+      outputs.onFail(error?.message || "扫码失败");
     }
   });
 };
-
