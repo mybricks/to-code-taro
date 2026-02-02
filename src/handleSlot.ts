@@ -146,7 +146,7 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults
     : hasFixedChildren(childrenResults) ? { transform: "translateX(0)" } : {};
 
   const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout, ...layoutAdjustment }));
-  
+
   const rootClassName = getRootComponentClassName(config.getCurrentScene(), config.checkIsRoot());
   // 插槽根容器增强：加上可读的标识，便于用户定位/调试
   // - className: slot-<parentComId>
@@ -155,7 +155,10 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults
   const classNameStr = [rootClassName, slotMarkClass].filter(Boolean).join(" ");
   const classNameAttr = classNameStr ? ` className='${classNameStr}'` : "";
 
-  return `${indent}<View${classNameAttr} style={${styleCode}}>\n${childrenUi}\n${indent}</View>`;
+  // 支持通过 params.style 传递额外样式
+  const styleAttr = slotMarkClass ? `style={{...params.style || {}, ...${styleCode}}}` : `style={${styleCode}}`;
+
+  return `${indent}<View${classNameAttr} ${styleAttr}>\n${childrenUi}\n${indent}</View>`;
 };
 
 /**
