@@ -18,7 +18,8 @@ export type HandleComResult = any;
  */
 const COM_PROTOCOL: Record<string, { useWrap?: boolean }> = {
   "mybricks.taro.formContainer": { useWrap: true },
-  "mybricks.taro.formAdditionContainer": { useWrap: true },
+  // 移除 FormAdditionContainer 的配置，因为它的 runtime 没有传递 wrap 函数
+  // "mybricks.taro.formAdditionContainer": { useWrap: true },
 };
 
 /**
