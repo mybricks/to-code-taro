@@ -97,23 +97,41 @@ export type { DataType as mybricks_taro_choosemessagefile_DataType } from './_Ch
 export { default as mybricks_taro_open_camera } from './_OpenCamera';
 export type { DataType as mybricks_taro_open_camera_DataType } from './_OpenCamera';
 
+// 拨打电话
+export { default as mybricks_taro_callPhone } from './_CallPhone';
+export type { DataType as mybricks_taro_callPhone_DataType } from './_CallPhone';
 
-
-
-
-
-
-
-// 地理位置
+// 获取用户定位
 export { default as mybricks_taro_getLocation } from './_GetLocation';
 export type { DataType as mybricks_taro_getLocation_DataType } from './_GetLocation';
+
+// 地图选点
+export { default as mybricks_taro_chooseLocation } from './_ChooseLocation';
+export type { DataType as mybricks_taro_chooseLocation_DataType } from './_ChooseLocation';
+
+// 查询地址信息
+export { default as mybricks_taro_mapservice_geocoder } from './_GetAddress';
+export type { DataType as mybricks_taro_mapservice_geocoder_DataType } from './_GetAddress';
+
+// 路线规划
+export { default as mybricks_taro_mapservice_drive } from './_GetDrivePath';
+export type { DataType as mybricks_taro_mapservice_drive_DataType } from './_GetDrivePath';
+
+// 获取收货地址
+export { default as mybricks_taro_chooseAddress } from './_ChooseAddress';
+export type { DataType as mybricks_taro_chooseAddress_DataType } from './_ChooseAddress';
+
+// 查看位置
+export { default as mybricks_taro_openLocation } from './_OpenLocation';
+export type { DataType as mybricks_taro_openLocation_DataType } from './_OpenLocation';
+
+
+
+
 
 // 设备功能
 export { default as mybricks_taro_vibrate } from './_Vibrate';
 export type { DataType as mybricks_taro_vibrate_DataType } from './_Vibrate';
-
-export { default as mybricks_taro_callPhone } from './_CallPhone';
-export type { DataType as mybricks_taro_callPhone_DataType } from './_CallPhone';
 
 export { default as mybricks_taro_share } from './_Share';
 export type { DataType as mybricks_taro_share_DataType } from './_Share';
