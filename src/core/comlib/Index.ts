@@ -125,6 +125,26 @@ export type { DataType as mybricks_taro_chooseAddress_DataType } from './_Choose
 export { default as mybricks_taro_openLocation } from './_OpenLocation';
 export type { DataType as mybricks_taro_openLocation_DataType } from './_OpenLocation';
 
+// 预览图片
+export { default as mybricks_taro_previewImage } from './_PreviewImage';
+export type { DataType as mybricks_taro_previewImage_DataType } from './_PreviewImage';
+
+// 保存图片到系统相册
+export { default as mybricks_taro_saveImageToPhotosAlbum } from './_SaveImageToPhotosAlbum';
+export type { DataType as mybricks_taro_saveImageToPhotosAlbum_DataType } from './_SaveImageToPhotosAlbum';
+
+// 保存视频到系统相册
+export { default as mybricks_taro_saveVideoToPhotosAlbum } from './_SaveVideoToPhotosAlbum';
+export type { DataType as mybricks_taro_saveVideoToPhotosAlbum_DataType } from './_SaveVideoToPhotosAlbum';
+
+// 图片绘制
+export { default as mybricks_taro_poster } from './_Poster';
+export type { DataType as mybricks_taro_poster_DataType } from './_Poster';
+
+// 订阅消息
+export { default as mybricks_taro_requestSubscribeMessage } from './_RequestSubscribeMessage';
+export type { DataType as mybricks_taro_requestSubscribeMessage_DataType } from './_RequestSubscribeMessage';
+
 
 
 
@@ -143,11 +163,6 @@ export type { DataType as mybricks_taro_getSystemInfo_DataType } from './_GetSys
 export { default as mybricks_taro_aesEncode } from './_AesEncode';
 export type { DataType as mybricks_taro_aesEncode_DataType } from './_AesEncode';
 
-
-export { default as mybricks_taro_openPetalMap } from './_OpenPetalMap';
-export type { DataType as mybricks_taro_openPetalMap_DataType } from './_OpenPetalMap';
-
-// 语音和多媒体
 export { default as mybricks_taro_textToSpeech } from './_TextToSpeech';
 export type { DataType as mybricks_taro_textToSpeech_DataType } from './_TextToSpeech';
 
