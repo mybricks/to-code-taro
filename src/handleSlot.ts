@@ -142,7 +142,7 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults
   const layout = ui.layout || mergedStyle.layout;
   const smart = isSmartLayout(layout);
   const layoutAdjustment = smart
-    ? { position: isHasInSmartLayout(childrenResults) ? "fixed" : "relative" }
+    ? { position: "relative" }
     : hasFixedChildren(childrenResults) ? { transform: "translateX(0)" } : {};
 
   const styleCode = JSON.stringify(convertRootStyle({ ...mergedStyle, layout, ...layoutAdjustment }));
@@ -191,10 +191,6 @@ const hasFixedChildren = (childrenResults: any[]) => {
  */
 const isSmartLayout = (layout: any) => {
   return layout === "smart" || layout?.position === "smart";
-}
-
-const isHasInSmartLayout = (childrenResults: any[]) => {
-  return childrenResults.some((item) => item?.rootStyle?.inSmartLayout === true );
 }
 
 export default handleSlot;
