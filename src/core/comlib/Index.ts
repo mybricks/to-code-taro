@@ -145,6 +145,22 @@ export type { DataType as mybricks_taro_poster_DataType } from './_Poster';
 export { default as mybricks_taro_requestSubscribeMessage } from './_RequestSubscribeMessage';
 export type { DataType as mybricks_taro_requestSubscribeMessage_DataType } from './_RequestSubscribeMessage';
 
+// 微信支付弹窗
+export { default as mybricks_taro_wxPay } from './_WxPay';
+export type { DataType as mybricks_taro_wxPay_DataType } from './_WxPay';
+
+// 打开视频号
+export { default as mybricks_taro_openChannelsActivity } from './_OpenChannelsActivity';
+export type { DataType as mybricks_taro_openChannelsActivity_DataType } from './_OpenChannelsActivity';
+
+// 打开视频号主页
+export { default as mybricks_taro_openChannelsUserProfile } from './_OpenChannelsUserProfile';
+export type { DataType as mybricks_taro_openChannelsUserProfile_DataType } from './_OpenChannelsUserProfile';
+
+// 获取运动步数
+export { default as mybricks_taro_getWeRunData } from './_GetWeRunData';
+export type { DataType as mybricks_taro_getWeRunData_DataType } from './_GetWeRunData';
+
 
 
 
