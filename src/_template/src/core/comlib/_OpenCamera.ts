@@ -1,65 +1,49 @@
-import Taro from '@tarojs/taro';
+import Taro from '@tarojs/taro'
 
 export type DataType = {
-  camera?: 'back' | 'front';
-  flash?: 'auto' | 'on' | 'off';
-  quality?: 'high' | 'normal' | 'low';
-};
+  selectMethodConfig?: 'both' | 'camera' | 'album' // 照片选取方式
+  photoCount?: number // 选择的照片数量
+}
 
 export interface Inputs {
-  openCamera?: (fn: (config: DataType, relOutputs?: any) => void) => void;
+  takePhotos?: (fn: () => void) => void
 }
 
 export interface Outputs {
-  onSuccess: (value?: any) => void;
-  onFail: (value?: any) => void;
+  onSuccess: (value?: any) => void
+  onFail: (value?: any) => void
 }
 
 interface IOContext {
-  data: DataType;
-  inputs: Inputs;
-  outputs: Outputs;
+  data: DataType
+  inputs: Inputs
+  outputs: Outputs
 }
 
 export default (context: IOContext) => {
-  const data: DataType = context.data;
-  const inputs: Inputs = context.inputs;
-  const outputs: Outputs = context.outputs;
+  const data: DataType = context.data
+  const inputs: Inputs = context.inputs
+  const outputs: Outputs = context.outputs
 
-  inputs.openCamera?.((val: DataType) => {
+  inputs.takePhotos?.(() => {
     try {
-      const config = {
-        camera: val?.camera || data.camera || 'back',
-        flash: val?.flash || data.flash || 'auto',
-        quality: val?.quality || data.quality || 'normal',
-      };
-
-      // Taro没有直接的打开相机API，我们可以：
-      // 1. 使用chooseImage并设置sourceType为camera
-      // 2. 或者提示用户使用系统相机
-
       Taro.chooseImage({
-        count: 1,
-        sourceType: ['camera'],
-        success: (res) => {
-          outputs.onSuccess({
-            type: 'camera',
-            tempFilePath: res.tempFilePaths[0],
-            tempFile: res.tempFiles[0],
-            config,
-          });
+        count: data.photoCount, // 默认9
+        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+        sourceType: data.selectMethodConfig, // 可以指定来源是相册还是相机，默认二者都有，在H5浏览器端支持使用 `user` 和 `environment`分别指定为前后摄像头
+        success: function (res: any) {
+          // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
+          // var tempFilePaths = res.tempFilePaths;
+          // outputs["onSuccess"]?.(tempFilePaths);
+          outputs['onSuccess']?.(res)
         },
-        fail: (err) => {
-          if (err.errMsg?.includes('cancel')) {
-            outputs.onFail('用户取消拍照');
-          } else {
-            outputs.onFail(err.errMsg || '打开相机失败');
-          }
+        fail: ({ errMsg }: any) => {
+          outputs['onFail']?.({ errMsg })
         },
-      });
+      })
     } catch (error: any) {
-      console.error('打开相机失败:', error);
-      outputs.onFail(error?.message || '打开相机失败');
+      console.error('打开相机失败:', error)
+      outputs.onFail(error?.message || '打开相机失败')
     }
-  });
-};
+  })
+}
