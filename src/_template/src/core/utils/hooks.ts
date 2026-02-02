@@ -165,10 +165,9 @@ export function useBindEvents(props: any, context?: { id: string, name: string, 
       if (typeof props[key] === 'function') {
         const handler = props[key];
         const wrapped = (original: any) => {
-          const value = context?.parentSlot?.params?.itemWrap 
-            ? { id: context.id, name: context.name, value: original } 
-            : original;
-          return handler(value);
+          // 直接传递原始值，不再包装
+          // 组件内部已经通过 parentSlot?._inputs["onChange"] 手动处理了 FormContainer 的数据收集
+          return handler(original);
         };
         wrapped.getConnections = () => [{ id: 'default' }];
         events[key] = wrapped;
