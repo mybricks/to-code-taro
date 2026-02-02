@@ -34,56 +34,68 @@ export { default as mybricks_taro_navigateBack } from './_BackTo';
 export type { DataType as mybricks_taro_navigateBack_DataType } from './_BackTo';
 
 // 获取路由信息
-export { default as mybricks_taro_getRouter } from './_getRouter';
-export type { DataType as mybricks_taro_getRouter_DataType } from './_getRouter';
+export { default as mybricks_taro_getRouter } from './_GetRouter';
+export type { DataType as mybricks_taro_getRouter_DataType } from './_GetRouter';
 
 // 显示 Toast
 export { default as mybricks_taro_showToast } from './_ShowToast';
 export type { DataType as mybricks_taro_showToast_DataType } from './_ShowToast';
 
 // 隐藏 Toast
-export { default as mybricks_taro_hideToast } from './_hideToast';
-export type { DataType as mybricks_taro_hideToast_DataType } from './_hideToast';
+export { default as mybricks_taro_hideToast } from './_HideToast';
+export type { DataType as mybricks_taro_hideToast_DataType } from './_HideToast';
 
 // 显示 Loading
-export { default as mybricks_taro_showLoading } from './_showLoading';
-export type { DataType as mybricks_taro_showLoading_DataType } from './_showLoading';
+export { default as mybricks_taro_showLoading } from './_ShowLoading';
+export type { DataType as mybricks_taro_showLoading_DataType } from './_ShowLoading';
 
 // 隐藏 Loading
-export { default as mybricks_taro_hideLoading } from './_hideLoading';
-export type { DataType as mybricks_taro_hideLoading_DataType } from './_hideLoading';
+export { default as mybricks_taro_hideLoading } from './_HideLoading';
+export type { DataType as mybricks_taro_hideLoading_DataType } from './_HideLoading';
 
 // 模态对话框
 export { default as mybricks_taro_modal } from './_Modal';
 export type { DataType as mybricks_taro_modal_DataType } from './_Modal';
 
 // 显示操作菜单
-export { default as mybricks_taro_showActionSheet } from './_showActionSheet';
-export type { DataType as mybricks_taro_showActionSheet_DataType } from './_showActionSheet';
+export { default as mybricks_taro_showActionSheet } from './_ShowActionSheet';
+export type { DataType as mybricks_taro_showActionSheet_DataType } from './_ShowActionSheet';
 
 // 写入剪贴板
-export { default as mybricks_taro_setClipboardData } from './_setClipboardData';
-export type { DataType as mybricks_taro_setClipboardData_DataType } from './_setClipboardData';
+export { default as mybricks_taro_setClipboardData } from './_SetClipboardData';
+export type { DataType as mybricks_taro_setClipboardData_DataType } from './_SetClipboardData';
 
 // 单文件上传
-export { default as mybricks_taro_uploadFile } from './_uploadFile';
-export type { DataType as mybricks_taro_uploadFile_DataType } from './_uploadFile';
+export { default as mybricks_taro_uploadFile } from './_UploadFile';
+export type { DataType as mybricks_taro_uploadFile_DataType } from './_UploadFile';
 
 // 获取登录凭证
-export { default as mybricks_taro_login } from './_login';
-export type { DataType as mybricks_taro_login_DataType } from './_login';
+export { default as mybricks_taro_login } from './_Login';
+export type { DataType as mybricks_taro_login_DataType } from './_Login';
 
 // 获取 scheme
-export { default as mybricks_taro_generateScheme } from './_generateScheme';
-export type { DataType as mybricks_taro_generateScheme_DataType } from './_generateScheme';
+export { default as mybricks_taro_generateScheme } from './_GenerateScheme';
+export type { DataType as mybricks_taro_generateScheme_DataType } from './_GenerateScheme';
 
 // 设置当前页标题
-export { default as mybricks_taro_setNavigationBarTitle } from './_setNavigationBarTitle';
-export type { DataType as mybricks_taro_setNavigationBarTitle_DataType } from './_setNavigationBarTitle';
+export { default as mybricks_taro_setNavigationBarTitle } from './_SetNavigationBarTitle';
+export type { DataType as mybricks_taro_setNavigationBarTitle_DataType } from './_SetNavigationBarTitle';
 
 // 扫码
 export { default as mybricks_taro_scanQrcode } from './_ScanQrcode';
 export type { DataType as mybricks_taro_scanQrcode_DataType } from './_ScanQrcode';
+
+// 选择图片或视频
+export { default as mybricks_taro_chooseMedia } from './_ChooseMedia';
+export type { DataType as mybricks_taro_chooseMedia_DataType } from './_ChooseMedia';
+
+// 文件选择
+export { default as mybricks_taro_choosemessagefile } from './_ChooseMessageFile';
+export type { DataType as mybricks_taro_choosemessagefile_DataType } from './_ChooseMessageFile';
+
+// 打开相机/相册
+export { default as mybricks_taro_open_camera } from './_OpenCamera';
+export type { DataType as mybricks_taro_open_camera_DataType } from './_OpenCamera';
 
 
 
@@ -103,9 +115,6 @@ export type { DataType as mybricks_taro_vibrate_DataType } from './_Vibrate';
 export { default as mybricks_taro_callPhone } from './_CallPhone';
 export type { DataType as mybricks_taro_callPhone_DataType } from './_CallPhone';
 
-export { default as mybricks_taro_openCamera } from './_OpenCamera';
-export type { DataType as mybricks_taro_openCamera_DataType } from './_OpenCamera';
-
 export { default as mybricks_taro_share } from './_Share';
 export type { DataType as mybricks_taro_share_DataType } from './_Share';
 
@@ -115,13 +124,6 @@ export type { DataType as mybricks_taro_getSystemInfo_DataType } from './_GetSys
 // 数据处理
 export { default as mybricks_taro_aesEncode } from './_AesEncode';
 export type { DataType as mybricks_taro_aesEncode_DataType } from './_AesEncode';
-
-// 文件和媒体
-export { default as mybricks_taro_chooseFile } from './_ChooseFile';
-export type { DataType as mybricks_taro_chooseFile_DataType } from './_ChooseFile';
-
-export { default as mybricks_taro_chooseMedia } from './_ChooseMedia';
-export type { DataType as mybricks_taro_chooseMedia_DataType } from './_ChooseMedia';
 
 
 export { default as mybricks_taro_openPetalMap } from './_OpenPetalMap';
