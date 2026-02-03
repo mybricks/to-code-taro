@@ -16,7 +16,7 @@ export default function ({ id, env, data, inputs, outputs }) {
         outputs["onUnexposure"]?.(res);
       }
     });
-  }, []);
+  }, [io, id, outputs]);
 
   useEffect(() => {
     Taro.nextTick(() => {
