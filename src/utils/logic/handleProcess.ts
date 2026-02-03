@@ -26,8 +26,9 @@ const isJsCalculationComponent = (namespace: string): boolean => {
  * 判断是否是 JS API 组件
  */
 const isJsApiComponent = (namespace: string, rtType?: string): boolean => {
+  const jsCompNamespace = ['mybricks.taro.', 'mybricks.normal-pc.']
   return (
-    namespace.startsWith("mybricks.taro.") &&
+    jsCompNamespace.some(_namespace => namespace.startsWith(_namespace)) &&
     rtType?.match(/^js/gi) !== null
   );
 };

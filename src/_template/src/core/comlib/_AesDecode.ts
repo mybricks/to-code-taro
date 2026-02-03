@@ -26,6 +26,7 @@ export default (context: IOContext) => {
 
   inputs.call?.((val) => {
     try {
+      //
       if (!val || !data.key || !data.iv) {
         outputs['result']('')
         return
@@ -39,18 +40,18 @@ export default (context: IOContext) => {
         data.iv.padEnd(16, '0').slice(0, 16),
       )
 
-      // AES 加密
-      const encrypted = CryptoJS.AES.encrypt(val, fixedKey, {
+      // AES 解密
+      const decrypted = CryptoJS.AES.decrypt(val, fixedKey, {
         iv: fixedIv,
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7,
       })
 
-      // 输出 Base64 编码的加密结果
-      const encryptedBase64 = encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+      // 输出解密后的结果
+      const decryptedText = decrypted.toString(CryptoJS.enc.Utf8)
 
-      // 输出加密结果
-      outputs['result'](encryptedBase64)
+      // 输出解密结果
+      outputs['result'](decryptedText)
     } catch (error: any) {
       console.error('AES加密失败:', error)
     }

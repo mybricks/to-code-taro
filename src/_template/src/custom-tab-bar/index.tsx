@@ -1,12 +1,10 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import cx from "classnames";
 import * as Taro from "@tarojs/taro";
 import { View, Image } from "@tarojs/components";
 import DynamicIcon from "../components/components/dynamic-icon";
 import css from "./style.less";
-
 import tabBarJson from "./mybricks/tabbar-config";
-import { tabbarIns } from "./utils/tabbar";
+import { tabbarIns } from "@/core/utils/tabbar";
 
 tabbarIns.initWithLength(tabBarJson.length);
 
@@ -57,10 +55,6 @@ function CustomTabBar() {
       ? itemData.selectedIconStyle
       : itemData.normalIconStyle;
 
-    let iconSlotCx = cx({
-      ["iconSlot"]: true,
-    });
-
     let formatText = "";
     if (itemData.active) {
       switch (true) {
@@ -81,7 +75,7 @@ function CustomTabBar() {
       }
     }
     return (
-      <View className={iconSlotCx}>
+      <View className={css.iconSlot}>
         {useImgIcon ? (
           <Image
             style={{
@@ -101,7 +95,9 @@ function CustomTabBar() {
           />
         )}
         {itemData.active && (
-          <View className={`badge ${!formatText ? "small" : "normal"}`}>
+          <View
+            className={`${css.badge} ${!formatText ? css.small : css.normal}`}
+          >
             {formatText}
           </View>
         )}

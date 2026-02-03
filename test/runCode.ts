@@ -25,7 +25,8 @@ async function runCode() {
         const { namespace = "", rtType = "" } = com.def || {};
 
         // JS API 组件（以 _ 开头，如 _showToast）
-        if (namespace.startsWith(`${compNamespace}.`) && rtType?.match(/^js/gi) !== null) {
+        const jsCompNamespace = [`${compNamespace}.`, 'mybricks.normal-pc.']
+        if (jsCompNamespace.some(_namespace => namespace.startsWith(_namespace)) && rtType?.match(/^js/gi) !== null) {
           const importName = convertNamespaceToImportName(namespace);
           return {
             importInfo: {
