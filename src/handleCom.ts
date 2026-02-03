@@ -265,6 +265,8 @@ const buildSlotLogicCode = (args: {
     addConsumer: config.addConsumer,
     getParams: () => paramsProxy,
   } as any)
+    .replace(/this\.\$vars\./g, "$vars.current.")
+    .replace(/this\.\$fxs\./g, "$fxs.current.")
     .replace(/this\./g, "comRefs.current.")
     .replace(/comRefs\.current\.([a-zA-Z0-9_]+)\.controller_/g, "comRefs.current.$1.")
     .replace(/comRefs\.current\.slot_Index\./g, "comRefs.current.");
