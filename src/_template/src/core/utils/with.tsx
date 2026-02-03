@@ -107,7 +107,7 @@ export const WithCom: React.FC<WithComProps> = (props) => {
 
   return (
     show || isPopup ? (
-      <View className={className} style={{ ...style, ...dynamicStyle }} >
+      <View id={id} className={className} style={{ ...style, ...dynamicStyle }} >
         {jsx}
         {props.children}
       </View>

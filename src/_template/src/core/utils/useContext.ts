@@ -43,6 +43,7 @@ export function useAppCreateContext(id: string): ComContextStore {
       runtime: true,
       request: (connector: any, params: any, config: any) => request(connector, params, config, { $vars }),
     },
+    rootScroll: {},
     edit: false,
     isH5: false,
     isDesigner: false,
