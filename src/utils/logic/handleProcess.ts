@@ -337,7 +337,7 @@ const getNextCode = (props: any, config: HandleProcessConfig, isSameScope: boole
   // 这样可以确保 trigger 和 cancel 两个输入端口生成不同的变量名
   const pinId = props.id;
   const sanitizedPinId = pinId.replace(/[^a-zA-Z0-9_]/g, '_');
-  return `const ${componentNameWithId}_${sanitizedPinId}_result = `;
+  return `const ${componentNameWithId}_${sanitizedPinId}_result: any = `;
 };
 
 /**
