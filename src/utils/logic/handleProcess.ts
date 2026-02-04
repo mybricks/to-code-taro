@@ -138,11 +138,20 @@ export const handleProcess = (
   });
 
   // 处理节点调用
+  // 边遍历边构建映射：确保引用时只能看到已声明的变量
+  const outputToInputPinMap = new Map<string, string>();
+
   process.nodesInvocation.forEach((props: any) => {
     const { componentType, category, runType } = props;
-    let nextValue = getNextValue(props, config, event);
+    const nextValue = getNextValue(props, config, event, outputToInputPinMap);
     const isSameScope = checkIsSameScope(event, props);
     const nextCode = getNextCode(props, config, isSameScope, event);
+
+    // 声明后记录映射，供后续引用
+    const inputPinId = props.id.replace(/[^a-zA-Z0-9_]/g, '_');
+    props.nextParam?.forEach((np: any) => {
+      outputToInputPinMap.set(`${props.meta.id}_${np.id}`, inputPinId);
+    });
 
     if (code) {
       code += "\n";
@@ -324,7 +333,11 @@ const getNextCode = (props: any, config: HandleProcessConfig, isSameScope: boole
   }
 
   const componentNameWithId = getComponentNameWithId(props, config, event);
-  return `const ${componentNameWithId}_result = `;
+  // 使用输入端口ID（props.id）来区分同一组件的不同调用
+  // 这样可以确保 trigger 和 cancel 两个输入端口生成不同的变量名
+  const pinId = props.id;
+  const sanitizedPinId = pinId.replace(/[^a-zA-Z0-9_]/g, '_');
+  return `const ${componentNameWithId}_${sanitizedPinId}_result = `;
 };
 
 /**
@@ -346,7 +359,12 @@ function getFrameInputValueExpr(meta: any, config: HandleProcessConfig, event: a
   }
 }
 
-const getNextValue = (props: any, config: HandleProcessConfig, event: any) => {
+const getNextValue = (
+  props: any,
+  config: HandleProcessConfig,
+  event: any,
+  outputToInputPinMap?: Map<string, string>
+) => {
   const { paramSource } = props;
   const nextValue = paramSource.map((param: any) => {
     if (param.type === "params") {
@@ -365,6 +383,15 @@ const getNextValue = (props: any, config: HandleProcessConfig, event: any) => {
     // 变量组件直接返回 Subject，不加 .id 后缀
     if (param.meta?.def?.namespace?.includes(".var")) {
       return `${componentNameWithId}_result`;
+    }
+
+    // 从 outputToInputPinMap 中查找对应的输入端口ID
+    // key = `${componentId}_${outputPinId}`
+    const key = `${param.meta?.id}_${param.id}`;
+    const inputPinId = outputToInputPinMap?.get(key);
+
+    if (inputPinId) {
+      return `${componentNameWithId}_${inputPinId}_result.${param.id}`;
     }
     return `${componentNameWithId}_result.${param.id}`;
   });
@@ -391,6 +418,11 @@ const getNextValueWithParam = (
   // 变量组件直接返回 Subject
   if (param.meta?.def?.namespace?.includes(".var")) {
     return `${componentNameWithId}_result`;
+  }
+  // 使用 connectId（连接ID）来引用对应的 result 变量
+  const connectId = param.connectId;
+  if (connectId) {
+    return `${componentNameWithId}_${connectId}_result.${param.id}`;
   }
   return `${componentNameWithId}_result.${param.id}`;
 };
