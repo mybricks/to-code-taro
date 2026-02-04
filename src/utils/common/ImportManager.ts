@@ -51,10 +51,32 @@ export class ImportManager {
     }
   }
 
+  /**
+   * 获取 import 排序优先级
+   * 1. 第三方包（react, @tarojs 等）
+   * 2. 绝对路径别名（@/xxx）
+   * 3. 相对路径（./xxx, ../xxx）
+   */
+  private getImportPriority(packageName: string): number {
+    if (packageName.startsWith('./') || packageName.startsWith('../')) {
+      return 3; // 相对路径
+    }
+    if (packageName.startsWith('@/')) {
+      return 2; // 绝对路径别名
+    }
+    return 1; // 第三方包
+  }
+
   /** 依赖解析为code */
   toCode() {
     const indent = indentation(this._config.codeStyle!.indent);
-    return Object.entries(this._imports).reduce(
+
+    // 对 imports 按优先级排序
+    const sortedEntries = Object.entries(this._imports).sort(([a], [b]) => {
+      return this.getImportPriority(a) - this.getImportPriority(b);
+    });
+
+    return sortedEntries.reduce(
       (pre, [packageName, dependencies]) => {
         let defaultDependency = "";
         let namedDependencies = "";
