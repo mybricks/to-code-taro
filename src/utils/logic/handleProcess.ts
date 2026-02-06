@@ -508,7 +508,7 @@ const generateJsCalculationComponentCode = (params: {
     (props.outputs
       ? `\n${indent2}outputs: [${props.outputs.map((output: string) => `"${output}"`).join(", ")}],`
       : "") +
-    `\n${indent}}, appContext)\n`
+    `\n${indent}}, appContext, '${meta.id}')\n`
   );
 };
 
@@ -585,6 +585,6 @@ const generateJsApiComponentCode = (params: {
       : "") +
     `\n${indent2}},` +
     `\n${indent2}appContext` +
-    `\n${indent}})\n`
+    `\n${indent}}, '${meta.id}')\n`
   );
 };

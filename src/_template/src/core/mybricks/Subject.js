@@ -17,19 +17,25 @@ export class Subject {
 
   constructor(params = {}) {
     this._log = params.log
+    this._subjectNextCache = {}
     return new Proxy(this, {
       get(target, prop) {
         if (prop in target) {
           return target[prop];
         }
 
-        const subjectNext = new SubjectNext(prop)
+        // 缓存 SubjectNext，避免重复访问同一属性时创建新实例和新订阅
+        if (!target._subjectNextCache[prop]) {
+          const subjectNext = new SubjectNext(prop)
 
-        target[SUBJECT_SUBSCRIBE]((value, extra) => {
-          subjectNext[SUBJECT_NEXT](value, extra)
-        })
+          target[SUBJECT_SUBSCRIBE]((value, extra) => {
+            subjectNext[SUBJECT_NEXT](value, extra)
+          })
 
-        return subjectNext
+          target._subjectNextCache[prop] = subjectNext
+        }
+
+        return target._subjectNextCache[prop]
       }
     })
   }

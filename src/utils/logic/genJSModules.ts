@@ -79,7 +79,7 @@ export const genScopedJSModules = (
 import { createJSHandle } from "${importCreateJSHandleFrom}";
 import { _execJs } from "${importRuntimeFrom}";
 
-export const jsModules: Record<string, (props: any, appContext: any) => any> = {};
+export const jsModules: Record<string, (props: any, appContext: any, handleKey?: string) => any> = {};
 `;
 
   jsModules.forEach((module) => {
@@ -94,7 +94,7 @@ export const jsModules: Record<string, (props: any, appContext: any) => any> = {
     code += `\n// ${title}\n`;
     code += `const js_${id} = ${decodedCode};\n`;
     code += `const _execJs_${id} = _execJs(js_${id});\n`;
-    code += `jsModules.${id} = (props, appContext) => createJSHandle(_execJs_${id}, { props, appContext });\n`;
+    code += `jsModules.${id} = (props, appContext, handleKey) => createJSHandle(_execJs_${id}, { props, appContext }, handleKey);\n`;
   });
 
   code += `\n`;
