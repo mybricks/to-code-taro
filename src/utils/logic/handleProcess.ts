@@ -382,6 +382,12 @@ const getNextValue = (
     const componentNameWithId = getComponentNameWithId(param, config, event);
     // 变量组件直接返回 Subject，不加 .id 后缀
     if (param.meta?.def?.namespace?.includes(".var")) {
+      // 从 outputToInputPinMap 中查找对应的输入端口ID
+      const key = `${param.meta?.id}_${param.id}`;
+      const inputPinId = outputToInputPinMap?.get(key);
+      if (inputPinId) {
+        return `${componentNameWithId}_${inputPinId}_result`;
+      }
       return `${componentNameWithId}_result`;
     }
 
@@ -417,6 +423,10 @@ const getNextValueWithParam = (
   const componentNameWithId = getComponentNameWithId(param, config, event);
   // 变量组件直接返回 Subject
   if (param.meta?.def?.namespace?.includes(".var")) {
+    const connectId = param.connectId;
+    if (connectId) {
+      return `${componentNameWithId}_${connectId}_result`;
+    }
     return `${componentNameWithId}_result`;
   }
   // 使用 connectId（连接ID）来引用对应的 result 变量
