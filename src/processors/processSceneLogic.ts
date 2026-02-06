@@ -60,7 +60,7 @@ const processVarEvents = (
   const importParams = { isPopup: config.isPopup };
   addDependencyImport({
     packageName: config.getUtilsPackageName(importParams),
-    dependencyNames: ["SUBJECT_SUBSCRIBE", "SUBJECT_VALUE"],
+    dependencyNames: ["SUBJECT_SUBSCRIBE"],
     importType: "named",
   });
   varEvents.forEach((varEvent: any) => {
@@ -94,11 +94,9 @@ const processVarEvents = (
     if (!process.trim()) return;
 
     code += `\n${indent}  /** 变量 ${sanitizeBlockComment(com.title || varName)} 的 ${pinId} */`;
-    // 统一逻辑函数：changed 触发 + 首次 get() 回放（解决“set 早于订阅”的丢事件）
+    // 订阅变量的 changed 事件
     code += `\n${indent}  const run_${varName}_${pinId} = (value: any) => {\n${process}\n${indent}  };`;
     code += `\n${indent}  $vars.current.${varName}.${pinId}?.()[SUBJECT_SUBSCRIBE](run_${varName}_${pinId});`;
-    code += `\n${indent}  const init_${varName}_${pinId} = $vars.current.${varName}.get?.();`;
-    code += `\n${indent}  run_${varName}_${pinId}(init_${varName}_${pinId}?.[SUBJECT_VALUE]);`;
   });
 
   return code;
