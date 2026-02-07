@@ -97,6 +97,7 @@ export interface GeneratedFile {
     | "abstractEventTypeDef"
     | "fx"
     | "api"
+    | "pageModel"
     | "connector-api"
     | "extension-event"
     | "jsModulesRuntime"
@@ -179,7 +180,7 @@ const getCode = (
   const globalVarTypeDef = buildGlobalVarTypeDef(tojson.global.comsReg);
   const defaultFxsMap = buildDefaultFxsMap(tojson.global.fxFrames || []);
 
-  // ========== 第四步：处理全局变量和 FX ==========
+  // ========== 第四步：处理全局变量、FX、其他全局配置 ==========
   files.push(
     ...handleGlobal(
       {

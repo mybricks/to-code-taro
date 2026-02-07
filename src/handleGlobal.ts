@@ -1,5 +1,5 @@
 /**
- * 处理全局变量和全局Fx
+ * 处理全局变量、全局Fx、其他全局配置
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -179,6 +179,12 @@ const handleGlobal = (
   }
 
   return [
+    {
+      type: "pageModel",
+      content: JSON.stringify(tojson.pageModel, null, 2),
+      importManager: null,
+      name: "pageModel",
+    },
     {
       type: "global",
       content: varCode + "\n\n" + fxCode,

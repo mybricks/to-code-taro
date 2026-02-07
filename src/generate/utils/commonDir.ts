@@ -46,5 +46,16 @@ export function handleCommonDir(commonDir: FileNode, items: GenerateItem[]): voi
       content: fullContent,
     });
   }
+
+  // 处理pageModel
+  const pageModelItem = items.find((item) => item.type === 'pageModel');
+  if (pageModelItem) {
+    const fileContent = pageModelItem.content || '{}';
+    const fullContent = `export default ${fileContent}`;
+    commonDir.children.push({
+      path: 'src/common/pageModel.ts',
+      content: fullContent,
+    });
+  }
 }
 
