@@ -105,7 +105,6 @@ export interface GeneratedFile {
     | "customTabBar";
   meta?: ReturnType<typeof toCode>["scenes"][0]["scene"];
   name: string;
-  tabBarConfig?: string; // TabBar 配置内容（用于 app.config.ts）
 }
 
 /** 统一的生成结果结构 */

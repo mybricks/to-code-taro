@@ -99,7 +99,6 @@ export const buildFinalResults = (
       content: globalTabBarConfig,
       importManager: new ImportManager(config),
       name: "tabBarConfig",
-      tabBarConfig: globalTabBarConfig,
     });
 
     files.push({

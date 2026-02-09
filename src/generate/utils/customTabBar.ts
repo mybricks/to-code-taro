@@ -4,7 +4,7 @@
 
 import { GeneratedFile } from '../../toCodeTaro'
 import { ensureDir } from './fileNode'
-import { runInNewContext } from 'node:vm'
+import { parseLooseObject } from './fileNode'
 
 interface FileNode {
   path: string
@@ -59,13 +59,5 @@ export function updateCustomTabBar(srcDir: FileNode, files: GeneratedFile[]) {
     } else {
       customTabBarDir.children[tabBarJsonIndex].content = contentStr
     }
-  }
-}
-
-function parseLooseObject(raw: string) {
-  try {
-    return JSON.parse(raw)
-  } catch {
-    return runInNewContext(`(${raw})`, Object.create(null))
   }
 }

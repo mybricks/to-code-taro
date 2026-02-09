@@ -1,3 +1,5 @@
+import { runInNewContext } from 'node:vm'
+
 /**
  * 文件节点相关工具函数
  */
@@ -42,3 +44,13 @@ export function ensureDir(parentDir: FileNode, dirPath: string): FileNode {
   return dir;
 }
 
+/**
+ * 解析宽松格式的对象字符串
+ */
+export function parseLooseObject(raw: string) {
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return runInNewContext(`(${raw})`, Object.create(null))
+  }
+}
