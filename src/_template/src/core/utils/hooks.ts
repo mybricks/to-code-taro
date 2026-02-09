@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { createReactiveInputHandler } from '../mybricks/createReactiveInputHandler';
 import { useAppContext, useParentSlot } from './ComContext';
@@ -156,24 +157,62 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
   }, [scope, id, todoPool, index]);
 }
 
-/** 组件事件绑定 Hook */
-export function useBindEvents(props: any, context?: { id: string, name: string, parentSlot?: any }) {
+/** 内置通用能力 Hook：_setStyle / _setData / show / hide / showOrHide */
+export function useBuiltinHandlers(opts: {
+  data: any;
+  setDynamicStyle: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
+  isPopup: boolean;
+}) {
+  const { data, setDynamicStyle, setShow, isPopup } = opts;
   return useMemo(() => {
-    const events: Record<string, any> = {};
+    const handlers: Record<string, any> = {
+      _setStyle: (style: any) => {
+        setDynamicStyle((prev) => ({ ...prev, ...style }));
+      },
+      _setData: (path: string, value: any) => {
+        const paths = path.split('.');
+        let current = data;
+        for (let i = 0; i < paths.length - 1; i++) {
+          if (!current[paths[i]]) current[paths[i]] = {};
+          current = current[paths[i]];
+        }
+        current[paths[paths.length - 1]] = value;
+      }
+    };
+    if (!isPopup) {
+      Object.assign(handlers, {
+        show: () => setShow(true),
+        hide: () => setShow(false),
+        showOrHide: () => setShow((prev) => !prev),
+      });
+    }
+    return handlers;
+  }, [data, setDynamicStyle, setShow, isPopup]);
+}
 
+/**
+ * 组件输出绑定 Hook（与 useBindInputs 对称）
+ * - 从 props 提取事件函数，创建 eventProxy
+ * - 合并 slot outputs，注册到 comRefs.current.$outputs[id]
+ */
+export function useBindOutputs(
+  comRefs: any,
+  id: string,
+  props: any,
+  enhancedSlots: any,
+  context?: { id: string; name: string; parentSlot?: any }
+) {
+  const eventProxy = useMemo(() => {
+    const events: Record<string, any> = {};
     Object.keys(props).forEach(key => {
       if (typeof props[key] === 'function') {
         const handler = props[key];
-        const wrapped = (original: any) => {
-          // 直接传递原始值，不再包装
-          // 组件内部已经通过 parentSlot?._inputs["onChange"] 手动处理了 FormContainer 的数据收集
-          return handler(original);
-        };
+        const wrapped = (original: any) => handler(original);
         wrapped.getConnections = () => [{ id: 'default' }];
         events[key] = wrapped;
       }
     });
-
     return new Proxy(events, {
       get(target, key: string) {
         if (typeof key === 'string' && key.startsWith('on')) {
@@ -186,4 +225,26 @@ export function useBindEvents(props: any, context?: { id: string, name: string, 
       }
     });
   }, [props, context]);
+
+  if (comRefs?.current?.$outputs) {
+    const slotOutputsList = Object.values(enhancedSlots || {})
+      .map((slot: any) => slot?.outputs)
+      .filter(Boolean);
+
+    if (slotOutputsList.length > 0) {
+      comRefs.current.$outputs[id] = new Proxy({}, {
+        get(_, prop: string) {
+          for (const outputs of slotOutputsList) {
+            const fn = outputs[prop];
+            if (fn) return fn;
+          }
+          return eventProxy[prop];
+        }
+      });
+    } else {
+      comRefs.current.$outputs[id] = eventProxy;
+    }
+  }
+
+  return eventProxy;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // @ts-ignore 运行时由宿主项目提供 @tarojs/components
 import { View } from '@tarojs/components';
-import { useModel, useBindInputs, useBindEvents, subscribePopupRouter, closeActivePopupRouter } from './index';
+import { useModel, useBindInputs, useBuiltinHandlers, useBindOutputs, subscribePopupRouter, closeActivePopupRouter } from './index';
 import { useAppCreateContext } from './useContext';
 import ComContext, { useAppContext } from './ComContext';
 import { useEnhancedSlots, useResolvedParentSlot } from './slots';
@@ -31,58 +31,25 @@ export const WithCom: React.FC<WithComProps> = (props) => {
   //数据模型
   const _data = useModel(data || {});
 
-  // 内置通用能力
-  const handlers = {
-    _setStyle: (style: any) => {
-      setDynamicStyle((prev) => ({ ...prev, ...style }));
-    },
-    _setData: (path: string, value: any) => {
-      const paths = path.split('.');
-      let current = _data;
-      for (let i = 0; i < paths.length - 1; i++) {
-        if (!current[paths[i]]) current[paths[i]] = {};
-        current = current[paths[i]];
-      }
-      current[paths[paths.length - 1]] = value;
-    }
-  };
-
-  if (!isPopup) {
-    Object.assign(handlers, {
-      show: () => setShow(true),
-      hide: () => setShow(false),
-      showOrHide: () => setShow((prev) => !prev),
-    });
-  }
-
-  // 绑定输入，传入初始 handlers
-  const inputProxy = useBindInputs(comRefs, id, handlers);
-
   const { slots: rawSlots, parentSlot: parentSlotProp, ...restProps } = rest as any;
   const parentSlot = useResolvedParentSlot(parentSlotProp);
-
-  // 绑定事件，带上上下文（用于事件流自动封装 id/name）
-  const eventProxy = useBindEvents(restProps, { 
-    id, 
-    name: props.name || id, 
-    parentSlot 
-  });
-
-  // 注册 outputs 到注册表（按组件 id）
-  if (comRefs?.current?.$outputs) {
-    comRefs.current.$outputs[id] = eventProxy;
-  }
-
-  // 鸿蒙规范：确保 comRefs 中挂载的是最新的 inputProxy
-  comRefs.current[id] = inputProxy;
-
   const enhancedSlots = useEnhancedSlots(rawSlots, id);
 
+  // ---- inputs ----
+  const handlers = useBuiltinHandlers({ data: _data, setDynamicStyle, setShow, isPopup });
+  const inputProxy = useBindInputs(comRefs, id, handlers);
+
+  // ---- outputs ----
+  const outputProxy = useBindOutputs(comRefs, id, restProps, enhancedSlots, {
+    id, name: props.name || id, parentSlot
+  });
+
+  // ---- render ----
   const jsx = (
     <Component
       {...restProps}
       inputs={inputProxy}
-      outputs={eventProxy}
+      outputs={outputProxy}
       slots={enhancedSlots}
       parentSlot={parentSlot}
       data={_data}
@@ -92,22 +59,17 @@ export const WithCom: React.FC<WithComProps> = (props) => {
     />
   );
 
-  // 鸿蒙化处理：支持 itemWrap 协议
   if (parentSlot?.params?.itemWrap) {
     return parentSlot.params.itemWrap({
-      id,
-      name: props.name || id,
-      jsx,
+      id, name: props.name || id, jsx,
       def: (Component as any).def,
-      inputs: inputProxy,
-      outputs: eventProxy,
-      style
+      inputs: inputProxy, outputs: outputProxy, style
     });
   }
 
   return (
     show || isPopup ? (
-      <View  id={id} className={className} style={{ ...style, ...dynamicStyle }} >
+      <View id={id} className={className} style={{ ...style, ...dynamicStyle }}>
         {jsx}
         {props.children}
       </View>

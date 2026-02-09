@@ -24,8 +24,20 @@ type SlotState = {
   _render?: SlotRenderFunction;
   /** 存储 inputValues，当 inputs 被调用时更新 */
   _inputValues: Record<string, any>;
+  /** 缓存上次合并结果，避免引用变化导致 useEffect 死循环 */
+  _lastMergedParams?: any;
   render: (params?: any) => React.ReactNode;
 };
+
+/** 浅比较两个对象的第一层 key-value */
+function shallowEqual(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every(key => a[key] === b[key]);
+}
 
 /**
  * 合并 slot 参数
@@ -147,22 +159,33 @@ export function useEnhancedSlots(rawSlots: any, id: string) {
             const r = state._render;
             const mergedParams = mergeSlotParams(state._inputValues, params);
 
+            // 浅比较 inputValues，内容不变时复用上次引用，避免 useEffect 死循环
+            if (
+              state._lastMergedParams &&
+              shallowEqual(mergedParams?.inputValues, state._lastMergedParams?.inputValues)
+            ) {
+              // 内容没变，复用旧引用
+            } else {
+              state._lastMergedParams = mergedParams;
+            }
+            const stableParams = state._lastMergedParams;
+
             // 只有存在 key 或 index 时才认为是"多实例作用域插槽"，需要实例隔离
-            const rawScope = mergedParams?.inputValues?.index ?? params?.key;
+            const rawScope = stableParams?.inputValues?.index ?? params?.key;
             if (rawScope === undefined || rawScope === null) {
               return (
-                <SlotParamsBridge state={state} params={mergedParams} render={r} />
+                <SlotParamsBridge state={state} params={stableParams} render={r} />
               );
             }
 
             const scopeId = createScopeId(id, slotKey, rawScope);
-            const index = mergedParams?.inputValues?.index ?? 0;
+            const index = stableParams?.inputValues?.index ?? 0;
             const scopedComRefs =
               (state._scopedComRefs[scopeId] ||= createPenetratingComRefs(parentComRefs, todoPool, index));
 
             return (
               <ScopedComContextProvider comRefs={scopedComRefs} scopeId={scopeId}>
-                <SlotParamsBridge state={state} params={mergedParams} render={r} />
+                <SlotParamsBridge state={state} params={stableParams} render={r} />
               </ScopedComContextProvider>
             );
           },
