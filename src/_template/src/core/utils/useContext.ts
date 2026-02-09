@@ -1,4 +1,6 @@
 import { useRef, useState, useMemo } from 'react'
+// @ts-ignore
+import * as Taro from '@tarojs/taro'
 import { proxyRefs } from './hooks'
 import { TodoPool } from './pool'
 // @ts-ignore
@@ -43,7 +45,15 @@ export function useAppCreateContext(id: string): ComContextStore {
     env: {
       runtime: true,
       request: (connector: any, params: any, config: any) => request(connector, params, config, { $vars }),
-      tabbar: tabbarIns
+      tabbar: tabbarIns,
+      uploadFile: (params: any) => {
+        const { success, fail, ...rest } = params
+        Taro.uploadFile({
+          ...rest,
+          success: (res: any) => success?.(res),
+          fail: (err: any) => fail?.(err),
+        })
+      },
     },
     rootScroll: {},
     edit: false,

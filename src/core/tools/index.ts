@@ -58,6 +58,7 @@ export function uuid(pre = "u_", len = 6) {
 }
 
 export { useUpdateEffect };
+export { default as UploadOssHelper } from './oss';
 
 export function deepCopy(obj: any, cache: any = []) {
   if (obj === null || typeof obj !== "object") {
