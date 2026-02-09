@@ -157,38 +157,6 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
   }, [scope, id, todoPool, index]);
 }
 
-/** 组件事件绑定 Hook */
-export function useBindEvents(props: any, context?: { id: string, name: string, parentSlot?: any }) {
-  return useMemo(() => {
-    const events: Record<string, any> = {};
-
-    Object.keys(props).forEach(key => {
-      if (typeof props[key] === 'function') {
-        const handler = props[key];
-        const wrapped = (original: any) => {
-          // 直接传递原始值，不再包装
-          // 组件内部已经通过 parentSlot?._inputs["onChange"] 手动处理了 FormContainer 的数据收集
-          return handler(original);
-        };
-        wrapped.getConnections = () => [{ id: 'default' }];
-        events[key] = wrapped;
-      }
-    });
-
-    return new Proxy(events, {
-      get(target, key: string) {
-        if (typeof key === 'string' && key.startsWith('on')) {
-          if (target[key]) return target[key];
-          const fn: any = () => {};
-          fn.getConnections = () => [];
-          return fn;
-        }
-        return target[key];
-      }
-    });
-  }, [props, context]);
-}
-
 /** 内置通用能力 Hook：_setStyle / _setData / show / hide / showOrHide */
 export function useBuiltinHandlers(opts: {
   data: any;
@@ -223,30 +191,60 @@ export function useBuiltinHandlers(opts: {
   }, [data, setDynamicStyle, setShow, isPopup]);
 }
 
-/** 注册 $outputs：合并事件代理 + 各插槽的 outputs */
-export function useRegisterOutputs(
+/**
+ * 组件输出绑定 Hook（与 useBindInputs 对称）
+ * - 从 props 提取事件函数，创建 eventProxy
+ * - 合并 slot outputs，注册到 comRefs.current.$outputs[id]
+ */
+export function useBindOutputs(
   comRefs: any,
   id: string,
-  eventProxy: any,
-  enhancedSlots: any
+  props: any,
+  enhancedSlots: any,
+  context?: { id: string; name: string; parentSlot?: any }
 ) {
-  if (!comRefs?.current?.$outputs) return;
-
-  const slotOutputsList = Object.values(enhancedSlots || {})
-    .map((slot: any) => slot?.outputs)
-    .filter(Boolean);
-
-  if (slotOutputsList.length > 0) {
-    comRefs.current.$outputs[id] = new Proxy({}, {
-      get(_, prop: string) {
-        for (const outputs of slotOutputsList) {
-          const fn = outputs[prop];
-          if (fn) return fn;
-        }
-        return eventProxy[prop];
+  const eventProxy = useMemo(() => {
+    const events: Record<string, any> = {};
+    Object.keys(props).forEach(key => {
+      if (typeof props[key] === 'function') {
+        const handler = props[key];
+        const wrapped = (original: any) => handler(original);
+        wrapped.getConnections = () => [{ id: 'default' }];
+        events[key] = wrapped;
       }
     });
-  } else {
-    comRefs.current.$outputs[id] = eventProxy;
+    return new Proxy(events, {
+      get(target, key: string) {
+        if (typeof key === 'string' && key.startsWith('on')) {
+          if (target[key]) return target[key];
+          const fn: any = () => {};
+          fn.getConnections = () => [];
+          return fn;
+        }
+        return target[key];
+      }
+    });
+  }, [props, context]);
+
+  if (comRefs?.current?.$outputs) {
+    const slotOutputsList = Object.values(enhancedSlots || {})
+      .map((slot: any) => slot?.outputs)
+      .filter(Boolean);
+
+    if (slotOutputsList.length > 0) {
+      comRefs.current.$outputs[id] = new Proxy({}, {
+        get(_, prop: string) {
+          for (const outputs of slotOutputsList) {
+            const fn = outputs[prop];
+            if (fn) return fn;
+          }
+          return eventProxy[prop];
+        }
+      });
+    } else {
+      comRefs.current.$outputs[id] = eventProxy;
+    }
   }
+
+  return eventProxy;
 }
