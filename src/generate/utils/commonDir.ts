@@ -47,13 +47,13 @@ export function handleCommonDir(commonDir: FileNode, items: GenerateItem[]): voi
     });
   }
 
-  // 处理pageModel
-  const pageModelItem = items.find((item) => item.type === 'pageModel');
-  if (pageModelItem) {
-    const fileContent = pageModelItem.content || '{}';
+  // 处理rootConfig
+  const rootConfigItem = items.find((item) => item.type === 'rootConfig');
+  if (rootConfigItem) {
+    const fileContent = rootConfigItem.content || '{}';
     const fullContent = `export default ${fileContent}`;
     commonDir.children.push({
-      path: 'src/common/pageModel.ts',
+      path: 'src/common/rootConfig.ts',
       content: fullContent,
     });
   }

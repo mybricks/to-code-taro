@@ -180,10 +180,10 @@ const handleGlobal = (
 
   return [
     {
-      type: "pageModel",
-      content: JSON.stringify(tojson.pageModel, null, 2),
+      type: "rootConfig",
+      content: JSON.stringify(tojson.rootConfig, null, 2),
       importManager: null,
-      name: "pageModel",
+      name: "rootConfig",
     },
     {
       type: "global",

@@ -97,7 +97,7 @@ export interface GeneratedFile {
     | "abstractEventTypeDef"
     | "fx"
     | "api"
-    | "pageModel"
+    | "rootConfig"
     | "connector-api"
     | "extension-event"
     | "jsModulesRuntime"

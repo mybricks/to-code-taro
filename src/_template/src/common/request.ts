@@ -3,7 +3,7 @@ import Taro from '@tarojs/taro';
 // @ts-ignore
 import { api, baseConfig } from './api';
 // @ts-ignore
-import pageModel from './pageModel';
+import rootConfig from './rootConfig';
 
 export function request(connector: any, params: any, config: any = {}, appContext?: any) {
   const connectorId = connector.id;
@@ -59,7 +59,7 @@ export function request(connector: any, params: any, config: any = {}, appContex
       /**
        * 如果 url 不以 http 开头，添加默认域名
        */
-      const defaultCallServiceHost = pageModel?.appConfig?.defaultCallServiceHost
+      const defaultCallServiceHost = rootConfig?.status?.defaultCallServiceHost
       if (
         !/^(http|https):\/\/.*/.test(requestConfig.url) &&
         defaultCallServiceHost
