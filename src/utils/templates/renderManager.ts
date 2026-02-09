@@ -35,10 +35,10 @@ export class RenderManager {
         code += `${indent}/** ${description} */\n`;
       }
       code += `${indent}function ${renderFunctionName}(params: any) {\n`;
-      // render 函数内的事件处理代码可能会用到 appContext（例如 jsModules.xxx(..., appContext)）
-      // outputs 统一从 comRefs.current.$outputs 读取（不再通过 context.outputs 透出）
       code += `${indent}${indent2}const { comRefs, $vars, $fxs, appContext } = useAppContext();\n`;
-      code += `${indent}${indent2}const $outputs = comRefs.current.$outputs;\n`;
+      if (logicCode?.includes('$outputs')) {
+        code += `${indent}${indent2}const $outputs = comRefs.current.$outputs;\n`;
+      }
 
       if (logicCode) {
         code += logicCode.split("\n").map(line => `${indent}${line}`).join("\n") + "\n";
