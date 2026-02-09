@@ -46,5 +46,16 @@ export function handleCommonDir(commonDir: FileNode, items: GenerateItem[]): voi
       content: fullContent,
     });
   }
+
+  // 处理rootConfig
+  const rootConfigItem = items.find((item) => item.type === 'rootConfig');
+  if (rootConfigItem) {
+    const fileContent = rootConfigItem.content || '{}';
+    const fullContent = `export default ${fileContent}`;
+    commonDir.children.push({
+      path: 'src/common/rootConfig.ts',
+      content: fullContent,
+    });
+  }
 }
 
