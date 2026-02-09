@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // @ts-ignore 运行时由宿主项目提供 @tarojs/components
 import { View } from '@tarojs/components';
-import { useModel, useBindInputs, useBindEvents, subscribePopupRouter, closeActivePopupRouter } from './index';
+import { useModel, useBindInputs, useBindEvents, useBuiltinHandlers, useRegisterOutputs, subscribePopupRouter, closeActivePopupRouter } from './index';
 import { useAppCreateContext } from './useContext';
 import ComContext, { useAppContext } from './ComContext';
 import { useEnhancedSlots, useResolvedParentSlot } from './slots';
@@ -31,29 +31,7 @@ export const WithCom: React.FC<WithComProps> = (props) => {
   //数据模型
   const _data = useModel(data || {});
 
-  // 内置通用能力
-  const handlers = {
-    _setStyle: (style: any) => {
-      setDynamicStyle((prev) => ({ ...prev, ...style }));
-    },
-    _setData: (path: string, value: any) => {
-      const paths = path.split('.');
-      let current = _data;
-      for (let i = 0; i < paths.length - 1; i++) {
-        if (!current[paths[i]]) current[paths[i]] = {};
-        current = current[paths[i]];
-      }
-      current[paths[paths.length - 1]] = value;
-    }
-  };
-
-  if (!isPopup) {
-    Object.assign(handlers, {
-      show: () => setShow(true),
-      hide: () => setShow(false),
-      showOrHide: () => setShow((prev) => !prev),
-    });
-  }
+  const handlers = useBuiltinHandlers({ data: _data, setDynamicStyle, setShow, isPopup });
 
   // 绑定输入，传入初始 handlers
   const inputProxy = useBindInputs(comRefs, id, handlers);
@@ -68,15 +46,12 @@ export const WithCom: React.FC<WithComProps> = (props) => {
     parentSlot 
   });
 
-  // 注册 outputs 到注册表（按组件 id）
-  if (comRefs?.current?.$outputs) {
-    comRefs.current.$outputs[id] = eventProxy;
-  }
-
   // 鸿蒙规范：确保 comRefs 中挂载的是最新的 inputProxy
   comRefs.current[id] = inputProxy;
 
   const enhancedSlots = useEnhancedSlots(rawSlots, id);
+
+  useRegisterOutputs(comRefs, id, eventProxy, enhancedSlots);
 
   const jsx = (
     <Component

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { createReactiveInputHandler } from '../mybricks/createReactiveInputHandler';
 import { useAppContext, useParentSlot } from './ComContext';
@@ -186,4 +187,66 @@ export function useBindEvents(props: any, context?: { id: string, name: string, 
       }
     });
   }, [props, context]);
+}
+
+/** 内置通用能力 Hook：_setStyle / _setData / show / hide / showOrHide */
+export function useBuiltinHandlers(opts: {
+  data: any;
+  setDynamicStyle: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
+  isPopup: boolean;
+}) {
+  const { data, setDynamicStyle, setShow, isPopup } = opts;
+  return useMemo(() => {
+    const handlers: Record<string, any> = {
+      _setStyle: (style: any) => {
+        setDynamicStyle((prev) => ({ ...prev, ...style }));
+      },
+      _setData: (path: string, value: any) => {
+        const paths = path.split('.');
+        let current = data;
+        for (let i = 0; i < paths.length - 1; i++) {
+          if (!current[paths[i]]) current[paths[i]] = {};
+          current = current[paths[i]];
+        }
+        current[paths[paths.length - 1]] = value;
+      }
+    };
+    if (!isPopup) {
+      Object.assign(handlers, {
+        show: () => setShow(true),
+        hide: () => setShow(false),
+        showOrHide: () => setShow((prev) => !prev),
+      });
+    }
+    return handlers;
+  }, [data, setDynamicStyle, setShow, isPopup]);
+}
+
+/** 注册 $outputs：合并事件代理 + 各插槽的 outputs */
+export function useRegisterOutputs(
+  comRefs: any,
+  id: string,
+  eventProxy: any,
+  enhancedSlots: any
+) {
+  if (!comRefs?.current?.$outputs) return;
+
+  const slotOutputsList = Object.values(enhancedSlots || {})
+    .map((slot: any) => slot?.outputs)
+    .filter(Boolean);
+
+  if (slotOutputsList.length > 0) {
+    comRefs.current.$outputs[id] = new Proxy({}, {
+      get(_, prop: string) {
+        for (const outputs of slotOutputsList) {
+          const fn = outputs[prop];
+          if (fn) return fn;
+        }
+        return eventProxy[prop];
+      }
+    });
+  } else {
+    comRefs.current.$outputs[id] = eventProxy;
+  }
 }

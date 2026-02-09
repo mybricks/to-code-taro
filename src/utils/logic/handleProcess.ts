@@ -236,9 +236,22 @@ export const handleProcess = (
       }
     } else {
       // UI 组件处理
-      code +=
-        `${indent}/** 调用 ${props.meta.title} 的 ${props.title} */` +
-        `\n${indent}${nextCode}this.${props.meta.id}.${props.id}(${nextValue})`;
+      if (props.type === "frameOutput") {
+        // 帧输出：找到拥有该帧的组件，通过 $outputs 调用
+        const currentScene = config.getCurrentScene();
+        const frameConEntry = Object.values(currentScene.cons || {}).flat()
+          .find((con: any) => con.type === "frame" && con.pinId === props.id);
+        const comId = frameConEntry?.comId || props.meta.id;
+        const comTitle = currentScene.coms?.[comId]?.title || props.meta.title || comId;
+
+        code +=
+          `${indent}/** 调用 ${comTitle} 的 ${props.title} */` +
+          `\n${indent}${nextCode}$outputs['${comId}'].${props.id}(${nextValue})`;
+      } else {
+        code +=
+          `${indent}/** 调用 ${props.meta.title} 的 ${props.title} */` +
+          `\n${indent}${nextCode}this.${props.meta.id}.${props.id}(${nextValue})`;
+      }
     }
   });
 
