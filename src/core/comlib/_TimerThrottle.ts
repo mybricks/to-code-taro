@@ -20,7 +20,7 @@ interface IOContext {
   outputs: Outputs
 }
 
-export default (context: IOContext) => {
+const handler = (context: IOContext) => {
   const data: DataType = context.data
   const inputs: Inputs = context.inputs
   const outputs: Outputs = context.outputs
@@ -42,3 +42,6 @@ export default (context: IOContext) => {
     }
   })
 }
+
+;(handler as any).__useCache = true
+export default handler
