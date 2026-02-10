@@ -1,11 +1,13 @@
 import { useRef, useState, useMemo } from 'react'
 // @ts-ignore
 import * as Taro from '@tarojs/taro'
-import { proxyRefs } from './hooks'
-import { TodoPool } from './pool'
 // @ts-ignore
 import { request } from '@/common/request'
 import { tabbarIns } from "@/core/utils/tabbar"
+// @ts-ignore
+import rootConfig from '@/common/rootConfig';
+import { proxyRefs } from './hooks'
+import { TodoPool } from './pool'
 
 export interface ComContextStore {
   comRefs: any;
@@ -47,6 +49,27 @@ export function useAppCreateContext(id: string): ComContextStore {
       request: (connector: any, params: any, config: any) => request(connector, params, config, { $vars }),
       tabbar: tabbarIns,
       uploadFile: (params: any) => {
+        let header = {};
+        let mybricksGlobalHeaders = Taro.getStorageSync(
+          "_MYBRICKS_GLOBAL_HEADERS_"
+        );
+        if (mybricksGlobalHeaders) {
+          header = {
+            ...mybricksGlobalHeaders,
+            ...header,
+          };
+        }
+
+        /**
+         * 如果 url 不以 http 开头，添加默认域名
+         */
+        if (
+          !/^(http|https):\/\/.*/.test(params.url) &&
+          rootConfig?.status?.defaultCallServiceHost
+        ) {
+          params.url = `${rootConfig?.status?.defaultCallServiceHost}${params.url}`;
+        }
+        
         const { success, fail, ...rest } = params
         Taro.uploadFile({
           ...rest,
