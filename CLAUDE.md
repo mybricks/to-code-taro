@@ -47,6 +47,22 @@ test/
 └── genTemplate.ts        # 生成模板 JSON
 ```
 
+## $outputs 与帧输出(frameOutput)代码生成
+
+### 运行时 $outputs 机制 (src/core/utils/hooks.ts - useBindOutputs)
+- 每个 `WithCom` 实例通过 `useBindOutputs` 注册 `comRefs.current.$outputs[id]`
+- 当组件有 slots 时，`$outputs[id]` 是一个 Proxy，优先查找 slot outputs，再 fallback 到 event proxy
+- slot outputs 由 `useEnhancedSlots` 中的 `createChannelProxy` 创建，每个 slot 独立隔离
+
+### 代码生成阶段 (src/utils/logic/handleProcess.ts)
+- `nodesInvocation` 中 `type === "frameOutput"` 的节点表示插槽的 output pin 调用
+- `props.meta` 中 **不包含** `parentComId` / `frameId`（`@mybricks/to-code-react` 未传递）
+- 需要通过 `scene.cons` 反查 `comId`，匹配条件必须包含 `event.comId`（父组件 ID）来消歧义
+- `event.comId` 在 slot 类型事件中可用，`event.meta?.parentComId` 在 com 类型事件中可用
+
+### 已修复的 Bug
+- **多组件帧输出指向错误**: 当多个相同组件（如两个 FormImageUploader）有相同 pinId 时，`.find()` 必须用 `event.comId` 匹配 `con.comId`，否则始终返回第一个组件的连接
+
 ## 重要约定
 - src/core 的代码 要和 src/_template/src/core保持一致 修改任何一方都要同步
 - 有文件修改之后运行 `npm run test:template` 和`npm run test:project`  会在 _output 输出产物，这里的内容就是测试内容

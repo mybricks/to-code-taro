@@ -239,8 +239,13 @@ export const handleProcess = (
       if (props.type === "frameOutput") {
         // 帧输出：找到拥有该帧的组件，通过 $outputs 调用
         const currentScene = config.getCurrentScene();
+        const parentComId = event.comId || event.meta?.parentComId;
         const frameConEntry = Object.values(currentScene.cons || {}).flat()
-          .find((con: any) => con.type === "frame" && con.pinId === props.id);
+          .find((con: any) => {
+            if (con.type !== "frame" || con.pinId !== props.id) return false;
+            if (parentComId && con.comId) return con.comId === parentComId;
+            return true;
+          });
         const comId = frameConEntry?.comId || props.meta.id;
         const comTitle = currentScene.coms?.[comId]?.title || props.meta.title || comId;
 
