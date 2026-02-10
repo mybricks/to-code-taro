@@ -7,6 +7,8 @@ export default defineConfig({
       "test/**",
       "src/_output/**",
       "src/_template/**",
+      "src/core/comlib/**",
+      "src/core/tools/**"
     ],
   },
   cjs: {
@@ -15,6 +17,8 @@ export default defineConfig({
       "test/**",
       "src/_output/**",
       "src/_template/**",
+      "src/core/comlib/**",
+      "src/core/tools/**"
     ],
   },
 });
