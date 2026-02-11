@@ -151,7 +151,7 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults
   // 插槽根容器增强：加上可读的标识，便于用户定位/调试
   // - className: slot-<parentComId>
   const parentComId = (config as any)?.parentComId;
-  const slotMarkClass = parentComId ? `slot-${parentComId}` : "";
+  const slotMarkClass = parentComId ? `mybricks_slot slot-${parentComId}` : "";
   const classNameStr = [rootClassName, slotMarkClass].filter(Boolean).join(" ");
   const classNameAttr = classNameStr ? ` className='${classNameStr}'` : "";
 
