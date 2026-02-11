@@ -1,5 +1,6 @@
 // 系统
 export { default as SystemPage } from "./system/systemPage/runtime";
+export { default as SystemWebview } from "./system/systemWebview/runtime";
 
 // 基础
 export { default as Image } from "./image/runtime";
