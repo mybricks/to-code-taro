@@ -373,6 +373,12 @@ function getFrameInputValueExpr(meta: any, config: HandleProcessConfig, event: a
   const pinProxy = (scene as any)?.pinValueProxies?.[proxyKey];
   const pinId = pinProxy?.pinId;
   if (typeof pinId === "string" && pinId) {
+    // 优先使用 getParams 映射（场景级输入：回调参数名如 data）
+    const paramsMap = config.getParams?.();
+    if (paramsMap?.[pinId]) {
+      return paramsMap[pinId];
+    }
+    // fallback：插槽场景使用 params.inputValues
     return `params?.inputValues?.[${JSON.stringify(pinId)}]`;
   }
 }
