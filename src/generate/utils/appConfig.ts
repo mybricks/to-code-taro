@@ -51,13 +51,11 @@ export function updateAppConfig(
     content.entryPagePath = entryPagePath;
   }
 
-  content.window = content.window || {};
-
   // 添加 TabBar 配置（从 items 中读取）
   const tabBarConfigItem = items.find((item) => item.type === 'tabBarConfig');
   if (tabBarConfigItem?.content) {
     const tabBar = parseLooseObject(`{${tabBarConfigItem.content}}`);
-    Object.assign(content.window, tabBar);
+    Object.assign(content, tabBar);
   }
 
   appConfigFile.content = `export default defineAppConfig(${JSON.stringify(content, null, 2)})`;
