@@ -95,9 +95,7 @@ export class RenderManager {
         // 如果是容器协议插槽，直接调用 wrap
         code += `${indent}${indent3}params?.wrap?.(descriptors)\n`;
       } else {
-        code += `${indent}${indent3}<>\n`;
         code += modifiedRenderCode.split("\n").map(line => `${indent}${indent2}${line}`).join("\n") + "\n";
-        code += `${indent}${indent3}</>\n`;
       }
       code += `${indent}${indent2});\n`;
       code += `${indent}}\n\n`;

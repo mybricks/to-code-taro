@@ -69,10 +69,10 @@ export const genComponentTemplate = ({
          `${combinedJsCode}\n` +
          `  return (\n` +
          `    <PageScopeContext.Provider value={pageScopeRef}>\n` +
-         `    <>\n` +
+         (hasPopups ? `    <>\n` : "") +
          `${uiResult.split('\n').map(line => `      ${line}`).join('\n')}\n` +
          (hasPopups ? `      <PopupRenderer popupMap={POPUP_MAP} />\n` : "") +
-         `    </>\n` +
+         (hasPopups ? `    </>\n` : "") +
          `    </PageScopeContext.Provider>\n` +
          `  );\n` +
          `}\n\n`;
