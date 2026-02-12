@@ -1,9 +1,0 @@
-{
-  "useDynamic": false,
-  
-  "text": "文本内容",
-  "ellipsis": false,
-  "maxLines": 1,
-  "displayState":"static",
-  "useLongPress": "none"
-}

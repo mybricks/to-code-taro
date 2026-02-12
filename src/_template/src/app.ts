@@ -1,7 +1,6 @@
 import { PropsWithChildren } from 'react'
 import { useLaunch } from '@tarojs/taro'
-import 'brickd-mobile/lib/index.css' 
-import "@taroify/icons/style"
+import '@mybricks/taro-components/dist/index.css';
 import './app.global.less'
 
 function App({ children }: PropsWithChildren<any>) {

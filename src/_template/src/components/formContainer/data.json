@@ -1,8 +1,0 @@
-{
-  "useSubmitButton": true,
-  "submitButtonText": "提交",
-  "skipValidation": false,
-  "useLoading": false,
-  "items": [],
-  "itemLayout": "horizontal"
-}

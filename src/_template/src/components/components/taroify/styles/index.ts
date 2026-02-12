@@ -1,1 +1,0 @@
-export { prefixClassname } from "./prefix"

@@ -62,14 +62,11 @@
     "@tarojs/react": "4.1.9",
     "react-dom": "^18.0.0",
     "react": "^18.0.0",
-    "brickd-mobile": "^0.0.53",
-    "@taroify/icons": "^0.9.0",
     "@types/crypto-js": "^4.2.2",
     "dayjs": "^1.11.19",
     "crypto-js": "^4.2.0",
-    "@antv/f2": "3.8.12",
-    "qrcode-generator": "^2.0.4",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "@mybricks/taro-components": "^0.0.2"
   },
   "devDependencies": {
     "@tarojs/plugin-generator": "4.1.9",

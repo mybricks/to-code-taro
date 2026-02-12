@@ -44,7 +44,7 @@ async function runCode() {
         return {
           importInfo: {
             name: componentName,
-            from: "@/components",
+            from: "@mybricks/taro-components",
             type: "named" as const,
           },
           name: componentName,

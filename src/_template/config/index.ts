@@ -32,8 +32,8 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     compiler: {
       type: 'webpack5',
       prebundle: {
-        exclude: ['brickd-mobile', '@taroify/icons']
-      }
+        exclude: ["@mybricks/taro-components"],
+      },
     },
     cache: {
       enable: false // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
