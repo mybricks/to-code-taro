@@ -176,7 +176,7 @@ const processComSlots = (com: Com, config: HandleComConfig, initialCss: string) 
       accumulatedCssContent += (accumulatedCssContent ? "\n" : "") + result.cssContent;
     }
 
-    const renderId = `${meta.id}_${slotId}`;
+    const renderId = slotEntries.length > 1 ? `${meta.id}_${slotId}` : meta.id;
     
     // 关键：不再预先 formatSlotContent，而是将原始 ui 传给 renderManager
     // 这样 RenderManager 在内部进行精确字符串替换时才能匹配成功

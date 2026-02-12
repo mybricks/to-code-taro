@@ -72,6 +72,7 @@ export const processModule = (params: ProcessModuleParams): void => {
   // 处理 Slot
   handleSlot(ui, {
     ...config,
+    isModule: true,
     getCurrentScene: () => {
       const originalScene = getSceneById(scene.id);
       return { ...scene, ...originalScene, event };

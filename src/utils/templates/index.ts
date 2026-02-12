@@ -25,6 +25,11 @@ export const toPascalCase = (str: string): string => {
     .join("");
 };
 
+/** 生成插槽渲染函数名：S${ID} (SCREAMING_SNAKE_CASE) */
+export const toSlotFunctionName = (renderId: string): string => {
+  return `S${renderId.replace(/[^a-zA-Z0-9]/g, "_").toUpperCase()}`;
+};
+
 /** 根节点data去除无用属性 */
 const formatData = (data: any, isRoot: boolean) => {
   if (!data) return {}

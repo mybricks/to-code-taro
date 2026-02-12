@@ -153,6 +153,59 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
     });
   });
 
+  // --- 处理模块/区块场景 (module) ---
+  const compsDir = ensureDir(srcDir, "src/comps");
+  const moduleScenes = files.filter((item) => item.type === "module" && item.meta);
+
+  const moduleExports: string[] = [];
+
+  moduleScenes.forEach((item) => {
+    const moduleId = item.meta!.id;
+    const exportName = `C${String(moduleId).replace(/[^a-zA-Z0-9]/g, "_").toUpperCase()}`;
+    const importCode = item.importManager?.toCode() || "";
+    const fullContent = `${importCode}\n${item.content || ""}`;
+
+    const moduleChildren: FileNode[] = [
+      {
+        path: `src/comps/${moduleId}/index.tsx`,
+        content: fullContent,
+      },
+      {
+        path: `src/comps/${moduleId}/index.global.less`,
+        content: item.cssContent || "",
+      },
+    ];
+
+    if (item.jsModules && item.jsModules.length > 0) {
+      moduleChildren.push({
+        path: `src/comps/${moduleId}/index.jsModules.ts`,
+        content: genScopedJSModules(
+          item.jsModules as any,
+          "@/core/mybricks/index",
+          "@/common/jsModulesRuntime",
+        ),
+      });
+    }
+
+    compsDir.children!.push({
+      path: `src/comps/${moduleId}`,
+      content: null,
+      children: moduleChildren,
+    });
+
+    moduleExports.push(
+      `export { default as ${exportName} } from "./${moduleId}/index";`,
+    );
+  });
+
+  // 生成 comps/Index.ts 汇总导出
+  if (moduleExports.length > 0) {
+    compsDir.children!.push({
+      path: "src/comps/Index.ts",
+      content: moduleExports.join("\n") + "\n",
+    });
+  }
+
   // 更新 app.config.ts (只传入 normalItems 作为真正的页面)
   const appConfigFile = srcDir.children?.find(
     (node) => node.path === "src/app.config.ts",

@@ -1,4 +1,4 @@
-import { indentation, toPascalCase } from "./index";
+import { indentation, toSlotFunctionName } from "./index";
 
 /** Render 函数管理器 */
 export class RenderManager {
@@ -29,7 +29,7 @@ export class RenderManager {
     const indent6 = indentation(indentSize * 5);
 
     this._renders.forEach(({ renderCode, children, logicCode, useWrap, description }, renderId) => {
-      const renderFunctionName = toPascalCase(`${renderId}_Render`);
+      const renderFunctionName = toSlotFunctionName(renderId);
       
       if (description) {
         code += `${indent}/** ${description} */\n`;
@@ -114,7 +114,7 @@ export class RenderManager {
   }
 
   genRenderRef(slotId: string, renderId: string, indent: string): string {
-    const renderFunctionName = toPascalCase(`${renderId}_Render`);
+    const renderFunctionName = toSlotFunctionName(renderId);
     return `${indent}${slotId}: {\n${indent}  render: ${renderFunctionName},\n${indent}},\n`;
   }
 }

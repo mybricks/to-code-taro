@@ -6,10 +6,12 @@ export const genReactiveDataManager = (indent: string, utilsPackageName: string)
 };
 
 /** 生成根组件定义代码 (useAppContext) */
-export const genRootDefineCode = (indent: string, utilsPackageName: string, hasJsModules: boolean = false) => {
+export const genRootDefineCode = (indent: string, utilsPackageName: string, hasJsModules: boolean = false, isModule: boolean = false) => {
   // 使用 useAppContext 获取 comRefs / $vars / $fxs / appContext
   let code = `${indent}const {comRefs, $vars, $fxs, appContext} = useAppContext();\n`;
-  code += `${indent}usePageLife();\n`;
+  if (!isModule) {
+    code += `${indent}usePageLife();\n`;
+  }
   // 如果有 JS 计算组件，需要初始化 comModules
   if (hasJsModules) {
     code += `${indent}const comModules = jsModules({ createJSHandle });\n`;
