@@ -123,6 +123,16 @@ const toCodeTaro = (
   tojson: ToJSON,
   config: ToTaroCodeConfig,
 ): GenerationResult => {
+  // 将 modules 中的场景展开到 scenes 中，使 toCode 能识别并处理模块
+  if ((tojson as any).modules) {
+    Object.values((tojson as any).modules as Record<string, any>).forEach((mod) => {
+      if (mod.json) {
+        tojson.scenes.push(mod.json);
+      }
+    });
+    // 预处理：从 modules.json 重建 frames 中模块的事件数据
+    rebuildModuleFrames(tojson);
+  }
   return getCode({ tojson, toCodejson: toCode(tojson) }, config);
 };
 
@@ -154,6 +164,14 @@ const getCode = (
 
   // 构建场景和事件映射
   const sceneMap = buildSceneMap(tojson.scenes);
+  // 将模块场景也加入 sceneMap，使 getSceneById 能查到模块
+  if (tojson.modules) {
+    Object.values(tojson.modules as Record<string, any>).forEach((mod) => {
+      if (mod.json?.id) {
+        sceneMap[mod.json.id] = mod.json;
+      }
+    });
+  }
   const eventsMap = buildEventsMap(tojson.frames);
   const getSceneById = createGetSceneById(sceneMap);
   const getExtensionEventById = createGetExtensionEventById(eventsMap);
@@ -352,6 +370,92 @@ const getCode = (
       pageImages: pageBase64Images,
     },
   };
+};
+
+/**
+ * 预处理：从 modules.json 重建 frames 中模块的事件数据
+ *
+ * 背景：tojson.frames 中模块的 frame 可能是空壳（coms: {}, diagrams[0].conAry: []），
+ * 而完整的组件事件数据在 modules[moduleId].json 中（coms/cons/outputEvents）。
+ * toCode 的 handleFrame 需要 frame.coms 包含组件事件子 frames 才能生成事件代码。
+ */
+const rebuildModuleFrames = (tojson: ToJSON) => {
+  const modules = (tojson as any).modules as Record<string, any> | undefined;
+  if (!modules) return;
+
+  Object.values(modules).forEach((mod) => {
+    const moduleJson = mod.json;
+    if (!moduleJson) return;
+
+    const frame = tojson.frames.find((f: any) => f.id === moduleJson.id);
+    if (!frame || Object.keys(frame.coms).length > 0) return;
+
+    const coms = moduleJson.coms || {};
+    const cons = moduleJson.cons || {};
+
+    Object.values(coms).forEach((com: any) => {
+      const outputEvents = com.model?.outputEvents;
+      if (!outputEvents || Object.keys(outputEvents).length === 0) return;
+
+      const comFrames: any[] = [];
+
+      Object.entries(outputEvents).forEach(([pinId, events]: [string, any]) => {
+        const activeEvent = Array.isArray(events)
+          ? events.find((e: any) => e.active)
+          : null;
+        if (!activeEvent?.options?.id) return;
+
+        const diagramId = activeEvent.options.id;
+        const consKey = `${com.id}-${pinId}`;
+        const connections: any[] = cons[consKey] || [];
+
+        const conAry = connections.map((con: any) => ({
+          id: con.id,
+          from: {
+            id: pinId,
+            title: activeEvent.options.title || pinId,
+            parent: { id: com.id, type: "com" },
+          },
+          to: {
+            id: con.pinId,
+            title: con.pinId,
+            parent: { id: con.comId, type: "com" },
+          },
+          startPinParentKey: con.startPinParentKey || con.frameKey,
+          finishPinParentKey: con.finishPinParentKey || con.targetFrameKey,
+        }));
+
+        if (conAry.length === 0) return;
+
+        comFrames.push({
+          id: `${com.id}_${pinId}_frame`,
+          title: activeEvent.options.title || `${com.title} > ${pinId}`,
+          type: "com",
+          coms: {},
+          autoRunComs: {},
+          inputs: [],
+          outputs: [],
+          frames: [],
+          diagrams: [{
+            id: diagramId,
+            title: activeEvent.options.title || `${com.title} > ${pinId}`,
+            starter: {
+              type: "com",
+              comId: com.id,
+              pinId,
+            },
+            conAry,
+            runtimeBefore: [],
+            runtimeAfter: [],
+          }],
+        });
+      });
+
+      if (comFrames.length > 0) {
+        (frame.coms as any)[com.id] = { id: com.id, frames: comFrames };
+      }
+    });
+  });
 };
 
 /**

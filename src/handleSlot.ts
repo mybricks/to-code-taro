@@ -19,6 +19,7 @@ interface HandleSlotConfig extends BaseConfig {
   renderManager?: RenderManager;
   addJSModule?: (module: any) => void;
   isPopup?: boolean;
+  isModule?: boolean;
   hasPopups?: boolean;
   /** handleCom 处理 slots 时的 slot key（如 item/content），用于识别 scope 入参 */
   slotKey?: string;
@@ -55,7 +56,7 @@ const handleSlot = (ui: UI, config: HandleSlotConfig) => {
     }
 
   const indent2 = indentation(config.codeStyle!.indent);
-  const envDefineCode = isRoot ? genRootDefineCode(indent2, config.getUtilsPackageName()) : genSlotDefineCode(indent2);
+  const envDefineCode = isRoot ? genRootDefineCode(indent2, config.getUtilsPackageName(), false, config.isModule) : genSlotDefineCode(indent2);
 
   // 2. 处理子节点
   const renderManager = isRoot ? new RenderManager() : (config.renderManager || new RenderManager());
@@ -122,7 +123,9 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
   addImport({ packageName: comPkg, dependencyNames: ["useAppContext"], importType: "named" });
 
   if (isRoot) {
-    addImport({ packageName: "@/common/pageLife", dependencyNames: ["usePageLife"], importType: "named" });
+    if (!config.isModule) {
+      addImport({ packageName: "@/common/pageLife", dependencyNames: ["usePageLife"], importType: "named" });
+    }
     if (config.hasPopups) {
       addImport({ packageName: "@/common/popup", dependencyNames: ["POPUP_MAP", "POPUP_IDS"], importType: "named" });
     }
@@ -167,7 +170,8 @@ const generateSlotUi = (ui: any, props: any, childrenUi: string, childrenResults
 const finalizeRootComponent = (ui: any, config: any, importManager: any, combinedJsCode: string, renderDefinitions: string, uiResult: string, cssContent: string) => {
   const fileName = config.getFileName?.(ui.meta.slotId) || ui.meta.title || "index";
   const componentId = ui.meta?.id || ui.id || ui.meta?.slotId || "Index";
-  const componentName = `I${String(componentId).replace(/[^a-zA-Z0-9]/g, "_")}`;
+  const prefix = config.isModule ? "C" : "P";
+  const componentName = `${prefix}${String(componentId).replace(/[^a-zA-Z0-9]/g, "_").toUpperCase()}`;
   
   const componentCode = genComponentTemplate({ 
     componentId,

@@ -1,5 +1,5 @@
 import type { UI, BaseConfig } from "./toCodeTaro";
-import { ImportManager, indentation, genObjectCode, convertComponentStyle, convertStyleAryToCss, firstCharToUpperCase } from "./utils";
+import { ImportManager, indentation, genObjectCode, convertComponentStyle, convertStyleAryToCss } from "./utils";
 import { handleProcess } from "./utils/logic/handleProcess";
 
 type Module = Extract<UI["children"][0], { type: "module" }>;
@@ -12,10 +12,7 @@ interface HandleModuleConfig extends BaseConfig {
 
 const handleModule = (module: Module, config: HandleModuleConfig) => {
   const { events, moduleId, props } = module;
-  const moduleScene = config.getSceneById(moduleId);
-
-  const rawName = config.getFileName?.(moduleId) || moduleScene.title;
-  const name = firstCharToUpperCase(rawName);
+  const name = `C${String(moduleId).replace(/[^a-zA-Z0-9]/g, "_").toUpperCase()}`;
   let comEventCode = "";
 
   const indent = indentation(config.codeStyle!.indent * (config.depth + 1));
@@ -63,7 +60,7 @@ const handleModule = (module: Module, config: HandleModuleConfig) => {
   });
 
   config.addParentDependencyImport({
-    packageName: "../sections/Index",
+    packageName: "@/comps/Index",
     dependencyNames: [name],
     importType: "named",
   });
@@ -94,7 +91,7 @@ const handleModule = (module: Module, config: HandleModuleConfig) => {
           indentSize: config.codeStyle!.indent,
         })}}`
       : "") +
-    `\n${indent3}controller={this.${currentProvider.name}.${componentController}}` +
+    `\n${indent3}controller={comRefs.current.${componentController}}` +
     (comEventCode
       ? `\n${indent3}onEvents={{${comEventCode.replace(/\n/g, "\n" + indent3)}}}`
       : "") +

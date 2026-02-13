@@ -1,4 +1,4 @@
-import { indentation, toPascalCase } from "./index";
+import { indentation, toSlotFunctionName } from "./index";
 import { RenderManager } from "./renderManager";
 
 /** 生成组件 Inputs 映射代码 */
@@ -33,7 +33,7 @@ export const genSlotRenderRef = ({
   indent: string;
   isLast: boolean;
 }) => {
-  const renderFunctionName = toPascalCase(`${renderId}_Render`);
+  const renderFunctionName = toSlotFunctionName(renderId);
   return `${indent}${slotId}: {\n${indent}  render: ${renderFunctionName},\n${indent}}${isLast ? '' : ','}\n`;
 };
 

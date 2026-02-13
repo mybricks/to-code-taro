@@ -140,17 +140,18 @@ export const handleProcess = (
   // 处理节点调用
   // 边遍历边构建映射：确保引用时只能看到已声明的变量
   const outputToInputPinMap = new Map<string, string>();
+  // 跟踪已声明的变量名，用于去重（同一组件+pin 多次调用时追加后缀）
+  const declaredVarCount = new Map<string, number>();
 
   process.nodesInvocation.forEach((props: any) => {
     const { componentType, category, runType } = props;
     const nextValue = getNextValue(props, config, event, outputToInputPinMap);
     const isSameScope = checkIsSameScope(event, props);
-    const nextCode = getNextCode(props, config, isSameScope, event);
+    const { code: nextCode, varName: declaredVarName } = getNextCode(props, config, isSameScope, event, declaredVarCount);
 
-    // 声明后记录映射，供后续引用
-    const inputPinId = props.id.replace(/[^a-zA-Z0-9_]/g, '_');
+    // 声明后记录映射，供后续引用（存储完整变量名，支持去重后缀）
     props.nextParam?.forEach((np: any) => {
-      outputToInputPinMap.set(`${props.meta.id}_${np.id}`, inputPinId);
+      outputToInputPinMap.set(`${props.meta.id}_${np.id}`, declaredVarName);
     });
 
     if (code) {
@@ -196,6 +197,9 @@ export const handleProcess = (
           `\n${indent}${nextCode}${componentNameWithId}(${runType === "input" ? nextValue : ""})`;
       } else if (category === "var") {
         const varKey = getSafeVarName(props.meta);
+        // 处理 xpath：如 "/a" -> "a"，"/a/b" -> "a.b"，用于读取变量的指定属性
+        const xpath = props.extData?.xpath;
+        const xpathArg = xpath ? `, "${xpath.replace(/^\//, "").replace(/\//g, ".")}"` : "";
         if (props.meta.global) {
           config.addParentDependencyImport({
             packageName: "../../common/global",
@@ -204,7 +208,7 @@ export const handleProcess = (
           });
           code +=
             `${indent}/** ${props.title} 全局变量 ${props.meta.title} */` +
-            `\n${indent}${nextCode}globalVars.${varKey}.${props.id}(${nextValue})`;
+            `\n${indent}${nextCode}globalVars.${varKey}.${props.id}(${nextValue}${xpathArg})`;
         } else {
           const currentProvider = getCurrentProvider(
             { isSameScope, props },
@@ -212,7 +216,7 @@ export const handleProcess = (
           );
           code +=
             `${indent}/** ${props.title} 变量 ${props.meta.title} */` +
-            `\n${indent}${nextCode}this.$vars.${varKey}.${props.id}(${nextValue})`;
+            `\n${indent}${nextCode}this.$vars.${varKey}.${props.id}(${nextValue}${xpathArg})`;
         }
       } else if (category === "fx") {
         if (props.meta.global) {
@@ -344,10 +348,16 @@ const getComponentNameWithId = (props: any, config: HandleProcessConfig, event: 
   return `${sanitizedName}_${props.meta.id}`;
 };
 
-const getNextCode = (props: any, config: HandleProcessConfig, isSameScope: boolean, event: any) => {
+const getNextCode = (
+  props: any,
+  config: HandleProcessConfig,
+  isSameScope: boolean,
+  event: any,
+  declaredVarCount: Map<string, number>
+): { code: string; varName: string } => {
   const { nextParam } = props;
   if (!nextParam.length) {
-    return "";
+    return { code: "", varName: "" };
   }
 
   const componentNameWithId = getComponentNameWithId(props, config, event);
@@ -355,7 +365,16 @@ const getNextCode = (props: any, config: HandleProcessConfig, isSameScope: boole
   // 这样可以确保 trigger 和 cancel 两个输入端口生成不同的变量名
   const pinId = props.id;
   const sanitizedPinId = pinId.replace(/[^a-zA-Z0-9_]/g, '_');
-  return `const ${componentNameWithId}_${sanitizedPinId}_result: any = `;
+  let varName = `${componentNameWithId}_${sanitizedPinId}_result`;
+
+  // 去重：同一变量名多次声明时追加后缀
+  const count = declaredVarCount.get(varName) || 0;
+  declaredVarCount.set(varName, count + 1);
+  if (count > 0) {
+    varName = `${varName}_${count}`;
+  }
+
+  return { code: `const ${varName}: any = `, varName };
 };
 
 /**
@@ -406,22 +425,22 @@ const getNextValue = (
     const componentNameWithId = getComponentNameWithId(param, config, event);
     // 变量组件直接返回 Subject，不加 .id 后缀
     if (param.meta?.def?.namespace?.includes(".var")) {
-      // 从 outputToInputPinMap 中查找对应的输入端口ID
+      // 从 outputToInputPinMap 中查找完整变量名（已包含去重后缀）
       const key = `${param.meta?.id}_${param.id}`;
-      const inputPinId = outputToInputPinMap?.get(key);
-      if (inputPinId) {
-        return `${componentNameWithId}_${inputPinId}_result`;
+      const fullVarName = outputToInputPinMap?.get(key);
+      if (fullVarName) {
+        return fullVarName;
       }
       return `${componentNameWithId}_result`;
     }
 
-    // 从 outputToInputPinMap 中查找对应的输入端口ID
+    // 从 outputToInputPinMap 中查找完整变量名（已包含去重后缀）
     // key = `${componentId}_${outputPinId}`
     const key = `${param.meta?.id}_${param.id}`;
-    const inputPinId = outputToInputPinMap?.get(key);
+    const fullVarName = outputToInputPinMap?.get(key);
 
-    if (inputPinId) {
-      return `${componentNameWithId}_${inputPinId}_result.${param.id}`;
+    if (fullVarName) {
+      return `${fullVarName}.${param.id}`;
     }
     return `${componentNameWithId}_result.${param.id}`;
   });
