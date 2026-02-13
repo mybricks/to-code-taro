@@ -51,8 +51,8 @@ async function runCode() {
           callName: componentName,
         };
       },
-      getComponentPackageName: () => "@/core/utils/index",
-      getUtilsPackageName: () => "@/core/utils/index",
+      getComponentPackageName: () => "@mybricks/taro-core",
+      getUtilsPackageName: () => "@mybricks/taro-core",
       getPageId: (id: string) => id,
       getModuleApi: () => ({
         dependencyImport: {

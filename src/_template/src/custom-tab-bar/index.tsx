@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import * as Taro from "@tarojs/taro";
 import { View, Image } from "@tarojs/components";
-import DynamicIcon from "@mybricks/taro-components";
+import {DynamicIcon} from "@mybricks/taro-components";
 import css from "./style.less";
 import tabBarJson from "./mybricks/tabbar-config";
 import { tabbarIns } from "@/core/utils/tabbar";

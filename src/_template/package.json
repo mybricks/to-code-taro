@@ -66,7 +66,8 @@
     "dayjs": "^1.11.19",
     "crypto-js": "^4.2.0",
     "lodash": "^4.17.21",
-    "@mybricks/taro-components": "^0.0.2"
+    "@mybricks/taro-components": "^0.0.2",
+    "@mybricks/taro-core": "^0.0.2"
   },
   "devDependencies": {
     "@tarojs/plugin-generator": "4.1.9",
