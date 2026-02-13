@@ -94,9 +94,11 @@ const processVarEvents = (
     if (!process.trim()) return;
 
     code += `\n${indent}  /** 变量 ${sanitizeBlockComment(com.title || varName)} 的 ${pinId} */`;
-    // 订阅变量的 changed 事件
+    // 使用 registerChange 订阅变量事件，确保有初始值时也能触发
     code += `\n${indent}  const run_${varName}_${pinId} = (value: any) => {\n${process}\n${indent}  };`;
-    code += `\n${indent}  $vars.current.${varName}.${pinId}?.()[SUBJECT_SUBSCRIBE](run_${varName}_${pinId});`;
+    code += `\n${indent}  $vars.current.${varName}.registerChange((changeValue: any) => {`;
+    code += `\n${indent}    changeValue[SUBJECT_SUBSCRIBE](run_${varName}_${pinId});`;
+    code += `\n${indent}  });`;
   });
 
   return code;
