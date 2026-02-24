@@ -1,8 +1,17 @@
 import { PropsWithChildren } from 'react'
 import { useLaunch } from '@tarojs/taro'
-import 'brickd-mobile/lib/index.css' 
+import { configureCoreRuntime } from '@/core/runtime'
+// @ts-ignore
+import { request } from '@/common/request'
+// @ts-ignore
+import rootConfig from '@/common/rootConfig'
+// @ts-ignore
+import tabBarConfig from '@/custom-tab-bar/tabBar.json'
+import 'brickd-mobile/lib/index.css'
 import "@taroify/icons/style"
 import './app.global.less'
+
+configureCoreRuntime({ request, rootConfig, tabBarConfig })
 
 function App({ children }: PropsWithChildren<any>) {
   useLaunch(() => {
@@ -12,7 +21,6 @@ function App({ children }: PropsWithChildren<any>) {
   // children 是将要会渲染的页面
   return children
 }
-  
 
 
 export default App

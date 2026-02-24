@@ -1,7 +1,6 @@
 // @ts-ignore 运行时由宿主项目提供 @tarojs/taro
 import Taro from "@tarojs/taro";
-// @ts-ignore 运行时由宿主项目提供
-import tabBarConfig from "@/custom-tab-bar/tabBar.json";
+import { getCoreRuntime } from '../runtime'
 import { Page } from "../mybricks";
 
 /**
@@ -89,6 +88,7 @@ class TaroRouter {
    * @returns 是否为标签栏页面
    */
   isTabBarPage(pagePath: string) {
+    const { tabBarConfig } = getCoreRuntime();
     return tabBarConfig?.tabBar?.list?.some(
       (item) => item.pagePath === pagePath,
     );

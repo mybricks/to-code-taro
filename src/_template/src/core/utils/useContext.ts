@@ -1,11 +1,8 @@
 import { useRef, useState, useMemo } from 'react'
 // @ts-ignore
 import * as Taro from '@tarojs/taro'
-// @ts-ignore
-import { request } from '@/common/request'
 import { tabbarIns } from "@/core/utils/tabbar"
-// @ts-ignore
-import rootConfig from '@/common/rootConfig';
+import { getCoreRuntime } from '../runtime'
 import { proxyRefs } from './hooks'
 import { TodoPool } from './pool'
 
@@ -25,6 +22,7 @@ export interface ComContextStore {
 }
 
 export function useAppCreateContext(id: string): ComContextStore {
+  const { request, rootConfig } = getCoreRuntime();
   const todoPool = useMemo(() => new TodoPool(), []);
   const comRefs = useRef<any>(proxyRefs({ $inputs: {}, $outputs: {} }, undefined, todoPool));
   const $vars = useRef<any>({});
@@ -46,7 +44,9 @@ export function useAppCreateContext(id: string): ComContextStore {
     },
     env: {
       runtime: true,
-      request: (connector: any, params: any, config: any) => request(connector, params, config, { $vars }),
+      request: request
+        ? (connector: any, params: any, config: any) => request(connector, params, config, { $vars })
+        : () => Promise.reject('request 未配置'),
       tabbar: tabbarIns,
       uploadFile: (params: any) => {
         let header = {};
@@ -69,7 +69,7 @@ export function useAppCreateContext(id: string): ComContextStore {
         ) {
           params.url = `${rootConfig?.status?.defaultCallServiceHost}${params.url}`;
         }
-        
+
         const { success, fail, ...rest } = params
         Taro.uploadFile({
           ...rest,
