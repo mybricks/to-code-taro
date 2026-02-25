@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["ES2017", "DOM"],
+    "module": "commonjs",
+    "strict": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "jsx": "react"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "src/_template/**/*"]
+}

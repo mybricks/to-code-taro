@@ -1,0 +1,59 @@
+{
+  "name": "@mybricks/taro-components",
+  "version": "0.0.2",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    },
+    "./dist/index.css": "./dist/index.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "rollup -c --watch",
+    "build": "rollup -c",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@taroify/icons": "^0.9.0",
+    "brickd-mobile": "^0.0.53",
+    "classnames": "^2.2.6",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.19",
+    "lodash": "^4.17.21",
+    "@antv/f2": "3.8.12",
+    "qrcode-generator": "^2.0.4"
+  },
+  "peerDependencies": {
+    "@tarojs/components": "*",
+    "@tarojs/taro": "*",
+    "react": "*",
+    "react-dom": "*"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.24.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "tslib": "^2.6.3",
+    "@tarojs/components": "4.1.9",
+    "@tarojs/helper": "4.1.9",
+    "@tarojs/runtime": "4.1.9",
+    "@tarojs/shared": "4.1.9",
+    "@tarojs/taro": "4.1.9",
+    "less": "^4.5.1",
+    "postcss": "^8.4.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}

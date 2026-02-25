@@ -4,8 +4,8 @@ node_modules/
 .pnp.js
 
 # Output
-src/_output/*
-src/_temp/*
+example/taro-project/
+packages/to-code-taro/src/_temp/*
 
 
 # Testing

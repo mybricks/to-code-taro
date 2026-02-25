@@ -1,0 +1,52 @@
+{
+  "name": "@mybricks/taro-core",
+  "version": "0.0.3",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "rollup -c --watch",
+    "build": "rollup -c",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "peerDependencies": {
+    "@tarojs/components": "*",
+    "@tarojs/taro": "*",
+    "react": "*",
+    "react-dom": "*"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.24.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "tslib": "^2.6.3",
+    "@tarojs/components": "4.1.9",
+    "@tarojs/helper": "4.1.9",
+    "@tarojs/runtime": "4.1.9",
+    "@tarojs/shared": "4.1.9",
+    "@tarojs/taro": "4.1.9",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.19",
+    "lodash": "^4.17.21"
+  }
+}
