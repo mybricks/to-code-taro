@@ -55,7 +55,10 @@ export default [
       postcss({
         extract: 'index.css',
         minimize: true,
-        modules: true,
+        autoModules: false, // isAutoModule 检查的是文件名是否包含 .module.。我们的文件是 style.less、index.less，不含 .module.，所以 isAutoModule = false，CSS Modules 根本没启用
+        modules: {
+          generateScopedName: 'mybricks_[local]__[hash:base64:5]',
+        },
         use: ['less'],
       }),
       typescript({

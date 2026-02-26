@@ -60,7 +60,7 @@ const handleModule = (module: Module, config: HandleModuleConfig) => {
   });
 
   config.addParentDependencyImport({
-    packageName: "@/comps/Index",
+    packageName: "@/components/Index",
     dependencyNames: [name],
     importType: "named",
   });

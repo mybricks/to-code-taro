@@ -154,7 +154,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
   });
 
   // --- 处理模块/区块场景 (module) ---
-  const compsDir = ensureDir(srcDir, "src/comps");
+  const componentsDir = ensureDir(srcDir, "src/components");
   const moduleScenes = files.filter((item) => item.type === "module" && item.meta);
 
   const moduleExports: string[] = [];
@@ -167,18 +167,18 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
 
     const moduleChildren: FileNode[] = [
       {
-        path: `src/comps/${moduleId}/index.tsx`,
+        path: `src/components/${moduleId}/index.tsx`,
         content: fullContent,
       },
       {
-        path: `src/comps/${moduleId}/index.global.less`,
+        path: `src/components/${moduleId}/index.global.less`,
         content: item.cssContent || "",
       },
     ];
 
     if (item.jsModules && item.jsModules.length > 0) {
       moduleChildren.push({
-        path: `src/comps/${moduleId}/index.jsModules.ts`,
+        path: `src/components/${moduleId}/index.jsModules.ts`,
         content: genScopedJSModules(
           item.jsModules as any,
           "@mybricks/taro-core",
@@ -187,8 +187,8 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
       });
     }
 
-    compsDir.children!.push({
-      path: `src/comps/${moduleId}`,
+    componentsDir.children!.push({
+      path: `src/components/${moduleId}`,
       content: null,
       children: moduleChildren,
     });
@@ -198,10 +198,10 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
     );
   });
 
-  // 生成 comps/Index.ts 汇总导出
+  // 生成 components/Index.ts 汇总导出
   if (moduleExports.length > 0) {
-    compsDir.children!.push({
-      path: "src/comps/Index.ts",
+    componentsDir.children!.push({
+      path: "src/components/Index.ts",
       content: moduleExports.join("\n") + "\n",
     });
   }
