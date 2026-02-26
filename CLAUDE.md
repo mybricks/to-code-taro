@@ -21,7 +21,7 @@ pnpm monorepo，包含代码生成器和运行时包。
 - `pnpm build:components` — 构建 @mybricks/taro-components
 - `pnpm build:generator` — 构建 @mybricks/to-code-taro
 - `pnpm example` — 运行核心转换测试（不输出文件）
-- `pnpm example:project` — 生成模板 + 完整 Taro 项目到 `example/_output/project`
+- `pnpm example:project` — 生成模板 + 完整 Taro 项目到 `example/taro-project`
 
 ## 项目结构
 
@@ -51,7 +51,7 @@ example/                    # 示例 & 测试脚本
 ├── runCode.ts              # 转换配置
 ├── genProject.ts           # 生成完整项目
 ├── genTemplate.ts          # 生成模板 JSON
-└── _output/                # 生成产物（不提交）
+└── taro-project/           # 生成的完整 Taro 项目产物（不提交）
 ```
 
 ## $outputs 与帧输出(frameOutput)代码生成
@@ -71,5 +71,5 @@ example/                    # 示例 & 测试脚本
 - **多组件帧输出指向错误**: 当多个相同组件（如两个 FormImageUploader）有相同 pinId 时，`.find()` 必须用 `event.comId` 匹配 `con.comId`，否则始终返回第一个组件的连接
 
 ## 重要约定
-- 有文件修改之后运行 `pnpm example:project` 会在 `example/_output` 输出产物，这里的内容就是测试内容
+- 有文件修改之后运行 `pnpm example:project` 会在 `example/taro-project` 输出产物，这里的内容就是测试内容
 - 所有的回答使用中文

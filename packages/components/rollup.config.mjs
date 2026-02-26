@@ -28,23 +28,54 @@ const external = (id) => {
   return externalLibs.some((lib) => id.startsWith(lib))
 }
 
+const postcssPlugin = postcss({
+  extract: 'index.css',
+  minimize: true,
+  autoModules: false,
+  modules: {
+    generateScopedName: 'mybricks_[local]__[hash:base64:5]',
+  },
+  use: ['less'],
+})
+
+const plugins = [
+  nodeResolve({
+    extensions: ['.mjs', '.js', '.json', '.node', '.ts', '.tsx'],
+  }),
+  commonjs(),
+  json(),
+  postcssPlugin,
+  typescript({
+    tsconfig: './tsconfig.json',
+    declaration: false,
+    declarationMap: false,
+  }),
+]
+
 export default [
+  // ESM — preserveModules，保留模块结构，支持 tree-shaking
   {
     input,
-    output: [
-      {
-        file: 'dist/index.esm.js',
-        format: 'esm',
-        sourcemap: true,
-      },
-      {
-        file: 'dist/index.cjs.js',
-        format: 'cjs',
-        sourcemap: true,
-        exports: 'named',
-        interop: 'auto',
-      },
-    ],
+    output: {
+      dir: 'dist/es',
+      format: 'esm',
+      preserveModules: true,
+      preserveModulesRoot: '.',
+      sourcemap: true,
+    },
+    external,
+    plugins,
+  },
+  // CJS — 单 bundle 兼容
+  {
+    input,
+    output: {
+      file: 'dist/index.cjs.js',
+      format: 'cjs',
+      sourcemap: true,
+      exports: 'named',
+      interop: 'auto',
+    },
     external,
     plugins: [
       nodeResolve({
@@ -55,7 +86,7 @@ export default [
       postcss({
         extract: 'index.css',
         minimize: true,
-        autoModules: false, // isAutoModule 检查的是文件名是否包含 .module.。我们的文件是 style.less、index.less，不含 .module.，所以 isAutoModule = false，CSS Modules 根本没启用
+        autoModules: false,
         modules: {
           generateScopedName: 'mybricks_[local]__[hash:base64:5]',
         },

@@ -2,12 +2,17 @@
   "name": "@mybricks/taro-components",
   "version": "0.1.1",
   "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "module": "dist/es/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": [
+    "*.css",
+    "*.less",
+    "*.scss"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.esm.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/index.cjs.js"
     },
     "./dist/index.css": "./dist/index.css"
