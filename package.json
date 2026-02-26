@@ -11,7 +11,8 @@
     "example": "tsx example/index.ts",
     "example:project": " tsx example/genTemplate.ts && tsx example/genProject.ts",
     "link": "node scripts/link.js",
-    "unlink": "node scripts/link.js --unlink"
+    "unlink": "node scripts/link.js --unlink",
+    "sync-versions": "node scripts/sync-versions.js"
   },
   "devDependencies": {
     "chalk": "^4.1.2",
