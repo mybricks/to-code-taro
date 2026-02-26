@@ -51,7 +51,9 @@ async function runCode() {
           callName: componentName,
         };
       },
+      // 运行时 hooks/路由等依赖的包名，如 import { useAppContext, pageRouter } from "@mybricks/taro-core"
       getComponentPackageName: () => "@mybricks/taro-core",
+      // 工具函数（变量、Fx 等）依赖的包名，如 import { createVariable, createFx } from "@mybricks/taro-core"
       getUtilsPackageName: () => "@mybricks/taro-core",
       getPageId: (id: string) => id,
       getModuleApi: () => ({
