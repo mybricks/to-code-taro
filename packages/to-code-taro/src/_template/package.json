@@ -70,8 +70,8 @@
     "@antv/f2": "3.8.12",
     "qrcode-generator": "^2.0.4",
     "lodash": "^4.17.21",
-    "@mybricks/taro-core": "^0.1.1",
-    "@mybricks/taro-components": "^0.1.1"
+    "@mybricks/taro-core": "^0.1.2",
+    "@mybricks/taro-components": "^0.1.2"
   },
   "devDependencies": {
     "@tarojs/plugin-generator": "4.1.9",
