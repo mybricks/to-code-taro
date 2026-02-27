@@ -32,13 +32,16 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     compiler: {
       type: 'webpack5',
       prebundle: {
-        exclude: ['brickd-mobile', '@taroify/icons']
+        exclude: ['brickd-mobile', '@taroify/icons', '@mybricks/taro-components']
       }
     },
     cache: {
       enable: false // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
     },
     mini: {
+      optimizeMainPackage: {
+        enable: true
+      },
       postcss: {
         pxtransform: {
           enable: true,
@@ -60,7 +63,21 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         chain.resolve.modules
           .add(path.resolve(__dirname, '../node_modules'))
           .add('node_modules')
-      }
+        chain.merge({
+          optimization: {
+            splitChunks: {
+              cacheGroups: {
+                'antv-f2': {
+                  name: 'antv-f2',
+                  test: /[\\/]node_modules[\\/]@antv[\\/]f2[\\/]/,
+                  minChunks: 1,
+                  priority: 100,
+                },
+              },
+            },
+          },
+        })
+      },
     },
     h5: {
       publicPath: '/',
@@ -93,7 +110,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         chain.resolve.modules
           .add(path.resolve(__dirname, '../node_modules'))
           .add('node_modules')
-      }
+              }
     },
     rn: {
       appName: 'taroDemo',
