@@ -152,8 +152,7 @@ export const convertStyleAryToCss = (
       let finalSelector = selector.trim();
       if (parentSelector) {
         const prefix = `.${parentSelector}`;
-        // 同时支持后代选择器和同级选择器（针对 itemWrap 场景）
-        finalSelector = `${prefix} ${finalSelector}, ${prefix}${finalSelector}`;
+        finalSelector = `${prefix} ${finalSelector}`;
       }
 
       const transformedCss: Record<string, string | number> = {};
