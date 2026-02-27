@@ -1,20 +1,18 @@
-import { generateTaroProjectJson } from '../packages/to-code-taro/src/index';
+import { generateTaroProjectJson, compressImages } from '../packages/to-code-taro/src/index';
 import genFile from './utils/genFile';
 import { runCode } from './runCode';
-import testData from './test-data.json';
 
 async function genProjectDir() {
-  // 运行代码
-  const testDataWithModules = {
-    ...testData,
-    modules: (testData as any).modules || {},
-    frames: (testData as any).frames || [],
-  } as any;
-  
   const result = await runCode();
-  const projectJson = generateTaroProjectJson(result);
+  const compressed = await compressImages(result, {
+    png: { compressionLevel: 9, palette: true, effort: 10 },
+    jpeg: { quality: 80 },
+  });
+
+  const projectJson = generateTaroProjectJson(compressed);
   genFile(projectJson);
 }
+
 // 如果直接运行此文件，执行测试
 if (require.main === module) {
   genProjectDir();
