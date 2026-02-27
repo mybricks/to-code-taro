@@ -129,7 +129,7 @@ const setupImports = (addImport: any, config: any, isRoot: boolean) => {
     if (config.hasPopups) {
       addImport({ packageName: "@/common/popup", dependencyNames: ["POPUP_MAP", "POPUP_IDS"], importType: "named" });
     }
-    addImport({ packageName: "./index.global.less", dependencyNames: [], importType: "module" });
+    addImport({ packageName: "./index.less", dependencyNames: [], importType: "module" });
   }
 };
 

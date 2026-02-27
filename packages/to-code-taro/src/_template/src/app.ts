@@ -10,7 +10,7 @@ import tabBarConfig from '@/custom-tab-bar/tabBar.json'
 import 'brickd-mobile/lib/index.css'
 import '@mybricks/taro-components/dist/index.css'
 import "@taroify/icons/style"
-import './app.global.less'
+import './app.less'
 
 configureCoreRuntime({ request, rootConfig, tabBarConfig })
 

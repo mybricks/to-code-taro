@@ -84,7 +84,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
         content: configContent,
       },
       {
-        path: `src/pages/${pageName}/index.global.less`,
+        path: `src/pages/${pageName}/index.less`,
         content: item.cssContent || "",
       },
       {
@@ -130,7 +130,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
         content: fullContent,
       },
       {
-        path: `src/popupComponents/${popupId}/index.global.less`,
+        path: `src/popupComponents/${popupId}/index.less`,
         content: item.cssContent || "",
       },
     ];
@@ -171,7 +171,7 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
         content: fullContent,
       },
       {
-        path: `src/components/${moduleId}/index.global.less`,
+        path: `src/components/${moduleId}/index.less`,
         content: item.cssContent || "",
       },
     ];

@@ -81,7 +81,7 @@
       },
       {
         "path": "src/app.ts",
-        "content": "import { PropsWithChildren } from 'react'\nimport { useLaunch } from '@tarojs/taro'\nimport { configureCoreRuntime } from '@mybricks/taro-core'\n// @ts-ignore\nimport { request } from '@/common/request'\n// @ts-ignore\nimport rootConfig from '@/common/rootConfig'\n// @ts-ignore\nimport tabBarConfig from '@/custom-tab-bar/tabBar.json'\nimport 'brickd-mobile/lib/index.css'\nimport '@mybricks/taro-components/dist/index.css'\nimport \"@taroify/icons/style\"\nimport './app.global.less'\n\nconfigureCoreRuntime({ request, rootConfig, tabBarConfig })\n\nfunction App({ children }: PropsWithChildren<any>) {\n  useLaunch(() => {\n    console.log('App launched.')\n  })\n\n  // children 是将要会渲染的页面\n  return children\n}\n\n\nexport default App\n"
+        "content": "import { PropsWithChildren } from 'react'\nimport { useLaunch } from '@tarojs/taro'\nimport { configureCoreRuntime } from '@mybricks/taro-core'\n// @ts-ignore\nimport { request } from '@/common/request'\n// @ts-ignore\nimport rootConfig from '@/common/rootConfig'\n// @ts-ignore\nimport tabBarConfig from '@/custom-tab-bar/tabBar.json'\nimport 'brickd-mobile/lib/index.css'\nimport '@mybricks/taro-components/dist/index.css'\nimport \"@taroify/icons/style\"\nimport './app.less'\n\nconfigureCoreRuntime({ request, rootConfig, tabBarConfig })\n\nfunction App({ children }: PropsWithChildren<any>) {\n  useLaunch(() => {\n    console.log('App launched.')\n  })\n\n  // children 是将要会渲染的页面\n  return children\n}\n\n\nexport default App\n"
       },
       {
         "path": "src/index.html",
