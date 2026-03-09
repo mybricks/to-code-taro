@@ -31,7 +31,7 @@ const generateTaroTemplateJson = (templateDir: string = _templateDir): TemplateJ
     '.husky',
     '.swc',
     'yarn.lock',
-    'package-lock.json',
+    'package-lock.json'
   ];
 
   /**
@@ -53,7 +53,6 @@ const generateTaroTemplateJson = (templateDir: string = _templateDir): TemplateJ
       if (ignoreList.includes(entry.name)) {
         continue;
       }
-      console.log(entry.name)
 
       const fullPath = path.join(dirPath, entry.name);
       const itemRelativePath = relativePath
@@ -71,14 +70,30 @@ const generateTaroTemplateJson = (templateDir: string = _templateDir): TemplateJ
       } else {
         // 读取文件内容
         try {
-          const content = fs.readFileSync(fullPath, 'utf-8');
-          items.push({
-            path: itemRelativePath,
-            content,
-            children: undefined,
-          });
+          // 判断是否为二进制文件（通过扩展名）
+          const binaryExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.jar', '.keystore'];
+          const ext = path.extname(fullPath).toLowerCase();
+          const isBinaryFile = binaryExtensions.includes(ext);
+
+          // 如果是二进制文件，内容设为 base64 编码
+          if (isBinaryFile) {
+            const buffer = fs.readFileSync(fullPath);
+            items.push({
+              path: itemRelativePath,
+              content: buffer.toString('base64'),
+              children: undefined,
+            });
+          } else {
+            // 其他文件内容设为字符串
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            items.push({
+              path: itemRelativePath,
+              content,
+              children: undefined,
+            });
+          }
         } catch (error) {
-          // 如果读取失败（如二进制文件），内容设为空字符串
+          // 如果读取失败，内容设为空字符串
           items.push({
             path: itemRelativePath,
             content: '',
