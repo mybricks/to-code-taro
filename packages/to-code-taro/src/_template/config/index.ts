@@ -110,6 +110,9 @@ export default defineConfig<'webpack5'>(async (merge, {command, mode}) => {
     rn: {
       appName: 'taroDemo',
       entry: 'app',
+      alias: {
+        '@': path.resolve(__dirname, '../src'),
+      },
       output: {
         ios: './ios/main.jsbundle',
         iosAssetsDest: './ios',
