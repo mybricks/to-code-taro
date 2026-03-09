@@ -1,10 +1,10 @@
 {
   "miniprogramRoot": "./dist",
-  "projectname": "taro-project",
+  "projectname": "taroDemo",
   "description": "",
   "appid": "touristappid",
   "setting": {
-    "urlCheck": false,
+    "urlCheck": true,
     "es6": false,
     "enhance": false,
     "compileHotReLoad": false,

@@ -1,27 +1,28 @@
-import { PropsWithChildren } from 'react'
-import { useLaunch } from '@tarojs/taro'
-import { configureCoreRuntime } from '@mybricks/taro-core'
+import {Component, PropsWithChildren} from 'react';
+import {configureCoreRuntime} from '@mybricks/taro-core';
 // @ts-ignore
-import { request } from '@/common/request'
+import {request} from '@/common/request';
 // @ts-ignore
-import rootConfig from '@/common/rootConfig'
+import rootConfig from '@/common/rootConfig';
 // @ts-ignore
-import tabBarConfig from '@/custom-tab-bar/tabBar.json'
-import 'brickd-mobile/lib/index.css'
-import '@mybricks/taro-components/dist/index.css'
-import "@taroify/icons/style"
-import './app.less'
+import tabBarConfig from '@/custom-tab-bar/tabBar.json';
+import 'brickd-mobile/lib/index.css';
+import '@mybricks/taro-components/dist/index.css';
+import '@taroify/icons/style';
+import './app.less';
 
-configureCoreRuntime({ request, rootConfig, tabBarConfig })
+configureCoreRuntime({request, rootConfig, tabBarConfig});
 
-function App({ children }: PropsWithChildren<any>) {
-  useLaunch(() => {
-    console.log('App launched.')
-  })
+class App extends Component<PropsWithChildren> {
+  componentDidMount() {}
 
-  // children 是将要会渲染的页面
-  return children
+  componentDidShow() {}
+
+  componentDidHide() {}
+
+  // this.props.children 是将要会渲染的页面
+  render() {
+    return this.props.children;
+  }
 }
-
-
-export default App
+export default App;

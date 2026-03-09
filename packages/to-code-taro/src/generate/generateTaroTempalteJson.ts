@@ -53,6 +53,7 @@ const generateTaroTemplateJson = (templateDir: string = _templateDir): TemplateJ
       if (ignoreList.includes(entry.name)) {
         continue;
       }
+      console.log(entry.name)
 
       const fullPath = path.join(dirPath, entry.name);
       const itemRelativePath = relativePath
