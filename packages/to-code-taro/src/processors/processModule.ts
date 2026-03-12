@@ -78,10 +78,12 @@ export const processModule = (params: ProcessModuleParams): void => {
       return { ...scene, ...originalScene, event };
     },
     add: (value) => {
+      const jsModules = Array.from(jsModulesMap.values());
       addResult({
         ...value,
         type: scene.type,
         meta: scene,
+        jsModules,
       });
     },
     addJSModule: (module) => {
