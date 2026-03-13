@@ -226,6 +226,19 @@ const generateTaroProjectJson = (result: GenerationResult): FileNode[] => {
   // 处理 common 目录下的文件
   handleCommonDir(commonDir, files);
 
+  // 生成全局 jsModules（如果全局 Fx 中有 JS 计算组件）
+  const globalItem = files.find((item) => item.type === 'global');
+  if (globalItem?.jsModules && globalItem.jsModules.length > 0) {
+    commonDir.children!.push({
+      path: 'src/common/index.jsModules.ts',
+      content: genScopedJSModules(
+        globalItem.jsModules as any,
+        "@mybricks/taro-core",
+        "@/common/jsModulesRuntime",
+      ),
+    });
+  }
+
   // 处理 common 目录下的 api.ts
   const apiItem = files.find((item) => item.type === 'connector-api');
   if (apiItem) {

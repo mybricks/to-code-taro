@@ -6,6 +6,7 @@
 import { ImportManager, indentation } from "./utils";
 import { handleProcess } from "./utils/logic/handleProcess";
 import { getSafeVarName } from "./utils/common/string";
+import { extractJSModuleFromCom } from "./utils/context/collectJSModules";
 import type { ToTaroCodeConfig, GeneratedFile } from "./toCodeTaro";
 
 interface HandleGlobalParams {
@@ -130,9 +131,11 @@ const handleGlobal = (
       })
       .join(", ");
 
+    const fxParams = values ? `${values}, appContext: any` : `appContext: any`;
+
     globalFxsInitCode +=
       `${indent}/** ${event.title} */` +
-      `\n${indent}${event.frameId}: any = createFx((${values}) => {` +
+      `\n${indent}${event.frameId}: any = createFx((${fxParams}) => {` +
       `\n${res}` +
       `\n${indent}})\n`;
   });
@@ -178,6 +181,17 @@ const handleGlobal = (
     });
   }
 
+  // 收集全局 JS 计算组件（从 fxFrames 的 coms 中提取）
+  const globalJsModules: any[] = [];
+  (tojson.global.fxFrames || []).forEach((fxFrame: any) => {
+    Object.entries(fxFrame.coms || {}).forEach(([comId, comInfo]: [string, any]) => {
+      const jsModule = extractJSModuleFromCom(comId, comInfo);
+      if (jsModule && !globalJsModules.some((m) => m.id === comId)) {
+        globalJsModules.push(jsModule);
+      }
+    });
+  });
+
   return [
     {
       type: "rootConfig",
@@ -190,6 +204,7 @@ const handleGlobal = (
       content: varCode + "\n\n" + fxCode,
       importManager: globalImportManager,
       name: "global",
+      jsModules: globalJsModules,
     },
   ];
 };

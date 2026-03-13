@@ -227,7 +227,7 @@ export const handleProcess = (
           });
           code +=
             `${indent}/** 调用全局Fx ${props.meta.title} */` +
-            `\n${indent}${nextCode}globalFxs.${props.meta.ioProxy.id}(${nextValue})`;
+            `\n${indent}${nextCode}globalFxs.${props.meta.ioProxy.id}(${nextValue}${nextValue ? ', ' : ''}appContext)`;
         } else {
           const currentProvider = getCurrentProvider(
             { isSameScope, props },
@@ -272,7 +272,7 @@ export const handleProcess = (
         } else {
           const next = outputs
             .map((output: any) => {
-              return getNextValueWithParam(output, config, event);
+              return getNextValueWithParam(output, config, event, outputToInputPinMap);
             })
             .join(", ");
 
@@ -452,6 +452,7 @@ const getNextValueWithParam = (
   param: any,
   config: HandleProcessConfig,
   event: any,
+  outputToInputPinMap?: Map<string, string>
 ) => {
   if (param.type === "params") {
     const params = config.getParams();
@@ -466,16 +467,19 @@ const getNextValueWithParam = (
   const componentNameWithId = getComponentNameWithId(param, config, event);
   // 变量组件直接返回 Subject
   if (param.meta?.def?.namespace?.includes(".var")) {
-    const connectId = param.connectId;
-    if (connectId) {
-      return `${componentNameWithId}_${connectId}_result`;
+    const key = `${param.meta?.id}_${param.id}`;
+    const fullVarName = outputToInputPinMap?.get(key);
+    if (fullVarName) {
+      return fullVarName;
     }
     return `${componentNameWithId}_result`;
   }
-  // 使用 connectId（连接ID）来引用对应的 result 变量
-  const connectId = param.connectId;
-  if (connectId) {
-    return `${componentNameWithId}_${connectId}_result.${param.id}`;
+
+  // 从 outputToInputPinMap 中查找完整变量名（已包含去重后缀）
+  const key = `${param.meta?.id}_${param.id}`;
+  const fullVarName = outputToInputPinMap?.get(key);
+  if (fullVarName) {
+    return `${fullVarName}.${param.id}`;
   }
   return `${componentNameWithId}_result.${param.id}`;
 };
