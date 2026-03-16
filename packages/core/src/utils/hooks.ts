@@ -184,7 +184,7 @@ export function useBuiltinHandlers(opts: {
       Object.assign(handlers, {
         show: () => setShow(true),
         hide: () => setShow(false),
-        showOrHide: () => setShow((prev) => !prev),
+        showOrHide: () => setShow((prev) => !!prev),
       });
     }
     return handlers;
