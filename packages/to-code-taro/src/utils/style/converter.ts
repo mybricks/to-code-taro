@@ -97,6 +97,17 @@ export const convertRootStyle = (style: Style) => {
       return;
     }
 
+    // widthAuto、heightAuto、widthFull、heightFull
+    if (key === "widthAuto" && value === true) {
+      rootStyle["width"] = "auto";
+    } else if (key === "heightAuto" && value === true) {
+      rootStyle["height"] = "auto";
+    } else if (key === "widthFull" && value === true) {
+      rootStyle["width"] = "100%";
+    } else if (key === "heightFull" && value === true) {
+      rootStyle["height"] = "100%";
+    }
+
     const camelKey = key.includes("-") ? kebabToCamel(key) : key;
     rootStyle[camelKey] = transformStyleValue(camelKey, value);
   });
