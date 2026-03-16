@@ -10,7 +10,7 @@ export interface ComContextStore {
   comRefs: any;
   $vars: any;
   $fxs: any;
-  appContext: any;  
+  appContext: any;
   popupState: {
     visible: boolean;
     name: string;
@@ -21,10 +21,18 @@ export interface ComContextStore {
   todoPool: TodoPool;
 }
 
-export function useAppCreateContext(id: string): ComContextStore {
+export function useAppCreateContext(id: string, parentComRefs?: any, moduleId?: string): ComContextStore {
   const { request, rootConfig } = getCoreRuntime();
   const todoPool = useMemo(() => new TodoPool(), []);
+
   const comRefs = useRef<any>(proxyRefs({ $inputs: {}, $outputs: {} }, undefined, todoPool));
+
+  // 模块场景：把 $inputs 注册到页面 comRefs 上，使页面调用能找到 handler
+  useMemo(() => {
+    if (parentComRefs?.current && moduleId) {
+      parentComRefs.current[moduleId] = comRefs.current.$inputs;
+    }
+  }, []);
   const $vars = useRef<any>({});
   const $fxs = useRef<any>({});
 

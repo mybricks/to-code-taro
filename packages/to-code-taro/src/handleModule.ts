@@ -71,11 +71,7 @@ const handleModule = (module: Module, config: HandleModuleConfig) => {
   currentProvider.controllers.add(module.meta.id);
   const resultStyle = convertComponentStyle(module.props.style);
   const cssContent = convertStyleAryToCss((props.style as any)?.styleAry, module.meta.id);
-  const componentController =
-    config.getComponentController?.({
-      com: module.meta,
-      scene: config.getCurrentScene(),
-    }) || `controller_${module.meta.id}`;
+  const componentController = module.meta.id;
 
   const initialIndent = config.codeStyle!.indent * config.depth;
   const indentView = indentation(initialIndent);
@@ -91,7 +87,8 @@ const handleModule = (module: Module, config: HandleModuleConfig) => {
           indentSize: config.codeStyle!.indent,
         })}}`
       : "") +
-    `\n${indent3}controller={comRefs.current.${componentController}}` +
+    `\n${indent3}parentComRefs={comRefs}` +
+    `\n${indent3}moduleId="${componentController}"` +
     (comEventCode
       ? `\n${indent3}onEvents={{${comEventCode.replace(/\n/g, "\n" + indent3)}}}`
       : "") +
