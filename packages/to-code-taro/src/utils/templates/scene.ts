@@ -8,7 +8,9 @@ export const genReactiveDataManager = (indent: string, utilsPackageName: string)
 /** 生成根组件定义代码 (useAppContext) */
 export const genRootDefineCode = (indent: string, utilsPackageName: string, hasJsModules: boolean = false, isModule: boolean = false) => {
   // 使用 useAppContext 获取 comRefs / $vars / $fxs / appContext
-  let code = `${indent}const {comRefs, $vars, $fxs, appContext} = useAppContext();\n`;
+  let code = isModule
+    ? `${indent}const {comRefs, $vars, $fxs, appContext, moduleOutputs} = useAppContext();\n`
+    : `${indent}const {comRefs, $vars, $fxs, appContext} = useAppContext();\n`;
   if (!isModule) {
     code += `${indent}usePageLife();\n`;
   }
@@ -21,8 +23,7 @@ export const genRootDefineCode = (indent: string, utilsPackageName: string, hasJ
 
 /** 生成普通插槽定义代码 */
 export const genSlotDefineCode = (indent: string) => {
-  // 插槽内部也使用 useAppContext，获取 comRefs / $vars / $fxs / appContext
-  return `${indent}const {comRefs, $vars, $fxs, appContext} = useAppContext();\n`;
+  return `${indent}const { comRefs, $vars, $fxs, appContext, moduleOutputs } = useAppContext();\n`;
 };
 
 /** 生成控制器初始化代码 */

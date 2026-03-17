@@ -216,7 +216,7 @@ export const handleProcess = (
           );
           code +=
             `${indent}/** ${props.title} 变量 ${props.meta.title} */` +
-            `\n${indent}${nextCode}this.$vars.${varKey}.${props.id}(${nextValue}${xpathArg})`;
+            `\n${indent}${nextCode}$vars.current.${varKey}.${props.id}(${nextValue}${xpathArg})`;
         }
       } else if (category === "fx") {
         if (props.meta.global) {
@@ -235,7 +235,7 @@ export const handleProcess = (
           );
           code +=
             `${indent}/** 调用Fx ${props.meta.title} */` +
-            `\n${indent}${nextCode}this.$fxs.${props.meta.ioProxy.id}(${nextValue})`;
+            `\n${indent}${nextCode}$fxs.current.${props.meta.ioProxy.id}(${nextValue})`;
         }
       }
     } else {

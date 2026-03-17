@@ -43,40 +43,31 @@ export class ComRefResolver {
     return this.createShadowProxy(id);
   }
 
-  /**
-   * 注册真实引用
-   */
+  /** 注册真实引用，并向上渗透 */
   set(id: string, ref: any): void {
     this.registry[id] = ref;
-    // 向上渗透到父级
     this.parent?.set(id, ref);
   }
 
-  /**
-   * 删除引用
-   */
+  /** 删除引用 */
   delete(id: string): void {
     delete this.registry[id];
     this.parent?.delete(id);
   }
 
-  /**
-   * 查找真实引用（仅用于父级链查找）
-   */
-  findRealRef(id: string): any | null {
-    const local = this.registry[id];
-    if (local && !local.__isShadow) {
-      return local;
+  /** 在本地查找真实引用（不创建影子） */
+  findRealRef(id: string): any | undefined {
+    if (this.registry[id] && !this.registry[id].__isShadow) {
+      return this.registry[id];
     }
-    return this.parent?.findRealRef(id) ?? null;
+    return this.parent?.findRealRef(id);
   }
 
   /**
-   * 创建影子对象
-   * 关键：影子对象的方法被调用时，会动态查找真实引用
+   * 创建影子代理对象
+   * 调用时动态检查真实引用，未找到则缓冲到 TodoPool
    */
   private createShadowProxy(id: string): any {
-    const resolver = this;
     const registry = this.registry;
     const todoPool = this.todoPool;
     const scopeIndex = this.scopeIndex;
@@ -87,7 +78,6 @@ export class ComRefResolver {
 
         return (...args: any[]) => {
           // 动态检查是否已有真实引用
-          // 注意：这里直接检查 registry[id]，因为真实引用注册时会覆盖它
           const realRef = registry[id];
           if (realRef && !realRef.__isShadow) {
             if (typeof realRef[method] === 'function') {

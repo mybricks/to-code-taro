@@ -11,6 +11,7 @@ export interface ComContextStore {
   $vars: any;
   $fxs: any;
   appContext: any;
+  moduleOutputs: Record<string, Function>;
   popupState: {
     visible: boolean;
     name: string;
@@ -21,7 +22,7 @@ export interface ComContextStore {
   todoPool: TodoPool;
 }
 
-export function useAppCreateContext(id: string, parentComRefs?: any, moduleId?: string): ComContextStore {
+export function useAppCreateContext(id: string, parentComRefs?: any, moduleId?: string, moduleOutputs?: Record<string, Function>): ComContextStore {
   const { request, rootConfig } = getCoreRuntime();
   const todoPool = useMemo(() => new TodoPool(), []);
 
@@ -99,12 +100,15 @@ export function useAppCreateContext(id: string, parentComRefs?: any, moduleId?: 
     useTabBar: false,
   }).current;
 
+  const moduleOutputsRef = useRef<Record<string, Function>>(moduleOutputs || {});
+
   return useMemo(() => ({
     comRefs,
     $vars,
     $fxs,
     todoPool,
     appContext,
+    moduleOutputs: moduleOutputsRef.current,
     popupState,
     setPopupState
   }), [popupState]);

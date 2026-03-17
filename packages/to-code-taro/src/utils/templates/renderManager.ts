@@ -35,7 +35,7 @@ export class RenderManager {
         code += `${indent}/** ${description} */\n`;
       }
       code += `${indent}function ${renderFunctionName}(params: any) {\n`;
-      code += `${indent}${indent2}const { comRefs, $vars, $fxs, appContext } = useAppContext();\n`;
+      code += `${indent}${indent2}const { comRefs, $vars, $fxs, appContext, moduleOutputs } = useAppContext();\n`;
       if (logicCode?.includes('$outputs')) {
         code += `${indent}${indent2}const $outputs = comRefs.current.$outputs;\n`;
       }

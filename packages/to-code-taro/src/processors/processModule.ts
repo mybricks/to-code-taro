@@ -120,9 +120,20 @@ export const processModule = (params: ProcessModuleParams): void => {
       const { com, pinId, args } = params;
       // 优先通过 sceneId 查找，如果找不到再通过 id 查找
       const targetScene = getSceneById(com.sceneId || com.id);
-      
+
       if (targetScene || com.isScene) {
         const sceneId = targetScene?.id || com.sceneId || com.id;
+
+        // 当前模块自身的 output → 通过 moduleOutputs 回调
+        if (sceneId === scene.id) {
+          const isOutput = targetScene?.outputs?.some((pin: any) => pin.id === pinId);
+          if (isOutput) {
+            return {
+              code: `moduleOutputs?.${pinId}?.(${args || ''})`,
+            };
+          }
+        }
+
         const isTargetPopup = targetScene?.type === 'popup' || targetScene?.deps?.some((dep: any) => dep.namespace === 'mybricks.taro.popup');
         const routerName = isTargetPopup ? "popupRouter" : "pageRouter";
 

@@ -106,7 +106,9 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
   const handlersRef = useRef<Record<string, any>>({ ...initialHandlers });
   const { todoPool } = useAppContext();
   const parentSlot = useParentSlot();
-  const index = parentSlot?.params?.inputValues?.index ?? 0;
+  // 优先从 scope（comRefs）获取 $index，与 proxyRefs 的 scopeIndex 保持一致
+  // 避免条件容器 slot 继承了循环列表的 index 导致 push/pop 不匹配
+  const index = scope?.current?.$index ?? parentSlot?.params?.inputValues?.index ?? 0;
 
   useEffect(() => {
     return () => {
@@ -148,7 +150,9 @@ export function useBindInputs(scope: any, id: string, initialHandlers?: Record<s
       }
     });
 
-    if (scope?.current) scope.current[id] = proxy;
+    if (scope?.current) {
+      scope.current[id] = proxy;
+    }
     if (initialHandlers) {
       Object.keys(initialHandlers).forEach(pin => (proxy as any)[pin](initialHandlers[pin]));
     }
