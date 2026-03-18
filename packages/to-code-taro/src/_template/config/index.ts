@@ -63,20 +63,6 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         chain.resolve.modules
           .add(path.resolve(__dirname, '../node_modules'))
           .add('node_modules')
-        chain.merge({
-          optimization: {
-            splitChunks: {
-              cacheGroups: {
-                'antv-f2': {
-                  name: 'antv-f2',
-                  test: /[\\/]node_modules[\\/]@antv[\\/]f2[\\/]/,
-                  minChunks: 1,
-                  priority: 100,
-                },
-              },
-            },
-          },
-        })
       },
     },
     h5: {
