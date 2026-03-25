@@ -12,6 +12,9 @@ export interface HandleProcessConfig extends BaseConfig {
   target?: string;
 }
 
+/** JS API 组件中用于动态配置接口的 input pin id */
+const DYNAMIC_CONFIG_PIN_ID = "dynamicConfig";
+
 /**
  * 判断是否是 JS 计算组件
  */
@@ -57,6 +60,20 @@ export const handleProcess = (
     });
   }
 
+  // outputToInputPinMap 被 nodesDeclaration 和 nodesInvocation 两个阶段共享，需提前初始化
+  const outputToInputPinMap = new Map<string, string>();
+  // 以下两个仅在 nodesInvocation 阶段使用
+  const declaredVarCount = new Map<string, number>();
+  const invokedNodeSet = new Set<string>();
+
+  // 预构建 dynamicConfig 调用映射（componentId → invocation），避免 nodesDeclaration 中重复 find()
+  const dynamicConfigInvocationMap = new Map<string, any>();
+  process.nodesInvocation.forEach((inv: any) => {
+    if (inv.id === DYNAMIC_CONFIG_PIN_ID) {
+      dynamicConfigInvocationMap.set(inv.meta.id, inv);
+    }
+  });
+
   // 处理节点声明
   process.nodesDeclaration.forEach(({ meta, props }: any) => {
     if (meta.def.namespace.startsWith("mybricks.taro.module")) {
@@ -84,6 +101,12 @@ export const handleProcess = (
     }
 
     if (isJsApi) {
+      // 检查是否有 dynamicConfig 调用，若有则把对应的 FX 参数值注入到 data.dynamicConfig
+      const configInvocation = dynamicConfigInvocationMap.get(meta.id);
+      let configInjection: string | undefined;
+      if (configInvocation) {
+        configInjection = getNextValue(configInvocation, config, event, outputToInputPinMap);
+      }
       code += generateJsApiComponentCode({
         meta,
         props,
@@ -94,6 +117,7 @@ export const handleProcess = (
         event,
         indent,
         indent2,
+        configInjection,
       });
       return;
     }
@@ -137,19 +161,25 @@ export const handleProcess = (
       `\n${indent}}, appContext)\n`;
   });
 
-  // 处理节点调用
-  // 边遍历边构建映射：确保引用时只能看到已声明的变量
-  const outputToInputPinMap = new Map<string, string>();
-  // 跟踪已声明的变量名，用于去重（同一组件+pin 多次调用时追加后缀）
-  const declaredVarCount = new Map<string, number>();
-
   process.nodesInvocation.forEach((props: any) => {
     const { componentType, category, runType } = props;
+
+    // dynamicConfig 已注入到 createJSHandle 的 data 中，不需要生成运行时调用
+    if (props.id === DYNAMIC_CONFIG_PIN_ID) {
+      return;
+    }
+
+    // 去重：同一组件的同一 input pin 只生成一次调用代码
+    const invokeKey = `${props.meta.id}_${props.id}`;
+    if (invokedNodeSet.has(invokeKey)) {
+      return;
+    }
+    invokedNodeSet.add(invokeKey);
+
     const nextValue = getNextValue(props, config, event, outputToInputPinMap);
     const isSameScope = checkIsSameScope(event, props);
     const { code: nextCode, varName: declaredVarName } = getNextCode(props, config, isSameScope, event, declaredVarCount);
 
-    // 声明后记录映射，供后续引用（存储完整变量名，支持去重后缀）
     props.nextParam?.forEach((np: any) => {
       outputToInputPinMap.set(`${props.meta.id}_${np.id}`, declaredVarName);
     });
@@ -270,13 +300,27 @@ export const handleProcess = (
         if (!outputs) {
           return pre + `${indent2}${id}: undefined,\n`;
         } else {
-          const next = outputs
-            .map((output: any) => {
-              return getNextValueWithParam(output, config, event, outputToInputPinMap);
-            })
-            .join(", ");
+          const uniqueOutputs = outputs.filter(
+            (output: any, index: number, arr: any[]) =>
+              arr.findIndex(
+                (o: any) => o.type === output.type && o.id === output.id && o.meta?.id === output.meta?.id
+              ) === index
+          );
 
-          return pre + `${indent2}${id}: ${next},\n`;
+          if (uniqueOutputs.length === 1) {
+            const next = getNextValueWithParam(uniqueOutputs[0], config, event, outputToInputPinMap);
+            return pre + `${indent2}${id}: ${next},\n`;
+          } else {
+            config.addParentDependencyImport({
+              packageName: "@mybricks/taro-core",
+              dependencyNames: ["merge"],
+              importType: "named",
+            });
+            const parts = uniqueOutputs.map((output: any) =>
+              getNextValueWithParam(output, config, event, outputToInputPinMap)
+            );
+            return pre + `${indent2}${id}: merge(${parts.join(", ")}),\n`;
+          }
         }
       },
       "",
@@ -572,6 +616,7 @@ const generateJsApiComponentCode = (params: {
   event: any;
   indent: string;
   indent2: string;
+  configInjection?: string;
 }): string => {
   const {
     meta,
@@ -583,6 +628,7 @@ const generateJsApiComponentCode = (params: {
     event,
     indent,
     indent2,
+    configInjection,
   } = params;
 
   // 导入 createJSHandle
@@ -613,17 +659,27 @@ const generateJsApiComponentCode = (params: {
     importType: "named",
   });
 
+  // 生成 data 字段：如果有 configInjection，追加 dynamicConfig 字段
+  let dataCode = "";
+  if (props.data) {
+    const staticDataCode = genObjectCode(props.data, {
+      initialIndent: config.codeStyle!.indent * (config.depth + 2),
+      indentSize: config.codeStyle!.indent,
+    });
+    if (configInjection) {
+      // 展开静态 data 并注入 dynamicConfig
+      dataCode = `\n${indent2}  data: { ...${staticDataCode}, dynamicConfig: ${configInjection} },`;
+    } else {
+      dataCode = `\n${indent2}  data: ${staticDataCode},`;
+    }
+  }
+
   return (
     `${indent}/** ${meta.title} */` +
     `\n${indent}const ${componentNameWithId} = createJSHandle(${callName || componentName}, {` +
     `\n${indent2}props: {` +
     (config.verbose ? `\n${indent2}  title: "${meta.title}",` : "") +
-    (props.data
-      ? `\n${indent2}  data: ${genObjectCode(props.data, {
-          initialIndent: config.codeStyle!.indent * (config.depth + 2),
-          indentSize: config.codeStyle!.indent,
-        })},`
-      : "") +
+    dataCode +
     (props.inputs
       ? `\n${indent2}  inputs: [${props.inputs.map((input: string) => `"${input}"`).join(", ")}],`
       : "") +
